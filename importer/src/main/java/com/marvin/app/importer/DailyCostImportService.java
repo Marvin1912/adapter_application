@@ -21,7 +21,7 @@ public class DailyCostImportService implements ImportService<DailyCostDTO> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DailyCostImportService.class);
 
-    private static final Pattern PATTERN = Pattern.compile("(?i).*\\b(edeka|rewe|budni|lidl)\\b.*");
+    private static final Pattern PATTERN = Pattern.compile("(?i).*\\b(edeka|rewe|budni|lidl|lamehr)\\b.*");
 
     private final DailyCostRepository dailyCostRepository;
     private final DailyCostImport dailyCostImport;
