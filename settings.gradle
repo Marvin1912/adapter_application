@@ -9,4 +9,6 @@ include 'database'
 include 'consul'
 include 'exporter'
 include 'uploader'
+include 'plants'
+include 'image-server'
 
