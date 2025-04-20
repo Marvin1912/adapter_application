@@ -9,6 +9,7 @@ dependencies {
     implementation project(':database')
     implementation project(':exporter')
     implementation project(':uploader')
+    implementation project(':plants')
 }
 
 bootJar {
