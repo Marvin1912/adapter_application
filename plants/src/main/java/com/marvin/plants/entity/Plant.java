@@ -37,6 +37,10 @@ public class Plant {
     @Column(name = "description", nullable = false)
     private String description;
 
+    @Column(name = "care_instructions", nullable = false)
+    private String careInstructions;
+
+    @Column(name = "location", nullable = false)
     @Enumerated(EnumType.STRING)
     private PlantLocation location;
 

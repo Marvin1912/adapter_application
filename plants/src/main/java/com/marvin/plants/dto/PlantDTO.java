@@ -7,6 +7,7 @@ public record PlantDTO(
         String name,
         String species,
         String description,
+        String careInstructions,
         PlantLocation location,
         Integer wateringFrequency,
         LocalDateTime lastWateredDate,
