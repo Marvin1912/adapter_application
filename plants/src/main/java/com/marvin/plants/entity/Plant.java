@@ -37,7 +37,7 @@ public class Plant {
     @Column(name = "description", nullable = false)
     private String description;
 
-    @Column(name = "care_instructions", nullable = false)
+    @Column(name = "care_instructions")
     private String careInstructions;
 
     @Column(name = "location", nullable = false)
