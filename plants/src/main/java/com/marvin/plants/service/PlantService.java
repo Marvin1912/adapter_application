@@ -52,10 +52,14 @@ public class PlantService {
         plantRepository.deleteById(id);
     }
 
+    // TODO: Make the watering logic cleaner (the method call does not use the return value f.e.)
     @Transactional
     public void updatePlant(PlantDTO dto) {
         plantRepository.findById(dto.id()).ifPresentOrElse(
-                plant -> plantMapper.toPlant(plant, dto),
+                plant -> {
+                    plantMapper.toPlant(plant, dto);
+                    wateredPlant(dto.id(), dto.lastWateredDate());
+                },
                 () -> {
                     throw new IllegalArgumentException("Plant with id %s not found".formatted(dto.id()));
                 }

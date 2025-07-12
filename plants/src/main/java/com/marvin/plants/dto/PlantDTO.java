@@ -1,6 +1,6 @@
 package com.marvin.plants.dto;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 public record PlantDTO(
         long id,
@@ -10,8 +10,8 @@ public record PlantDTO(
         String careInstructions,
         PlantLocation location,
         Integer wateringFrequency,
-        LocalDateTime lastWateredDate,
-        LocalDateTime nextWateredDate,
+        LocalDate lastWateredDate,
+        LocalDate nextWateredDate,
         String image
 ) {
 }
