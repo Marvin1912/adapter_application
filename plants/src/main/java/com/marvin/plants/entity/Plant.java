@@ -12,6 +12,7 @@ import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.envers.Audited;
 
 import java.time.LocalDate;
 import java.util.Objects;
@@ -20,6 +21,7 @@ import java.util.Objects;
 @Setter
 @Entity
 @Table(name = "plant", schema = "plants")
+@Audited
 public class Plant {
 
     @Id

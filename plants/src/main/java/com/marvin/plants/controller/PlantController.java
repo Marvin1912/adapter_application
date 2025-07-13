@@ -118,7 +118,7 @@ public class PlantController {
         return Mono.just(id)
                 .flatMap(aLong ->
                         Mono.fromCallable(
-                                () -> plantService.wateredPlant(id, lastWatered)
+                                () -> plantService.waterPlant(id, lastWatered)
                         ).subscribeOn(Schedulers.boundedElastic())
                 )
                 .map(ResponseEntity::ok);

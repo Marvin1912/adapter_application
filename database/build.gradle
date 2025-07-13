@@ -4,5 +4,6 @@ version = '0.0.1-SNAPSHOT'
 dependencies {
     api project(':entities')
     api 'org.flywaydb:flyway-core'
+    api 'org.hibernate.orm:hibernate-envers'
     implementation 'org.postgresql:postgresql:42.7.2'
 }
