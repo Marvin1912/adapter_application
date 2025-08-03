@@ -19,9 +19,9 @@ import java.util.regex.Pattern;
 @Component
 public class DailyCostImportService implements ImportService<DailyCostDTO> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DailyCostImportService.class);
+    public static final Pattern PATTERN = Pattern.compile("(?i).*\\b(edeka|rewe|budni|lidl|lamehr)\\b.*");
 
-    private static final Pattern PATTERN = Pattern.compile("(?i).*\\b(edeka|rewe|budni|lidl|lamehr)\\b.*");
+    private static final Logger LOGGER = LoggerFactory.getLogger(DailyCostImportService.class);
 
     private final DailyCostRepository dailyCostRepository;
     private final DailyCostImport dailyCostImport;
