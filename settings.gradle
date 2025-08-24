@@ -11,4 +11,5 @@ include 'exporter'
 include 'uploader'
 include 'plants'
 include 'image-server'
+include 'vocabulary'
 

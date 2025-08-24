@@ -11,6 +11,7 @@ dependencies {
     implementation project(':uploader')
     implementation project(':plants')
     implementation project(':image-server')
+    implementation project(':vocabulary')
 }
 
 bootJar {

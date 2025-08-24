@@ -1,0 +1,49 @@
+plugins {
+    id "org.openapi.generator" version "7.16.0"
+}
+
+group = 'com.marvin.vocabulary'
+version = '0.0.1-SNAPSHOT'
+
+dependencies {
+    implementation project(':common')
+    implementation project(':database')
+    implementation 'jakarta.validation:jakarta.validation-api'
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-csv'
+    implementation 'org.hibernate.validator:hibernate-validator'
+
+    implementation 'io.swagger.core.v3:swagger-annotations:2.2.38'
+    implementation("org.openapitools:jackson-databind-nullable:0.2.7")
+}
+
+openApiGenerate {
+    generatorName.set('java')
+    library.set('webclient')
+    inputSpecRootDirectory.set("${layout.projectDirectory.asFile.path}/src/main/resources/specs")
+    outputDir.set("${layout.buildDirectory.asFile.get().path}/generated/openapi")
+    apiPackage.set("com.generated.deepl.api")
+    modelPackage.set("com.generated.deepl.model")
+    generateApiTests.set(false)
+
+    configOptions = [
+            useJakartaEe           : 'true',
+            serializationLibrary   : 'jackson',
+            dateLibrary            : 'java8',
+            generateClientAsBean   : 'true',
+            hideGenerationTimestamp: 'true',
+            generateApiTests       : 'false',
+            skipFormModel          : 'false'
+    ]
+
+    globalProperties = [
+            skipFormModel: "false"
+    ]
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir("${layout.buildDirectory.asFile.get().path}/generated/openapi/src/main/java")
+        }
+    }
+}

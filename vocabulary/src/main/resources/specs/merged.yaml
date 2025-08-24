@@ -1,0 +1,48 @@
+---
+servers:
+- url: "https://api.deepl.com"
+- url: "https://api-free.deepl.com"
+openapi: "3.0.3"
+paths:
+  /v2/languages:
+    $ref: "./deepl.yaml#/paths/~1v2~1languages"
+  /v2/admin/developer-keys/deactivate:
+    $ref: "./deepl.yaml#/paths/~1v2~1admin~1developer-keys~1deactivate"
+  /v2/glossaries/{glossary_id}:
+    $ref: "./deepl.yaml#/paths/~1v2~1glossaries~1{glossary_id}"
+  /v2/admin/developer-keys:
+    $ref: "./deepl.yaml#/paths/~1v2~1admin~1developer-keys"
+  /v2/admin/developer-keys/label:
+    $ref: "./deepl.yaml#/paths/~1v2~1admin~1developer-keys~1label"
+  /v2/glossary-language-pairs:
+    $ref: "./deepl.yaml#/paths/~1v2~1glossary-language-pairs"
+  /v3/glossaries/{glossary_id}:
+    $ref: "./deepl.yaml#/paths/~1v3~1glossaries~1{glossary_id}"
+  /v2/admin/developer-keys/limits:
+    $ref: "./deepl.yaml#/paths/~1v2~1admin~1developer-keys~1limits"
+  /v2/glossaries:
+    $ref: "./deepl.yaml#/paths/~1v2~1glossaries"
+  /v2/usage:
+    $ref: "./deepl.yaml#/paths/~1v2~1usage"
+  /v2/translate:
+    $ref: "./deepl.yaml#/paths/~1v2~1translate"
+  /v2/document:
+    $ref: "./deepl.yaml#/paths/~1v2~1document"
+  /v2/document/{document_id}/result:
+    $ref: "./deepl.yaml#/paths/~1v2~1document~1{document_id}~1result"
+  /v2/document/{document_id}:
+    $ref: "./deepl.yaml#/paths/~1v2~1document~1{document_id}"
+  /v3/glossaries/{glossary_id}/entries:
+    $ref: "./deepl.yaml#/paths/~1v3~1glossaries~1{glossary_id}~1entries"
+  /v2/write/rephrase:
+    $ref: "./deepl.yaml#/paths/~1v2~1write~1rephrase"
+  /v3/glossaries:
+    $ref: "./deepl.yaml#/paths/~1v3~1glossaries"
+  /v2/glossaries/{glossary_id}/entries:
+    $ref: "./deepl.yaml#/paths/~1v2~1glossaries~1{glossary_id}~1entries"
+  /v3/glossaries/{glossary_id}/dictionaries:
+    $ref: "./deepl.yaml#/paths/~1v3~1glossaries~1{glossary_id}~1dictionaries"
+info:
+  title: "merged spec"
+  description: "merged spec"
+  version: "1.0.0"
