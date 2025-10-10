@@ -27,10 +27,6 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
-tasks.named('build') {
-    dependsOn 'openApiGenerate'
-}
-
 openApiGenerate {
     generatorName.set('java')
     library.set('webclient')

@@ -36,3 +36,5 @@ app/**
 *.bkp
 
 app/google/credentials.json
+
+!gradle/wrapper/gradle-wrapper.jar
