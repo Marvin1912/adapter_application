@@ -1,6 +1,5 @@
 package com.marvin.vocabulary.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marvin.vocabulary.dictionaryapi.DictionaryClient;
 import com.marvin.vocabulary.dto.DictionaryEntry;
 import com.marvin.vocabulary.dto.Flashcard;
@@ -20,19 +19,14 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.test.StepVerifier;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class FlashcardControllerTest {
@@ -47,7 +41,6 @@ class FlashcardControllerTest {
     private FlashcardController flashcardController;
 
     private WebTestClient webTestClient;
-    private ObjectMapper objectMapper;
 
     private FlashcardEntity testFlashcardEntity;
     private Flashcard testFlashcard;
@@ -55,7 +48,6 @@ class FlashcardControllerTest {
     @BeforeEach
     void setUp() {
         webTestClient = WebTestClient.bindToController(flashcardController).build();
-        objectMapper = new ObjectMapper();
 
         testFlashcardEntity = new FlashcardEntity(
                 1,
