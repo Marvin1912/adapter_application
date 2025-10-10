@@ -190,7 +190,7 @@ class FlashcardControllerTest {
     }
 
     @Test
-    void getFile_WhenExceptionThrown_ShouldReturnInternalServerError() {
+    void getFile_WhenExceptionThrown_ShouldReturnInternalServerError() throws Exception {
         when(flashcardService.getFile()).thenThrow(new RuntimeException("File generation failed"));
 
         webTestClient.get()
@@ -332,13 +332,13 @@ class FlashcardControllerTest {
             }
 
             @Override
-            public headers() {
+            public org.springframework.http.HttpHeaders headers() {
                 return org.springframework.http.HttpHeaders.EMPTY;
             }
 
             @Override
-            public void delete() {
-                // No-op for test
+            public reactor.core.publisher.Mono<Void> transferTo(java.nio.file.Path dest) {
+                return reactor.core.publisher.Mono.empty();
             }
         };
     }

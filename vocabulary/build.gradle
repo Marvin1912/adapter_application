@@ -58,3 +58,8 @@ sourceSets {
         }
     }
 }
+
+// Make sure OpenAPI generation runs before compilation
+tasks.named('compileJava') {
+    dependsOn 'openApiGenerate'
+}

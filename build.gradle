@@ -1,10 +1,10 @@
 plugins {
 	id 'java'
 	id 'java-library'
-	id 'org.springframework.boot' version '3.5.6'
-	id 'io.spring.dependency-management' version '1.1.7'
+	id 'org.springframework.boot' version '3.5.6' apply false
+	id 'io.spring.dependency-management' version '1.1.7' apply false
 	id 'com.bmuschko.docker-remote-api' version '9.3.2'
-	id("io.freefair.lombok") version "8.13.1"
+	id("io.freefair.lombok") version "8.13.1" apply false
 }
 
 import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
@@ -21,9 +21,14 @@ repositories {
 subprojects {
 	apply plugin: 'java'
 	apply plugin: 'java-library'
-	apply plugin: 'org.springframework.boot'
 	apply plugin: 'io.spring.dependency-management'
 	apply plugin: 'io.freefair.lombok'
+
+	dependencyManagement {
+		imports {
+			mavenBom org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES
+		}
+	}
 
 	repositories {
 		mavenCentral()
@@ -37,14 +42,38 @@ subprojects {
 		options.encoding = 'UTF-8'
 	}
 
+	// Only apply Spring Boot plugin to importer module
+	if (name == 'importer') {
+		apply plugin: 'org.springframework.boot'
+		bootJar {
+			mainClass = 'com.marvin.Application'
+		}
+	} else {
+		// Disable bootJar task for non-Spring Boot modules if it exists
+		tasks.matching { it.name == 'bootJar' }.all {
+			it.enabled = false
+		}
+	}
+
 	dependencies {
 
 		if (name != 'common') {
 			implementation project(':common')
 		}
 
-		implementation 'org.springframework.boot:spring-boot-starter-webflux'
-		implementation 'org.springframework.boot:spring-boot-starter-security'
+		// Only Spring Boot dependencies for modules that need them
+		if (name in ['importer', 'camt', 'database', 'consul', 'plants', 'image-server', 'vocabulary']) {
+			implementation 'org.springframework.boot:spring-boot-starter-webflux'
+			implementation 'org.springframework.boot:spring-boot-starter-security'
+		}
+
+		// Common dependencies for modules that need Jackson/Spring annotations
+		if (name in ['common', 'importer', 'camt', 'database', 'consul', 'plants', 'image-server', 'vocabulary', 'influxdb', 'uploader']) {
+			implementation 'org.springframework.boot:spring-boot-starter'
+			implementation 'com.fasterxml.jackson.core:jackson-databind'
+			implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+			implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8'
+		}
 
 		implementation 'org.apache.commons:commons-lang3'
 
