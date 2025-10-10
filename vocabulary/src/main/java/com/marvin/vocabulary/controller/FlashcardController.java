@@ -95,9 +95,11 @@ public class FlashcardController {
     @GetMapping("/flashcards/{id}")
     public Mono<ResponseEntity<Flashcard>> getFlashcard(@PathVariable int id) {
         final FlashcardEntity flashcardEntity = flashcardService.get(id);
-        return flashcardEntity == null ? Mono.empty() : Mono.just(flashcardEntity)
-                .map(e -> new Flashcard(e.getId(), e.getDeck(), e.getAnkiId(), e.getFront(), e.getBack(), e.getDescription(), e.isUpdated()))
-                .map(ResponseEntity::ok);
+        return flashcardEntity == null
+                ? Mono.just(ResponseEntity.notFound().build())
+                : Mono.just(flashcardEntity)
+                        .map(e -> new Flashcard(e.getId(), e.getDeck(), e.getAnkiId(), e.getFront(), e.getBack(), e.getDescription(), e.isUpdated()))
+                        .map(ResponseEntity::ok);
     }
 
     @GetMapping("/flashcards")
