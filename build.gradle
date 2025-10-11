@@ -1,105 +1,191 @@
+// PLUGIN DECLARATION
+// This section defines the plugins that will be applied to the project
 plugins {
+	// Java plugin - provides basic Java compilation capabilities (javac, java, jar tasks)
 	id 'java'
+	// Java Library plugin - extends Java plugin with support for API/implementation separation
+	// Allows declaring dependencies that are exposed to consumers vs internal implementation details
 	id 'java-library'
+	// Spring Boot plugin - enables building Spring Boot applications
+	// apply false means it won't be applied to the root project, but available to subprojects
 	id 'org.springframework.boot' version '3.5.6' apply false
+	// Spring Dependency Management plugin - manages dependency versions consistently
+	// Uses Bill of Materials (BOM) to align dependency versions automatically
 	id 'io.spring.dependency-management' version '1.1.7' apply false
+	// Docker Remote API plugin - enables building and pushing Docker images through Gradle
 	id 'com.bmuschko.docker-remote-api' version '9.3.2'
+	// Lombok plugin - enables annotation processing for Project Lombok
+	// Reduces boilerplate code by generating getters, setters, constructors, etc. at compile time
 	id("io.freefair.lombok") version "8.13.1" apply false
 }
 
+// IMPORT STATEMENTS
+// Import specific Docker task classes from the Docker plugin
 import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
 import com.bmuschko.gradle.docker.tasks.image.DockerPushImage
 
+// PROJECT PROPERTIES (ext block)
+// Defines extra properties that can be accessed throughout the build script
 ext {
+	// Defines the registry URL where Docker images will be pushed/pulled
+	// Uses a project property called 'registry_local' that should be defined in gradle.properties
 	registry = project.registry_local
 }
 
+// ROOT PROJECT REPOSITORIES
+// Defines where to download dependencies from for the root project
 repositories {
+	// Maven Central Repository - the default repository for Java libraries and dependencies
 	mavenCentral()
 }
 
+// SUBPROJECTS CONFIGURATION
+// This block defines configuration that applies to all submodules in the project
 subprojects {
+	// Apply plugins to each subproject
 	apply plugin: 'java'
 	apply plugin: 'java-library'
+	// Apply Spring dependency management to align versions across all modules
 	apply plugin: 'io.spring.dependency-management'
+	// Apply Lombok for annotation processing in all modules
 	apply plugin: 'io.freefair.lombok'
 
+	// DEPENDENCY MANAGEMENT
+	// Configures how dependencies are managed across all subprojects
 	dependencyManagement {
 		imports {
+			// Import Spring Boot Bill of Materials to align all Spring-related dependency versions
+			// This ensures compatibility between Spring Boot, Spring WebFlux, Spring Security, etc.
 			mavenBom org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES
 		}
 	}
 
+	// SUBPROJECT REPOSITORIES
+	// Each subproject will also use Maven Central for dependency resolution
 	repositories {
 		mavenCentral()
 	}
 
+	// JAVA COMPILATION CONFIGURATION
+	// Configure Java version and compilation settings for all subprojects
 	java {
+		// Set Java source compatibility to Java 17
+		// This ensures code is compiled for Java 17 JVM and allows using Java 17 features
 		sourceCompatibility = '17'
 	}
 
+	// MAIN SOURCE COMPILATION SETTINGS
+	// Configure compilation of the main source code
 	compileJava {
+		// Add '-parameters' compiler flag to preserve parameter names in compiled bytecode
+		// This enables Spring to use parameter names for dependency injection instead of annotations
 		options.compilerArgs += '-parameters'
 	}
 
+	// TEST SOURCE COMPILATION SETTINGS
+	// Configure compilation of the test source code
 	compileTestJava {
+		// Also preserve parameter names for test compilation
 		options.compilerArgs += '-parameters'
 	}
 
+	// ENCODING CONFIGURATION
+	// Ensure all Java compilation tasks use UTF-8 encoding
 	tasks.withType(JavaCompile).configureEach {
+		// Set source file encoding to UTF-8 to handle special characters correctly
 		options.encoding = 'UTF-8'
 	}
 
-	// Only apply Spring Boot plugin to importer module
+	// CONDITIONAL SPRING BOOT PLUGIN APPLICATION
+	// Only apply Spring Boot plugin to the 'importer' module (the main application)
 	if (name == 'importer') {
+		// Apply Spring Boot plugin to create executable JAR with embedded server
 		apply plugin: 'org.springframework.boot'
+		// Configure the Spring Boot JAR task
 		bootJar {
+			// Specify the main class that should be executed when running the application
 			mainClass = 'com.marvin.Application'
 		}
 	} else {
-		// Disable bootJar task for non-Spring Boot modules if it exists
+		// For all other modules, disable the Spring Boot JAR task if it exists
+		// This prevents creating executable JARs for library modules
 		tasks.matching { it.name == 'bootJar' }.all {
 			it.enabled = false
 		}
 	}
 
+	// DEPENDENCIES CONFIGURATION
+	// Define which dependencies each module should include based on its name/role
 	dependencies {
 
+		// INTER-MODULE DEPENDENCIES
+		// All modules except 'common' depend on the common module
 		if (name != 'common') {
+			// Add the common project as a dependency
+			// The 'common' module likely contains shared utilities, models, and interfaces
 			implementation project(':common')
 		}
 
-		// Only Spring Boot dependencies for modules that need them
+		// SPRING WEBFLUX & SECURITY DEPENDENCIES
+		// Only include these for modules that need web capabilities and security
 		if (name in ['importer', 'camt', 'database', 'consul', 'plants', 'image-server', 'vocabulary']) {
+			// Spring Boot WebFlux starter - provides reactive web server and REST capabilities
 			implementation 'org.springframework.boot:spring-boot-starter-webflux'
+			// Spring Boot Security starter - provides authentication and authorization features
 			implementation 'org.springframework.boot:spring-boot-starter-security'
 		}
 
-		// Common dependencies for modules that need Jackson/Spring annotations
+		// CORE SPRING & JACKSON DEPENDENCIES
+		// Include for modules that need Spring core functionality and JSON processing
 		if (name in ['common', 'importer', 'camt', 'database', 'consul', 'plants', 'image-server', 'vocabulary', 'influxdb', 'uploader']) {
+			// Spring Boot starter - provides core Spring Framework functionality
 			implementation 'org.springframework.boot:spring-boot-starter'
+			// Jackson Databind - provides JSON serialization/deserialization capabilities
 			implementation 'com.fasterxml.jackson.core:jackson-databind'
+			// Jackson JSR310 module - support for Java 8 Date/Time API (LocalDate, LocalDateTime, etc.)
 			implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+			// Jackson JDK8 module - additional support for Java 8 features
 			implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8'
 		}
 
+		// APACHE COMMONS LANG3
+		// Provides utility methods for common Java operations (string manipulation, etc.)
 		implementation 'org.apache.commons:commons-lang3'
 
+		// MAPSTRUCT DEPENDENCIES
+		// Code generation tool for type-safe bean-to-bean mappings
 		implementation 'org.mapstruct:mapstruct:1.6.3'
+		// Annotation processor that generates mapping implementations at compile time
 		annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
 	}
 }
 
+// ROOT PROJECT TASKS
+// These tasks are defined at the root project level, not in subprojects
+
+// DOCKER IMAGE BUILD TASK
+// Register a custom task to build the Docker image for the application
 tasks.register('buildAdapterDockerImage', DockerBuildImage) {
+	// Make this task depend on building the Spring Boot JAR first
 	dependsOn ':importer:bootJar'
 
+	// Set the build context directory to the project root directory
+	// All files referenced in the Dockerfile will be relative to this directory
 	inputDir = file("$project.rootDir")
+	// Specify the location of the Dockerfile
 	dockerFile = file("$project.rootDir/Dockerfile")
+	// Define the image name and tag for the built image
+	// Uses the registry property defined earlier and tags as 'latest'
 	images = ([registry + '/applications:latest'])
 }
 
+// DOCKER IMAGE PUSH TASK
+// Register a custom task to push the built Docker image to the registry
 tasks.register('pushAdapterDockerImage', DockerPushImage) {
+	// Make this task depend on building the image first
 	dependsOn buildAdapterDockerImage
 
+	// Define the image name that should be pushed to the registry
+	// Uses a HashSet to ensure unique image names
 	images = new HashSet(["$registry/applications:latest"])
 }
