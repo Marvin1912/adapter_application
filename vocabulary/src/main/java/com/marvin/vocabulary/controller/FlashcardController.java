@@ -9,6 +9,7 @@ import com.marvin.vocabulary.dictionaryapi.DictionaryClient;
 import com.marvin.vocabulary.dto.DictionaryEntry;
 import com.marvin.vocabulary.dto.Flashcard;
 import com.marvin.vocabulary.dto.Translation;
+import com.marvin.vocabulary.exceptions.*;
 import com.marvin.vocabulary.model.FlashcardEntity;
 import com.marvin.vocabulary.service.FlashcardService;
 import lombok.extern.slf4j.Slf4j;
@@ -245,6 +246,64 @@ public class FlashcardController {
     @ExceptionHandler
     public ResponseEntity<Map<String, String>> handleWebClientResponseException(WebClientResponseException exception) {
         return createErrorResponse(exception, exception.getResponseBodyAsString());
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<Map<String, String>> handleWordNotFoundException(WordNotFoundException ex) {
+        log.warn("Word not found: {}", ex.getWord());
+        return ResponseEntity.status(404).body(
+                Map.of(
+                        "type", "WORD_NOT_FOUND",
+                        "message", ex.getMessage(),
+                        "word", ex.getWord()
+                )
+        );
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<Map<String, String>> handleInvalidWordException(InvalidWordException ex) {
+        log.warn("Invalid word provided: {}", ex.getWord());
+        return ResponseEntity.badRequest().body(
+                Map.of(
+                        "type", "INVALID_WORD",
+                        "message", ex.getMessage(),
+                        "word", ex.getWord()
+                )
+        );
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<Map<String, String>> handleRateLimitExceededException(RateLimitExceededException ex) {
+        log.warn("Rate limit exceeded");
+        return ResponseEntity.status(429).body(
+                Map.of(
+                        "type", "RATE_LIMIT_EXCEEDED",
+                        "message", ex.getMessage()
+                )
+        );
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<Map<String, String>> handleDictionaryServiceUnavailableException(DictionaryServiceUnavailableException ex) {
+        log.error("Dictionary service unavailable");
+        return ResponseEntity.status(503).body(
+                Map.of(
+                        "type", "SERVICE_UNAVAILABLE",
+                        "message", ex.getMessage()
+                )
+        );
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<Map<String, String>> handleDictionaryApiException(DictionaryApiException ex) {
+        log.error("Dictionary API error: {}", ex.getMessage());
+        return ResponseEntity.status(ex.getStatusCode()).body(
+                Map.of(
+                        "type", ex.getErrorType(),
+                        "message", ex.getMessage(),
+                        "statusCode", String.valueOf(ex.getStatusCode())
+                )
+        );
     }
 
     /**
