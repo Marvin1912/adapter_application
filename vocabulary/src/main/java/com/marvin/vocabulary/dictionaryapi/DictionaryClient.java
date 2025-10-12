@@ -6,7 +6,6 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -71,23 +70,6 @@ public class DictionaryClient {
                     ))
                 )
                 .bodyToMono(DICT_REFERENCE)
-                .onErrorMap(WebClientResponseException.class, ex -> {
-                    if (ex.getStatusCode() == HttpStatus.NOT_FOUND) {
-                        return new WordNotFoundException(word);
-                    } else if (ex.getStatusCode() == HttpStatus.TOO_MANY_REQUESTS) {
-                        return new RateLimitExceededException();
-                    } else if (ex.getStatusCode() == HttpStatus.SERVICE_UNAVAILABLE) {
-                        return new DictionaryServiceUnavailableException();
-                    } else if (ex.getStatusCode() == HttpStatus.BAD_REQUEST) {
-                        return new InvalidWordException(word);
-                    } else {
-                        return new DictionaryApiException(
-                            "Error occurred while fetching dictionary entry for word: " + word + ". " + ex.getResponseBodyAsString(),
-                            ex.getStatusCode().value(),
-                            "API_ERROR"
-                        );
-                    }
-                })
                 .onErrorMap(Exception.class, ex -> {
                     if (ex instanceof DictionaryApiException) {
                         return ex;
