@@ -1,0 +1,75 @@
+package com.marvin.vocabulary.dictionaryapi;
+
+import com.marvin.vocabulary.dto.DictionaryEntry;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+class WiktionaryResponseMapperTest {
+
+    private HtmlCleaner htmlCleaner;
+    private WiktionaryResponseMapper responseMapper;
+
+    @BeforeEach
+    void setUp() {
+        htmlCleaner = new HtmlCleaner();
+        responseMapper = new WiktionaryResponseMapper(htmlCleaner);
+    }
+
+    @Test
+    void mapToDictionaryEntries_WithEmptyDefinitions_ShouldFilterThemOut() {
+        // Create test data with empty definitions
+        Map<String, List<WiktionaryResponseMapper.WiktionaryDefinition>> response = Map.of("en", List.of(
+            createDefinitionWithMixedContent()
+        ));
+
+        List<DictionaryEntry> entries = responseMapper.mapToDictionaryEntries("test", response);
+
+        assertEquals(1, entries.size());
+        DictionaryEntry entry = entries.get(0);
+        assertEquals(1, entry.meanings().size());
+
+        // Should only have 4 valid definitions (not 9 total with empty ones)
+        assertEquals(4, entry.meanings().get(0).definitions().size());
+
+        // Verify no empty definition objects
+        entry.meanings().get(0).definitions().forEach(word -> {
+            assertNotNull(word.definition());
+            assertFalse(word.definition().trim().isEmpty());
+        });
+    }
+
+    private WiktionaryResponseMapper.WiktionaryDefinition createDefinitionWithMixedContent() {
+        WiktionaryResponseMapper.WiktionaryDefinition definition = new WiktionaryResponseMapper.WiktionaryDefinition();
+        definition.setPartOfSpeech("Noun");
+
+        // Mix of valid and empty definitions
+        List<WiktionaryResponseMapper.WiktionaryDefinition.Definition> definitions = List.of(
+            createDefinition("A valid definition", null),
+            createDefinition("", null), // empty
+            createDefinition("   ", null), // whitespace only
+            createDefinition("Another valid definition", "Valid example"),
+            createDefinition("", ""), // empty with empty example
+            createDefinition("<b>HTML</b> definition", "<i>HTML</i> example"),
+            createDefinition(null, null), // null definition
+            createDefinition("Third valid definition", null),
+            createDefinition("", "Example without definition") // example but no definition
+        );
+
+        definition.setDefinitions(definitions);
+        return definition;
+    }
+
+    private WiktionaryResponseMapper.WiktionaryDefinition.Definition createDefinition(String definition, String example) {
+        WiktionaryResponseMapper.WiktionaryDefinition.Definition def = new WiktionaryResponseMapper.WiktionaryDefinition.Definition();
+        def.setDefinition(definition);
+        if (example != null) {
+            def.setExamples(List.of(example));
+        }
+        return def;
+    }
+}

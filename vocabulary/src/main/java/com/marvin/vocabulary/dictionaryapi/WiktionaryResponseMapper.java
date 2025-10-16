@@ -74,9 +74,20 @@ public class WiktionaryResponseMapper {
         }
 
         String cleanedDefinition = htmlCleaner.cleanHtml(definition.getDefinition());
+
+        // Filter out empty or whitespace-only definitions
+        if (cleanedDefinition == null || cleanedDefinition.trim().isEmpty()) {
+            return null;
+        }
+
         String example = definition.getExamples() != null && !definition.getExamples().isEmpty()
                 ? htmlCleaner.cleanHtml(definition.getExamples().get(0))
                 : null;
+
+        // Filter out empty examples
+        if (example != null && example.trim().isEmpty()) {
+            example = null;
+        }
 
         return new Word(
                 cleanedDefinition,
