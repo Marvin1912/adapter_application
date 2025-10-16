@@ -12,10 +12,14 @@ import java.util.List;
 class DictionaryClientTest {
 
     private DictionaryClient dictionaryClient;
+    private WiktionaryResponseMapper responseMapper;
+    private HtmlCleaner htmlCleaner;
 
     @BeforeEach
     void setUp() {
-        dictionaryClient = new DictionaryClient();
+        htmlCleaner = new HtmlCleaner();
+        responseMapper = new WiktionaryResponseMapper(htmlCleaner);
+        dictionaryClient = new DictionaryClient(responseMapper);
     }
 
     @Test

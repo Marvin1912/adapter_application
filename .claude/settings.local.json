@@ -17,7 +17,8 @@
       "Bash(curl:*)",
       "Read(//tmp/**)",
       "Bash(/tmp/gradle-8.5/bin/gradle:*)",
-      "Bash(gradle:*)"
+      "Bash(gradle:*)",
+      "WebFetch(domain:en.wiktionary.org)"
     ],
     "deny": [],
     "ask": []
