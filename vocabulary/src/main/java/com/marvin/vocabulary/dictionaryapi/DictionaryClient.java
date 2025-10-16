@@ -9,19 +9,22 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class DictionaryClient {
 
-    private static final ParameterizedTypeReference<List<DictionaryEntry>> DICT_REFERENCE =
+    private static final ParameterizedTypeReference<Map<String, List<WiktionaryResponseMapper.WiktionaryDefinition>>> WIKTIONARY_REFERENCE =
             new ParameterizedTypeReference<>() {
             };
 
     private final WebClient webClient;
+    private final WiktionaryResponseMapper responseMapper;
 
-    public DictionaryClient() {
+    public DictionaryClient(WiktionaryResponseMapper responseMapper) {
+        this.responseMapper = responseMapper;
         this.webClient = WebClient.builder()
-                .baseUrl("https://api.dictionaryapi.dev/api/v2/entries/en")
+                .baseUrl("https://en.wiktionary.org/api/rest_v1")
                 .build();
     }
 
@@ -35,7 +38,7 @@ public class DictionaryClient {
         }
 
         return webClient.get()
-                .uri("/" + word.trim())
+                .uri("/page/definition/" + word.trim())
                 .retrieve()
                 .onStatus(
                     HttpStatus.NOT_FOUND::equals,
@@ -69,7 +72,8 @@ public class DictionaryClient {
                         "SERVER_ERROR"
                     ))
                 )
-                .bodyToMono(DICT_REFERENCE)
+                .bodyToMono(WIKTIONARY_REFERENCE)
+                .map(response -> responseMapper.mapToDictionaryEntries(word, response))
                 .onErrorMap(Exception.class, ex -> {
                     if (ex instanceof DictionaryApiException) {
                         return ex;
