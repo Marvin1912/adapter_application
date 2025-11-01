@@ -101,7 +101,7 @@ public class PlantController {
 
     @GetMapping(path = "/{id}")
     public Mono<PlantDTO> getPlant(@PathVariable long id) {
-        return Mono.just(plantService.getPlant(id));
+        return Mono.justOrEmpty(plantService.getPlant(id));
     }
 
     @DeleteMapping("/{id}")
@@ -111,7 +111,7 @@ public class PlantController {
     }
 
     @PatchMapping("/{id}/watered")
-    public Mono<ResponseEntity<PlantDTO>> deletePlant(
+    public Mono<ResponseEntity<PlantDTO>> waterPlant(
             @PathVariable long id,
             @RequestParam("last-watered") LocalDate lastWatered
     ) {
