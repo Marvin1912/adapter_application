@@ -26,7 +26,6 @@ import reactor.core.scheduler.Schedulers;
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 
 /**
  * REST Controller for managing plants.
@@ -183,9 +182,7 @@ public class PlantController {
      */
     @PutMapping
     public Mono<ResponseEntity<Object>> updatePlant(@RequestBody Mono<PlantDTO> plantMono) {
-        return plantMono
-            .flatMap(this::updatePlantSynchronously)
-            .subscribeOn(Schedulers.boundedElastic());
+        return plantMono.flatMap(this::updatePlantSynchronously);
     }
 
     /**
@@ -196,9 +193,10 @@ public class PlantController {
      */
     private Mono<ResponseEntity<Object>> updatePlantSynchronously(PlantDTO plantDTO) {
         return Mono.fromCallable(() -> {
-            plantService.updatePlant(plantDTO);
-            return ResponseEntity.noContent().build();
-        });
+                plantService.updatePlant(plantDTO);
+                return ResponseEntity.noContent().build();
+            })
+            .subscribeOn(Schedulers.boundedElastic());
     }
 
     /**
