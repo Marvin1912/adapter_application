@@ -8,9 +8,9 @@
     <property name="severity" value="warning"/>
     <property name="fileExtensions" value="java"/>
 
-    <!-- Exclude generated source files from checkstyle scanning -->
-    <module name="BeforeExecutionExclusionFileFilter">
-        <property name="fileNamePattern" value=".*[\\/]build[\\/]generated[\\/].*"/>
+    <!-- Reference suppression file for exclusions -->
+    <module name="SuppressionFilter">
+        <property name="file" value="${config_loc}/suppressions.xml"/>
     </module>
 
     <!-- Line length should be at Checker level -->
