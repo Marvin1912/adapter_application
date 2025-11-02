@@ -22,17 +22,17 @@ class WiktionaryResponseMapperTest {
   }
 
   @Test
-  void mapToDictionaryEntries_WithEmptyDefinitions_ShouldFilterThemOut() {
+  void mapToDictionaryEntriesWithEmptyDefinitionsShouldFilterThemOut() {
     // Create test data with empty definitions
-    Map<String, List<WiktionaryResponseMapper.WiktionaryDefinition>> response = Map.of("en",
+    final Map<String, List<WiktionaryResponseMapper.WiktionaryDefinition>> response = Map.of("en",
         List.of(
             createDefinitionWithMixedContent()
         ));
 
-    List<DictionaryEntry> entries = responseMapper.mapToDictionaryEntries("test", response);
+    final List<DictionaryEntry> entries = responseMapper.mapToDictionaryEntries("test", response);
 
     assertEquals(1, entries.size());
-    DictionaryEntry entry = entries.get(0);
+    final DictionaryEntry entry = entries.get(0);
     assertEquals(1, entry.meanings().size());
 
     // Should only have 4 valid definitions (not 9 total with empty ones)
@@ -46,11 +46,12 @@ class WiktionaryResponseMapperTest {
   }
 
   private WiktionaryResponseMapper.WiktionaryDefinition createDefinitionWithMixedContent() {
-    WiktionaryResponseMapper.WiktionaryDefinition definition = new WiktionaryResponseMapper.WiktionaryDefinition();
+    final WiktionaryResponseMapper.WiktionaryDefinition definition =
+        new WiktionaryResponseMapper.WiktionaryDefinition();
     definition.setPartOfSpeech("Noun");
 
     // Mix of valid and empty definitions
-    List<WiktionaryResponseMapper.WiktionaryDefinition.Definition> definitions = List.of(
+    final List<WiktionaryResponseMapper.WiktionaryDefinition.Definition> definitions = List.of(
         createDefinition("A valid definition", null),
         createDefinition("", null), // empty
         createDefinition("   ", null), // whitespace only
@@ -68,7 +69,8 @@ class WiktionaryResponseMapperTest {
 
   private WiktionaryResponseMapper.WiktionaryDefinition.Definition createDefinition(
       String definition, String example) {
-    WiktionaryResponseMapper.WiktionaryDefinition.Definition def = new WiktionaryResponseMapper.WiktionaryDefinition.Definition();
+    final WiktionaryResponseMapper.WiktionaryDefinition.Definition def =
+        new WiktionaryResponseMapper.WiktionaryDefinition.Definition();
     def.setDefinition(definition);
     if (example != null) {
       def.setExamples(List.of(example));

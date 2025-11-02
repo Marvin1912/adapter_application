@@ -41,37 +41,34 @@ class FlashcardControllerTest {
 
   private WebTestClient webTestClient;
 
-  private FlashcardEntity testFlashcardEntity;
-  private Flashcard testFlashcard;
+  private final FlashcardEntity testFlashcardEntity = new FlashcardEntity(
+      1,
+      "test-deck",
+      "anki-123",
+      "test front",
+      "test back",
+      "test description",
+      true
+  );
+
+  private final Flashcard testFlashcard = new Flashcard(
+      1,
+      "test-deck",
+      "anki-123",
+      "test front",
+      "test back",
+      "test description",
+      true
+  );
 
   @BeforeEach
   void setUp() {
     webTestClient = WebTestClient.bindToController(flashcardController).build();
-
-    testFlashcardEntity = new FlashcardEntity(
-        1,
-        "test-deck",
-        "anki-123",
-        "test front",
-        "test back",
-        "test description",
-        true
-    );
-
-    testFlashcard = new Flashcard(
-        1,
-        "test-deck",
-        "anki-123",
-        "test front",
-        "test back",
-        "test description",
-        true
-    );
   }
 
   @Test
-  void getWord_ShouldReturnDictionaryEntries() {
-    List<DictionaryEntry> expectedEntries = List.of(new DictionaryEntry(
+  void getWordShouldReturnDictionaryEntries() {
+    final List<DictionaryEntry> expectedEntries = List.of(new DictionaryEntry(
         "hello",
         "/həˈloʊ/",
         List.of(),
@@ -91,7 +88,7 @@ class FlashcardControllerTest {
   }
 
   @Test
-  void getFlashcard_WhenFlashcardExists_ShouldReturnFlashcard() {
+  void getFlashcardWhenFlashcardExistsShouldReturnFlashcard() {
     when(flashcardService.get(1)).thenReturn(testFlashcardEntity);
 
     webTestClient.get()
@@ -103,7 +100,7 @@ class FlashcardControllerTest {
   }
 
   @Test
-  void getFlashcard_WhenFlashcardNotExists_ShouldReturnNotFound() {
+  void getFlashcardWhenFlashcardNotExistsShouldReturnNotFound() {
     when(flashcardService.get(999)).thenReturn(null);
 
     webTestClient.get()
@@ -113,9 +110,9 @@ class FlashcardControllerTest {
   }
 
   @Test
-  void getFlashcards_WithoutParams_ShouldReturnAllFlashcards() {
-    List<FlashcardEntity> flashcardEntities = List.of(testFlashcardEntity);
-    List<Flashcard> expectedFlashcards = List.of(testFlashcard);
+  void getFlashcardsWithoutParamsShouldReturnAllFlashcards() {
+    final List<FlashcardEntity> flashcardEntities = List.of(testFlashcardEntity);
+    final List<Flashcard> expectedFlashcards = List.of(testFlashcard);
 
     when(flashcardService.get(null, null)).thenReturn(flashcardEntities);
 
@@ -128,9 +125,9 @@ class FlashcardControllerTest {
   }
 
   @Test
-  void getFlashcards_WithMissingAnkiIdParam_ShouldReturnFlashcardsWithoutAnkiId() {
-    List<FlashcardEntity> flashcardEntities = List.of(testFlashcardEntity);
-    List<Flashcard> expectedFlashcards = List.of(testFlashcard);
+  void getFlashcardsWithMissingAnkiIdParamShouldReturnFlashcardsWithoutAnkiId() {
+    final List<FlashcardEntity> flashcardEntities = List.of(testFlashcardEntity);
+    final List<Flashcard> expectedFlashcards = List.of(testFlashcard);
 
     when(flashcardService.get("ankiId", null)).thenReturn(flashcardEntities);
 
@@ -146,9 +143,9 @@ class FlashcardControllerTest {
   }
 
   @Test
-  void getFlashcards_WithUpdatedParam_ShouldReturnUpdatedFlashcards() {
-    List<FlashcardEntity> flashcardEntities = List.of(testFlashcardEntity);
-    List<Flashcard> expectedFlashcards = List.of(testFlashcard);
+  void getFlashcardsWithUpdatedParamShouldReturnUpdatedFlashcards() {
+    final List<FlashcardEntity> flashcardEntities = List.of(testFlashcardEntity);
+    final List<Flashcard> expectedFlashcards = List.of(testFlashcard);
 
     when(flashcardService.get(null, true)).thenReturn(flashcardEntities);
 
@@ -164,9 +161,9 @@ class FlashcardControllerTest {
   }
 
   @Test
-  void getFile_ShouldReturnCsvFile() throws Exception {
-    byte[] expectedFileContent = "#separator:tab\n#html:false\n#guid column:1\ntest-content".getBytes(
-        StandardCharsets.UTF_8);
+  void getFileShouldReturnCsvFile() throws Exception {
+    final byte[] expectedFileContent = "#separator:tab\n#html:false\n#guid column:1\ntest-content"
+        .getBytes(StandardCharsets.UTF_8);
 
     when(flashcardService.getFile()).thenReturn(expectedFileContent);
 
@@ -184,7 +181,7 @@ class FlashcardControllerTest {
   }
 
   @Test
-  void getFile_WhenExceptionThrown_ShouldReturnInternalServerError() throws Exception {
+  void getFileWhenExceptionThrownShouldReturnInternalServerError() throws Exception {
     when(flashcardService.getFile()).thenThrow(new RuntimeException("File generation failed"));
 
     webTestClient.get()
@@ -197,8 +194,8 @@ class FlashcardControllerTest {
   }
 
   @Test
-  void addFlashcard_ShouldCreateFlashcardAndReturnLocation() {
-    Flashcard newFlashcard = new Flashcard(
+  void addFlashcardShouldCreateFlashcardAndReturnLocation() {
+    final Flashcard newFlashcard = new Flashcard(
         null,
         "new-deck",
         "anki-456",
@@ -208,7 +205,7 @@ class FlashcardControllerTest {
         false
     );
 
-    FlashcardEntity savedEntity = new FlashcardEntity(
+    final FlashcardEntity savedEntity = new FlashcardEntity(
         2,
         "new-deck",
         "anki-456",
@@ -231,7 +228,7 @@ class FlashcardControllerTest {
   }
 
   @Test
-  void updateFlashcard_ShouldUpdateFlashcardAndReturnNoContent() {
+  void updateFlashcardShouldUpdateFlashcardAndReturnNoContent() {
     when(flashcardService.update(any(FlashcardEntity.class))).thenReturn(1);
 
     webTestClient.put()
@@ -244,13 +241,13 @@ class FlashcardControllerTest {
   }
 
   @Test
-  void updateFlashcards_WithValidFile_ShouldImportAndUpdate() {
-    String csvContent = "deck1\tanki-123\tfront1\tback1\tdescription1\n";
-    byte[] fileBytes = csvContent.getBytes(StandardCharsets.UTF_8);
+  void updateFlashcardsWithValidFileShouldImportAndUpdate() {
+    final String csvContent = "deck1\tanki-123\tfront1\tback1\tdescription1\n";
+    final byte[] fileBytes = csvContent.getBytes(StandardCharsets.UTF_8);
 
     lenient().when(flashcardService.importFlashcards(fileBytes)).thenReturn(1);
 
-    FilePart filePart = createMockFilePart("test.csv", fileBytes);
+    final FilePart filePart = createMockFilePart("test.csv", fileBytes);
 
     webTestClient.put()
         .uri("/vocabulary/flashcards/file")
@@ -262,8 +259,8 @@ class FlashcardControllerTest {
   }
 
   @Test
-  void updateFlashcards_WithEmptyFile_ShouldHandleGracefully() {
-    FilePart filePart = createMockFilePart("empty.csv", new byte[0]);
+  void updateFlashcardsWithEmptyFileShouldHandleGracefully() {
+    final FilePart filePart = createMockFilePart("empty.csv", new byte[0]);
 
     lenient().when(flashcardService.importFlashcards(new byte[0])).thenReturn(0);
 
@@ -277,14 +274,14 @@ class FlashcardControllerTest {
   }
 
   @Test
-  void updateFlashcards_WhenExceptionThrown_ShouldHandleError() {
-    String csvContent = "invalid content";
-    byte[] fileBytes = csvContent.getBytes(StandardCharsets.UTF_8);
+  void updateFlashcardsWhenExceptionThrownShouldHandleError() {
+    final String csvContent = "invalid content";
+    final byte[] fileBytes = csvContent.getBytes(StandardCharsets.UTF_8);
 
     lenient().when(flashcardService.importFlashcards(fileBytes))
         .thenThrow(new RuntimeException("Import failed"));
 
-    FilePart filePart = createMockFilePart("test.csv", fileBytes);
+    final FilePart filePart = createMockFilePart("test.csv", fileBytes);
 
     webTestClient.put()
         .uri("/vocabulary/flashcards/file")
@@ -296,7 +293,7 @@ class FlashcardControllerTest {
   }
 
   @Test
-  void handleException_ShouldReturnErrorResponse() {
+  void handleExceptionShouldReturnErrorResponse() {
     // Force an exception by mocking the service to throw an exception
     when(dictionaryClient.getWord(any())).thenThrow(new RuntimeException("Test exception"));
 
@@ -311,33 +308,46 @@ class FlashcardControllerTest {
         });
   }
 
-  private FilePart createMockFilePart(String filename, byte[] content) {
-    return new FilePart() {
-      @Override
-      public String filename() {
-        return filename;
-      }
+  private FilePart createMockFilePart(final String filename, final byte[] content) {
+    return new MockFilePart(filename, content);
+  }
 
-      @Override
-      public String name() {
-        return "file";
-      }
+  /**
+   * Mock implementation of FilePart for testing purposes.
+   */
+  private static class MockFilePart implements FilePart {
+    private final String filename;
+    private final byte[] content;
 
-      @Override
-      public Flux<DataBuffer> content() {
-        DataBuffer buffer = new DefaultDataBufferFactory().wrap(content);
-        return Flux.just(buffer);
-      }
+    MockFilePart(final String filename, final byte[] content) {
+      this.filename = filename;
+      this.content = content;
+    }
 
-      @Override
-      public org.springframework.http.HttpHeaders headers() {
-        return org.springframework.http.HttpHeaders.EMPTY;
-      }
+    @Override
+    public String filename() {
+      return filename;
+    }
 
-      @Override
-      public reactor.core.publisher.Mono<Void> transferTo(java.nio.file.Path dest) {
-        return reactor.core.publisher.Mono.empty();
-      }
-    };
+    @Override
+    public String name() {
+      return "file";
+    }
+
+    @Override
+    public Flux<DataBuffer> content() {
+      final DataBuffer buffer = new DefaultDataBufferFactory().wrap(content);
+      return Flux.just(buffer);
+    }
+
+    @Override
+    public org.springframework.http.HttpHeaders headers() {
+      return org.springframework.http.HttpHeaders.EMPTY;
+    }
+
+    @Override
+    public reactor.core.publisher.Mono<Void> transferTo(final java.nio.file.Path dest) {
+      return reactor.core.publisher.Mono.empty();
+    }
   }
 }

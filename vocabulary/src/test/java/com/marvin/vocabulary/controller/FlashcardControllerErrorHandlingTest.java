@@ -39,9 +39,9 @@ class FlashcardControllerErrorHandlingTest {
   }
 
   @Test
-  void getWord_WhenWordNotFoundException_ShouldReturn404WithStructuredError() {
-    String word = "nonexistentword";
-    WordNotFoundException exception = new WordNotFoundException(word);
+  void getWordWhenWordNotFoundExceptionShouldReturn404WithStructuredError() {
+    final String word = "nonexistentword";
+    final WordNotFoundException exception = new WordNotFoundException(word);
 
     when(dictionaryClient.getWord(word)).thenReturn(Mono.error(exception));
 
@@ -59,9 +59,9 @@ class FlashcardControllerErrorHandlingTest {
   }
 
   @Test
-  void getWord_WhenInvalidWordException_ShouldReturn400WithStructuredError() {
-    String word = "invalid123";
-    InvalidWordException exception = new InvalidWordException(word);
+  void getWordWhenInvalidWordExceptionShouldReturn400WithStructuredError() {
+    final String word = "invalid123";
+    final InvalidWordException exception = new InvalidWordException(word);
 
     when(dictionaryClient.getWord(word)).thenReturn(Mono.error(exception));
 
@@ -79,9 +79,9 @@ class FlashcardControllerErrorHandlingTest {
   }
 
   @Test
-  void getWord_WhenRateLimitExceededException_ShouldReturn429WithStructuredError() {
-    String word = "test";
-    RateLimitExceededException exception = new RateLimitExceededException();
+  void getWordWhenRateLimitExceededExceptionShouldReturn429WithStructuredError() {
+    final String word = "test";
+    final RateLimitExceededException exception = new RateLimitExceededException();
 
     when(dictionaryClient.getWord(word)).thenReturn(Mono.error(exception));
 
@@ -97,9 +97,9 @@ class FlashcardControllerErrorHandlingTest {
   }
 
   @Test
-  void getWord_WhenDictionaryServiceUnavailableException_ShouldReturn503WithStructuredError() {
-    String word = "test";
-    DictionaryServiceUnavailableException exception = new DictionaryServiceUnavailableException();
+  void getWordWhenDictionaryServiceUnavailableExceptionShouldReturn503WithStructuredError() {
+    final String word = "test";
+    final DictionaryServiceUnavailableException exception = new DictionaryServiceUnavailableException();
 
     when(dictionaryClient.getWord(word)).thenReturn(Mono.error(exception));
 
@@ -116,9 +116,9 @@ class FlashcardControllerErrorHandlingTest {
   }
 
   @Test
-  void getWord_WhenGenericDictionaryApiException_ShouldReturnCorrectStatusCodeWithStructuredError() {
-    String word = "test";
-    DictionaryApiException exception = new DictionaryApiException(
+  void getWordWhenGenericDictionaryApiExceptionShouldReturnCorrectStatusCodeWithStructuredError() {
+    final String word = "test";
+    final DictionaryApiException exception = new DictionaryApiException(
         "Some API error occurred",
         402,
         "PAYMENT_REQUIRED"
@@ -139,9 +139,9 @@ class FlashcardControllerErrorHandlingTest {
   }
 
   @Test
-  void getWord_WhenRuntimeException_ShouldReturn500WithStructuredError() {
-    String word = "test";
-    RuntimeException exception = new RuntimeException("Unexpected error");
+  void getWordWhenRuntimeExceptionShouldReturn500WithStructuredError() {
+    final String word = "test";
+    final RuntimeException exception = new RuntimeException("Unexpected error");
 
     when(dictionaryClient.getWord(word)).thenReturn(Mono.error(exception));
 
@@ -157,10 +157,10 @@ class FlashcardControllerErrorHandlingTest {
   }
 
   @Test
-  void getWord_WhenCustomRateLimitMessage_ShouldReturnCustomMessage() {
-    String word = "test";
-    String customMessage = "Rate limit: 100 requests per hour exceeded. Try again later.";
-    RateLimitExceededException exception = new RateLimitExceededException(customMessage);
+  void getWordWhenCustomRateLimitMessageShouldReturnCustomMessage() {
+    final String word = "test";
+    final String customMessage = "Rate limit: 100 requests per hour exceeded. Try again later.";
+    final RateLimitExceededException exception = new RateLimitExceededException(customMessage);
 
     when(dictionaryClient.getWord(word)).thenReturn(Mono.error(exception));
 
@@ -176,11 +176,12 @@ class FlashcardControllerErrorHandlingTest {
   }
 
   @Test
-  void getWord_WhenCustomServiceUnavailableMessage_ShouldReturnCustomMessage() {
-    String word = "test";
-    String customMessage = "Dictionary API is under maintenance. Please try again in 5 minutes.";
-    DictionaryServiceUnavailableException exception = new DictionaryServiceUnavailableException(
-        customMessage);
+  void getWordWhenCustomServiceUnavailableMessageShouldReturnCustomMessage() {
+    final String word = "test";
+    final String customMessage =
+        "Dictionary API is under maintenance. Please try again in 5 minutes.";
+    final DictionaryServiceUnavailableException exception =
+        new DictionaryServiceUnavailableException(customMessage);
 
     when(dictionaryClient.getWord(word)).thenReturn(Mono.error(exception));
 
@@ -197,28 +198,29 @@ class FlashcardControllerErrorHandlingTest {
 
 
   @Test
-  void verifyExceptionProperties_AreCorrectlyMapped() {
-    String word = "testword";
+  void verifyExceptionPropertiesAreCorrectlyMapped() {
+    final String word = "testword";
 
     // Test WordNotFoundException properties
-    WordNotFoundException wordNotFound = new WordNotFoundException(word);
+    final WordNotFoundException wordNotFound = new WordNotFoundException(word);
     assert wordNotFound.getWord().equals(word);
     assert wordNotFound.getStatusCode() == 404;
     assert wordNotFound.getErrorType().equals("WORD_NOT_FOUND");
 
     // Test InvalidWordException properties
-    InvalidWordException invalidWord = new InvalidWordException(word);
+    final InvalidWordException invalidWord = new InvalidWordException(word);
     assert invalidWord.getWord().equals(word);
     assert invalidWord.getStatusCode() == 400;
     assert invalidWord.getErrorType().equals("INVALID_WORD");
 
     // Test RateLimitExceededException properties
-    RateLimitExceededException rateLimit = new RateLimitExceededException();
+    final RateLimitExceededException rateLimit = new RateLimitExceededException();
     assert rateLimit.getStatusCode() == 429;
     assert rateLimit.getErrorType().equals("RATE_LIMIT_EXCEEDED");
 
     // Test DictionaryServiceUnavailableException properties
-    DictionaryServiceUnavailableException serviceUnavailable = new DictionaryServiceUnavailableException();
+    final DictionaryServiceUnavailableException serviceUnavailable =
+        new DictionaryServiceUnavailableException();
     assert serviceUnavailable.getStatusCode() == 503;
     assert serviceUnavailable.getErrorType().equals("SERVICE_UNAVAILABLE");
   }
