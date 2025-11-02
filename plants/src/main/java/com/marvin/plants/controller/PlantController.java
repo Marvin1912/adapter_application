@@ -69,7 +69,7 @@ public class PlantController {
   private static Mono<byte[]> extractBytesFromFilePart(FilePart filePart) {
     return DataBufferUtils.join(filePart.content())
         .flatMap(dataBuffer -> {
-          byte[] bytes = new byte[dataBuffer.readableByteCount()];
+          final byte[] bytes = new byte[dataBuffer.readableByteCount()];
           dataBuffer.read(bytes);
           DataBufferUtils.release(dataBuffer);
           return Mono.just(bytes);
@@ -116,8 +116,8 @@ public class PlantController {
   private Mono<ResponseEntity<Object>> processImageAndCreatePlant(
       reactor.util.function.Tuple2<PlantDTO, byte[]> plantAndImage, String contentType) {
 
-    PlantDTO plantDTO = plantAndImage.getT1();
-    byte[] imageBytes = plantAndImage.getT2();
+    final PlantDTO plantDTO = plantAndImage.getT1();
+    final byte[] imageBytes = plantAndImage.getT2();
 
     return saveImageIfNotEmpty(imageBytes, contentType)
         .flatMap(imageUuid -> createPlantWithImage(plantDTO, imageUuid));
@@ -148,7 +148,7 @@ public class PlantController {
    */
   private Mono<ResponseEntity<Object>> createPlantWithImage(PlantDTO plantDTO, String imageUuid) {
     return Mono.fromCallable(() -> {
-      long plantId = plantService.createPlant(plantDTO, imageUuid);
+      final long plantId = plantService.createPlant(plantDTO, imageUuid);
       return createCreatedResponse(plantId);
     }).subscribeOn(Schedulers.boundedElastic());
   }
@@ -160,7 +160,7 @@ public class PlantController {
    * @return ResponseEntity with location header
    */
   private ResponseEntity<Object> createCreatedResponse(long plantId) {
-    URI location = URI.create(PLANTS_LOCATION_PREFIX + plantId);
+    final URI location = URI.create(PLANTS_LOCATION_PREFIX + plantId);
     return ResponseEntity.created(location).build();
   }
 

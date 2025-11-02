@@ -62,7 +62,7 @@ public class Plant {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    Plant plant = (Plant) o;
+    final Plant plant = (Plant) o;
     return Objects.equals(id, plant.id);
   }
 

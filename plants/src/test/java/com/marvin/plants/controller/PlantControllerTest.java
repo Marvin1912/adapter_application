@@ -68,9 +68,9 @@ class PlantControllerTest {
 
   @Test
   @DisplayName("Should create plant successfully without image")
-  void createPlant_ShouldReturnCreatedStatus_WhenValidPlantWithoutImage() {
+  void createPlantShouldReturnCreatedStatusWhenValidPlantWithoutImage() {
     // Given
-    PlantDTO newPlantDTO = new PlantDTO(
+    final PlantDTO newPlantDTO = new PlantDTO(
         0L,
         "New Plant",
         "New Species",
@@ -86,7 +86,7 @@ class PlantControllerTest {
     when(plantService.createPlant(any(PlantDTO.class), eq(""))).thenReturn(2L);
 
     // When
-    Mono<ResponseEntity<Object>> result = plantController.createPlant(Mono.empty(),
+    final Mono<ResponseEntity<Object>> result = plantController.createPlant(Mono.empty(),
         Mono.just(newPlantDTO), null);
 
     // Then
@@ -103,9 +103,9 @@ class PlantControllerTest {
 
   @Test
   @DisplayName("Should create plant successfully with image")
-  void createPlant_ShouldReturnCreatedStatus_WhenValidPlantWithImage() {
+  void createPlantShouldReturnCreatedStatusWhenValidPlantWithImage() {
     // Given
-    PlantDTO newPlantDTO = new PlantDTO(
+    final PlantDTO newPlantDTO = new PlantDTO(
         0L,
         "New Plant",
         "New Species",
@@ -118,20 +118,20 @@ class PlantControllerTest {
         null
     );
 
-    byte[] imageBytes = "test image content".getBytes(StandardCharsets.UTF_8);
-    String contentType = "image/jpeg";
+    final byte[] imageBytes = "test image content".getBytes(StandardCharsets.UTF_8);
+    final String contentType = "image/jpeg";
 
     when(imageService.saveImage(eq(imageBytes), eq(contentType))).thenReturn(
         Mono.just(testImageUuid));
     when(plantService.createPlant(any(PlantDTO.class),
         eq(testImageUuid.toString()))).thenReturn(1L);
 
-    FilePart filePart = mock(FilePart.class);
-    DataBuffer dataBuffer = new DefaultDataBufferFactory().wrap(imageBytes);
+    final FilePart filePart = mock(FilePart.class);
+    final DataBuffer dataBuffer = new DefaultDataBufferFactory().wrap(imageBytes);
     when(filePart.content()).thenReturn(Flux.just(dataBuffer));
 
     // When
-    Mono<ResponseEntity<Object>> result = plantController.createPlant(Mono.just(filePart),
+    final Mono<ResponseEntity<Object>> result = plantController.createPlant(Mono.just(filePart),
         Mono.just(newPlantDTO), contentType);
 
     // Then
@@ -149,9 +149,9 @@ class PlantControllerTest {
 
   @Test
   @DisplayName("Should handle empty image file")
-  void createPlant_ShouldHandleEmptyImageFile() {
+  void createPlantShouldHandleEmptyImageFile() {
     // Given
-    PlantDTO newPlantDTO = new PlantDTO(
+    final PlantDTO newPlantDTO = new PlantDTO(
         0L,
         "New Plant",
         "New Species",
@@ -164,13 +164,13 @@ class PlantControllerTest {
         null
     );
 
-    FilePart filePart = mock(FilePart.class);
+    final FilePart filePart = mock(FilePart.class);
     when(filePart.content()).thenReturn(Flux.empty());
 
     when(plantService.createPlant(any(PlantDTO.class), eq(""))).thenReturn(1L);
 
     // When
-    Mono<ResponseEntity<Object>> result = plantController.createPlant(Mono.just(filePart),
+    final Mono<ResponseEntity<Object>> result = plantController.createPlant(Mono.just(filePart),
         Mono.just(newPlantDTO), null);
 
     // Then
@@ -188,9 +188,9 @@ class PlantControllerTest {
 
   @Test
   @DisplayName("Should handle image processing in controller flow")
-  void createPlant_ShouldProcessImageCorrectly() {
+  void createPlantShouldProcessImageCorrectly() {
     // Given
-    PlantDTO newPlantDTO = new PlantDTO(
+    final PlantDTO newPlantDTO = new PlantDTO(
         0L,
         "New Plant",
         "New Species",
@@ -206,10 +206,10 @@ class PlantControllerTest {
     when(plantService.createPlant(any(PlantDTO.class), eq(""))).thenReturn(1L);
 
     // When - Testing with empty file part (which represents no image)
-    FilePart filePart = mock(FilePart.class);
+    final FilePart filePart = mock(FilePart.class);
     when(filePart.content()).thenReturn(Flux.empty());
 
-    Mono<ResponseEntity<Object>> result = plantController.createPlant(Mono.just(filePart),
+    final Mono<ResponseEntity<Object>> result = plantController.createPlant(Mono.just(filePart),
         Mono.just(newPlantDTO), null);
 
     // Then
@@ -227,9 +227,9 @@ class PlantControllerTest {
 
   @Test
   @DisplayName("Should update plant successfully")
-  void updatePlant_ShouldReturnNoContent_WhenValidPlantUpdate() {
+  void updatePlantShouldReturnNoContentWhenValidPlantUpdate() {
     // Given
-    PlantDTO updateDTO = new PlantDTO(
+    final PlantDTO updateDTO = new PlantDTO(
         1L,
         "Updated Plant",
         "Updated Species",
@@ -245,7 +245,7 @@ class PlantControllerTest {
     doNothing().when(plantService).updatePlant(any(PlantDTO.class));
 
     // When
-    Mono<ResponseEntity<Object>> result = plantController.updatePlant(Mono.just(updateDTO));
+    final Mono<ResponseEntity<Object>> result = plantController.updatePlant(Mono.just(updateDTO));
 
     // Then
     StepVerifier.create(result)
@@ -259,9 +259,9 @@ class PlantControllerTest {
 
   @Test
   @DisplayName("Should get all plants successfully")
-  void getPlants_ShouldReturnAllPlants_WhenPlantsExist() {
+  void getPlantsShouldReturnAllPlantsWhenPlantsExist() {
     // Given
-    PlantDTO plant2DTO = new PlantDTO(
+    final PlantDTO plant2DTO = new PlantDTO(
         2L,
         "Plant 2",
         "Species 2",
@@ -274,11 +274,11 @@ class PlantControllerTest {
         null
     );
 
-    List<PlantDTO> plants = List.of(testPlantDTO, plant2DTO);
+    final List<PlantDTO> plants = List.of(testPlantDTO, plant2DTO);
     when(plantService.getPlants()).thenReturn(Flux.fromIterable(plants));
 
     // When
-    Flux<PlantDTO> result = plantController.getPlants();
+    final Flux<PlantDTO> result = plantController.getPlants();
 
     // Then
     StepVerifier.create(result)
@@ -291,12 +291,12 @@ class PlantControllerTest {
 
   @Test
   @DisplayName("Should get all plants successfully when empty")
-  void getPlants_ShouldReturnEmptyList_WhenNoPlantsExist() {
+  void getPlantsShouldReturnEmptyListWhenNoPlantsExist() {
     // Given
     when(plantService.getPlants()).thenReturn(Flux.empty());
 
     // When
-    Flux<PlantDTO> result = plantController.getPlants();
+    final Flux<PlantDTO> result = plantController.getPlants();
 
     // Then
     StepVerifier.create(result)
@@ -307,12 +307,12 @@ class PlantControllerTest {
 
   @Test
   @DisplayName("Should get plant by id successfully")
-  void getPlant_ShouldReturnPlant_WhenPlantExists() {
+  void getPlantShouldReturnPlantWhenPlantExists() {
     // Given
     when(plantService.getPlant(1L)).thenReturn(testPlantDTO);
 
     // When
-    Mono<PlantDTO> result = plantController.getPlant(1L);
+    final Mono<PlantDTO> result = plantController.getPlant(1L);
 
     // Then
     StepVerifier.create(result)
@@ -329,7 +329,7 @@ class PlantControllerTest {
     when(plantService.getPlant(999L)).thenReturn(null);
 
     // When
-    Mono<PlantDTO> result = plantController.getPlant(999L);
+    final Mono<PlantDTO> result = plantController.getPlant(999L);
 
     // Then
     StepVerifier.create(result)
@@ -345,7 +345,7 @@ class PlantControllerTest {
     doNothing().when(plantService).deletePlant(1L);
 
     // When
-    Mono<ResponseEntity<Void>> result = plantController.deletePlant(1L);
+    final Mono<ResponseEntity<Void>> result = plantController.deletePlant(1L);
 
     // Then
     StepVerifier.create(result)
@@ -361,8 +361,8 @@ class PlantControllerTest {
   @DisplayName("Should water plant successfully")
   void waterPlant_ShouldReturnUpdatedPlant_WhenValidDate() {
     // Given
-    LocalDate waterDate = LocalDate.now();
-    PlantDTO wateredPlantDTO = new PlantDTO(
+    final LocalDate waterDate = LocalDate.now();
+    final PlantDTO wateredPlantDTO = new PlantDTO(
         1L,
         "Test Plant",
         "Test Species",
@@ -378,7 +378,7 @@ class PlantControllerTest {
     when(plantService.waterPlant(1L, waterDate)).thenReturn(wateredPlantDTO);
 
     // When
-    Mono<ResponseEntity<PlantDTO>> result = plantController.waterPlant(1L, waterDate);
+    final Mono<ResponseEntity<PlantDTO>> result = plantController.waterPlant(1L, waterDate);
 
     // Then
     StepVerifier.create(result)
@@ -395,8 +395,8 @@ class PlantControllerTest {
   @DisplayName("Should handle water plant with past date")
   void waterPlant_ShouldHandlePastDate() {
     // Given
-    LocalDate pastDate = LocalDate.now().minusDays(1);
-    PlantDTO wateredPlantDTO = new PlantDTO(
+    final LocalDate pastDate = LocalDate.now().minusDays(1);
+    final PlantDTO wateredPlantDTO = new PlantDTO(
         1L,
         "Test Plant",
         "Test Species",
@@ -412,7 +412,7 @@ class PlantControllerTest {
     when(plantService.waterPlant(1L, pastDate)).thenReturn(wateredPlantDTO);
 
     // When
-    Mono<ResponseEntity<PlantDTO>> result = plantController.waterPlant(1L, pastDate);
+    final Mono<ResponseEntity<PlantDTO>> result = plantController.waterPlant(1L, pastDate);
 
     // Then
     StepVerifier.create(result)
@@ -429,8 +429,8 @@ class PlantControllerTest {
   @DisplayName("Should handle water plant with future date")
   void waterPlant_ShouldHandleFutureDate() {
     // Given
-    LocalDate futureDate = LocalDate.now().plusDays(1);
-    PlantDTO wateredPlantDTO = new PlantDTO(
+    final LocalDate futureDate = LocalDate.now().plusDays(1);
+    final PlantDTO wateredPlantDTO = new PlantDTO(
         1L,
         "Test Plant",
         "Test Species",
@@ -446,7 +446,7 @@ class PlantControllerTest {
     when(plantService.waterPlant(1L, futureDate)).thenReturn(wateredPlantDTO);
 
     // When
-    Mono<ResponseEntity<PlantDTO>> result = plantController.waterPlant(1L, futureDate);
+    final Mono<ResponseEntity<PlantDTO>> result = plantController.waterPlant(1L, futureDate);
 
     // Then
     StepVerifier.create(result)
@@ -463,7 +463,7 @@ class PlantControllerTest {
   @DisplayName("Should handle water plant when service throws exception")
   void waterPlant_ShouldHandleServiceException() {
     // Given
-    LocalDate waterDate = LocalDate.now();
+    final LocalDate waterDate = LocalDate.now();
     when(plantService.waterPlant(1L, waterDate))
         .thenThrow(new RuntimeException("Plant not found"));
 
@@ -479,8 +479,8 @@ class PlantControllerTest {
   @DisplayName("Should verify method name typo fix in waterPlant endpoint")
   void waterPlant_ShouldFixMethodTypo() {
     // Given
-    LocalDate waterDate = LocalDate.now();
-    PlantDTO wateredPlantDTO = new PlantDTO(
+    final LocalDate waterDate = LocalDate.now();
+    final PlantDTO wateredPlantDTO = new PlantDTO(
         1L,
         "Test Plant",
         "Test Species",
@@ -496,7 +496,7 @@ class PlantControllerTest {
     when(plantService.waterPlant(1L, waterDate)).thenReturn(wateredPlantDTO);
 
     // When
-    Mono<ResponseEntity<PlantDTO>> result = plantController.waterPlant(1L, waterDate);
+    final Mono<ResponseEntity<PlantDTO>> result = plantController.waterPlant(1L, waterDate);
 
     // Then
     StepVerifier.create(result)
@@ -513,7 +513,7 @@ class PlantControllerTest {
   @DisplayName("Should handle create plant with content type parameter")
   void createPlant_ShouldHandleContentTypeParameter() {
     // Given
-    PlantDTO newPlantDTO = new PlantDTO(
+    final PlantDTO newPlantDTO = new PlantDTO(
         0L,
         "New Plant",
         "New Species",
@@ -526,20 +526,20 @@ class PlantControllerTest {
         null
     );
 
-    byte[] imageBytes = "test image content".getBytes(StandardCharsets.UTF_8);
-    String contentType = "image/jpeg";
+    final byte[] imageBytes = "test image content".getBytes(StandardCharsets.UTF_8);
+    final String contentType = "image/jpeg";
 
     when(imageService.saveImage(eq(imageBytes), eq(contentType))).thenReturn(
         Mono.just(testImageUuid));
     when(plantService.createPlant(any(PlantDTO.class),
         eq(testImageUuid.toString()))).thenReturn(1L);
 
-    FilePart filePart = mock(FilePart.class);
-    DataBuffer dataBuffer = new DefaultDataBufferFactory().wrap(imageBytes);
+    final FilePart filePart = mock(FilePart.class);
+    final DataBuffer dataBuffer = new DefaultDataBufferFactory().wrap(imageBytes);
     when(filePart.content()).thenReturn(Flux.just(dataBuffer));
 
     // When
-    Mono<ResponseEntity<Object>> result = plantController.createPlant(Mono.just(filePart),
+    final Mono<ResponseEntity<Object>> result = plantController.createPlant(Mono.just(filePart),
         Mono.just(newPlantDTO), contentType);
 
     // Then
@@ -559,7 +559,7 @@ class PlantControllerTest {
   @DisplayName("Should handle large number of plants request")
   void getPlants_ShouldHandleLargeNumberOfPlants() {
     // Given
-    List<PlantDTO> largePlantList = new ArrayList<>();
+    final List<PlantDTO> largePlantList = new ArrayList<>();
     for (int i = 1; i <= 100; i++) {
       largePlantList.add(new PlantDTO(
           (long) i,
@@ -578,7 +578,7 @@ class PlantControllerTest {
     when(plantService.getPlants()).thenReturn(Flux.fromIterable(largePlantList));
 
     // When
-    Flux<PlantDTO> result = plantController.getPlants();
+    final Flux<PlantDTO> result = plantController.getPlants();
 
     // Then
     StepVerifier.create(result)
@@ -595,7 +595,7 @@ class PlantControllerTest {
     doNothing().when(plantService).deletePlant(1L);
 
     // When
-    Mono<ResponseEntity<Void>> result = plantController.deletePlant(1L);
+    final Mono<ResponseEntity<Void>> result = plantController.deletePlant(1L);
 
     // Then
     StepVerifier.create(result)
@@ -611,17 +611,17 @@ class PlantControllerTest {
   @DisplayName("Should test getFileAsByteArray utility method")
   void testGetFileAsByteArray_WithValidFile() throws Exception {
     // Given - Using reflection to test the private method
-    java.lang.reflect.Method method = PlantController.class.getDeclaredMethod(
+    final java.lang.reflect.Method method = PlantController.class.getDeclaredMethod(
         "getFileAsByteArray", Mono.class);
     method.setAccessible(true);
 
-    byte[] expectedBytes = "test content".getBytes(StandardCharsets.UTF_8);
-    FilePart filePart = mock(FilePart.class);
-    DataBuffer dataBuffer = new DefaultDataBufferFactory().wrap(expectedBytes);
+    final byte[] expectedBytes = "test content".getBytes(StandardCharsets.UTF_8);
+    final FilePart filePart = mock(FilePart.class);
+    final DataBuffer dataBuffer = new DefaultDataBufferFactory().wrap(expectedBytes);
     when(filePart.content()).thenReturn(Flux.just(dataBuffer));
 
     // When
-    Mono<byte[]> result = (Mono<byte[]>) method.invoke(plantController, Mono.just(filePart));
+    final Mono<byte[]> result = (Mono<byte[]>) method.invoke(plantController, Mono.just(filePart));
 
     // Then
     StepVerifier.create(result)
@@ -633,15 +633,15 @@ class PlantControllerTest {
   @DisplayName("Should test getFileAsByteArray with empty file")
   void testGetFileAsByteArray_WithEmptyFile() throws Exception {
     // Given
-    java.lang.reflect.Method method = PlantController.class.getDeclaredMethod(
+    final java.lang.reflect.Method method = PlantController.class.getDeclaredMethod(
         "getFileAsByteArray", Mono.class);
     method.setAccessible(true);
 
-    FilePart filePart = mock(FilePart.class);
+    final FilePart filePart = mock(FilePart.class);
     when(filePart.content()).thenReturn(Flux.empty());
 
     // When
-    Mono<byte[]> result = (Mono<byte[]>) method.invoke(plantController, Mono.just(filePart));
+    final Mono<byte[]> result = (Mono<byte[]>) method.invoke(plantController, Mono.just(filePart));
 
     // Then
     StepVerifier.create(result)
@@ -653,15 +653,15 @@ class PlantControllerTest {
   @DisplayName("Should test getFileAsByteArray with error")
   void testGetFileAsByteArray_WithError() throws Exception {
     // Given
-    java.lang.reflect.Method method = PlantController.class.getDeclaredMethod(
+    final java.lang.reflect.Method method = PlantController.class.getDeclaredMethod(
         "getFileAsByteArray", Mono.class);
     method.setAccessible(true);
 
-    FilePart filePart = mock(FilePart.class);
+    final FilePart filePart = mock(FilePart.class);
     when(filePart.content()).thenReturn(Flux.error(new RuntimeException("File read error")));
 
     // When
-    Mono<byte[]> result = (Mono<byte[]>) method.invoke(plantController, Mono.just(filePart));
+    final Mono<byte[]> result = (Mono<byte[]>) method.invoke(plantController, Mono.just(filePart));
 
     // Then
     StepVerifier.create(result)
