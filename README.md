@@ -11,8 +11,8 @@ This project uses comprehensive code formatting and quality standards to ensure 
 The project includes multiple formatting configuration files to ensure consistent code style:
 
 1. **IntelliJ IDEA Code Style** (`config/intellij/`)
-   - `code-style.xml`: Complete IntelliJ formatting rules aligned with Checkstyle
-   - `project-style-config.xml`: Project style configuration for team consistency
+   - `java-formatting.xml`: Complete IntelliJ formatting rules aligned with Checkstyle
+   - `shared-format-config.xml`: Shared format configuration for team consistency
 
 2. **Cross-IDE Compatibility** (`.editorconfig`)
    - Basic formatting rules that work across different IDEs
@@ -42,7 +42,7 @@ Since formatting rules are stored in `config/intellij/`, you need to manually im
    ```
    File → Settings → Editor → Code Style → Java → Scheme → Import Scheme → IntelliJ IDEA code style XML
    ```
-   - Select: `config/intellij/code-style.xml`
+   - Select: `config/intellij/java-formatting.xml`
    - Name the scheme: "Project"
 
 2. **Set as Default**:
