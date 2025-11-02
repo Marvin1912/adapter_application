@@ -19,7 +19,8 @@
       "Bash(/tmp/gradle-8.5/bin/gradle:*)",
       "Bash(gradle:*)",
       "WebFetch(domain:en.wiktionary.org)",
-      "Bash(mvn compile test-compile:*)"
+      "Bash(mvn compile test-compile:*)",
+      "Bash(mvn compile:*)"
     ],
     "deny": [],
     "ask": []
