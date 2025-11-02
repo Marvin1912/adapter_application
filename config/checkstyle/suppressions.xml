@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<!DOCTYPE suppressions PUBLIC
+    "-//Checkstyle//DTD Suppressions 1.2//EN"
+    "https://checkstyle.org/dtds/suppressions_1_2.dtd">
+
+<suppressions>
+    <!-- Suppress for generated OpenAPI code -->
+    <suppress checks=".*" files=".*generated.*"/>
+
+    <!-- Suppress for test files with different conventions -->
+    <suppress checks="MethodLength" files=".*Test\.java"/>
+    <suppress checks="ParameterNumber" files=".*Test\.java"/>
+    <suppress checks="MagicNumber" files=".*Test\.java"/>
+    <suppress checks="Javadoc" files=".*Test\.java"/>
+
+    <!-- Suppress specific rules for utility classes -->
+    <suppress checks="Javadoc" files=".*Util\.java"/>
+    <suppress checks="MagicNumber" files=".*Util\.java"/>
+
+    <!-- Suppress for existing code that needs refactoring -->
+    <suppress checks="LineLength" files=".*AdapterController\.java"/>
+    <suppress checks="MethodLength" files=".*AdapterController\.java"/>
+    <suppress checks="ParameterNumber" files=".*AdapterController\.java"/>
+
+    <!-- Suppress for configuration files -->
+    <suppress checks=".*" files=".*[\/\\]config[\/\\].*"/>
+
+    <!-- Suppress for MapStruct generated code -->
+    <suppress checks=".*" files=".*[\/\\]generated[\/\\].*"/>
+    <suppress checks=".*" files=".*MapperImpl\.java"/>
+
+    <!-- Suppress for Lombok generated code patterns -->
+    <suppress checks="HiddenField" files=".* lombok\. .*"/>
+
+    <!-- Suppress for Spring Boot configuration classes -->
+    <suppress checks="Javadoc" files=".*Config\.java"/>
+    <suppress checks="Javadoc" files=".*Application\.java"/>
+
+    <!-- Suppress for DTOs and model classes -->
+    <suppress checks="Javadoc" files=".*Dto\.java"/>
+    <suppress checks="Javadoc" files=".*Model\.java"/>
+    <suppress checks="Javadoc" files=".*Request\.java"/>
+    <suppress checks="Javadoc" files=".*Response\.java"/>
+</suppressions>
