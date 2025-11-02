@@ -79,7 +79,7 @@ class PlantServiceTest {
   @Test
   void createPlant_ShouldReturnPlantId_WhenValidInput() {
     // Given
-    PlantDTO plantDto = new PlantDTO(
+    final PlantDTO plantDto = new PlantDTO(
         0L,
         "New Plant",
         "New Species",
@@ -92,7 +92,7 @@ class PlantServiceTest {
         null
     );
 
-    Plant newPlant = new Plant();
+    final Plant newPlant = new Plant();
     newPlant.setId(2);
     newPlant.setName("New Plant");
     newPlant.setSpecies("New Species");
@@ -106,7 +106,7 @@ class PlantServiceTest {
     when(plantRepository.save(newPlant)).thenReturn(newPlant);
 
     // When
-    long result = plantService.createPlant(plantDto, testImageUuid);
+    final long result = plantService.createPlant(plantDto, testImageUuid);
 
     // Then
     assertEquals(2L, result);
@@ -121,7 +121,7 @@ class PlantServiceTest {
     when(plantMapper.toPlantDTO(testPlant)).thenReturn(testPlantDTO);
 
     // When
-    PlantDTO result = plantService.getPlant(1L);
+    final PlantDTO result = plantService.getPlant(1L);
 
     // Then
     assertNotNull(result);
@@ -139,7 +139,7 @@ class PlantServiceTest {
     when(plantMapper.toPlantDTO(null)).thenReturn(null);
 
     // When
-    PlantDTO result = plantService.getPlant(999L);
+    final PlantDTO result = plantService.getPlant(999L);
 
     // Then
     assertNull(result);
@@ -150,7 +150,7 @@ class PlantServiceTest {
   @Test
   void getPlants_ShouldReturnAllPlantsAsDTOs() {
     // Given
-    Plant plant2 = new Plant();
+    final Plant plant2 = new Plant();
     plant2.setId(2);
     plant2.setName("Plant 2");
     plant2.setSpecies("Species 2");
@@ -159,7 +159,7 @@ class PlantServiceTest {
     plant2.setLocation(PlantLocation.KITCHEN);
     plant2.setWateringFrequency(10);
 
-    PlantDTO plantDTO2 = new PlantDTO(
+    final PlantDTO plantDTO2 = new PlantDTO(
         2L,
         "Plant 2",
         "Species 2",
@@ -172,17 +172,17 @@ class PlantServiceTest {
         null
     );
 
-    List<Plant> plants = List.of(testPlant, plant2);
+    final List<Plant> plants = List.of(testPlant, plant2);
     when(plantRepository.findAll()).thenReturn(plants);
     when(plantMapper.toPlantDTO(testPlant)).thenReturn(testPlantDTO);
     when(plantMapper.toPlantDTO(plant2)).thenReturn(plantDTO2);
 
     // When
-    var result = plantService.getPlants();
+    final var result = plantService.getPlants();
 
     // Then
     assertNotNull(result);
-    List<PlantDTO> resultList = result.collectList().block();
+    final List<PlantDTO> resultList = result.collectList().block();
     assertEquals(2, resultList.size());
     assertEquals(testPlantDTO.name(), resultList.get(0).name());
     assertEquals(plantDTO2.name(), resultList.get(1).name());
@@ -202,8 +202,8 @@ class PlantServiceTest {
   @Test
   void updatePlant_ShouldUpdateExistingPlant_WhenPlantExists() {
     // Given
-    LocalDate waterDate = LocalDate.now();
-    PlantDTO updateDTO = new PlantDTO(
+    final LocalDate waterDate = LocalDate.now();
+    final PlantDTO updateDTO = new PlantDTO(
         1L,
         "Updated Plant",
         "Updated Species",
@@ -233,7 +233,7 @@ class PlantServiceTest {
   @Test
   void updatePlant_ShouldThrowException_WhenPlantNotExists() {
     // Given
-    PlantDTO updateDTO = new PlantDTO(
+    final PlantDTO updateDTO = new PlantDTO(
         999L,
         "Updated Plant",
         "Updated Species",
@@ -249,7 +249,7 @@ class PlantServiceTest {
     when(plantRepository.findById(999L)).thenReturn(Optional.empty());
 
     // When & Then
-    IllegalArgumentException exception = assertThrows(
+    final IllegalArgumentException exception = assertThrows(
         IllegalArgumentException.class,
         () -> plantService.updatePlant(updateDTO)
     );
@@ -262,14 +262,14 @@ class PlantServiceTest {
   @Test
   void waterPlant_ShouldUpdateWateringDatesAndReturnDTO_WhenPlantExists() {
     // Given
-    LocalDate waterDate = LocalDate.now();
-    LocalDate expectedNextWaterDate = waterDate.plusDays(testPlant.getWateringFrequency());
+    final LocalDate waterDate = LocalDate.now();
+    final LocalDate expectedNextWaterDate = waterDate.plusDays(testPlant.getWateringFrequency());
 
     when(plantRepository.findById(1L)).thenReturn(Optional.of(testPlant));
     when(plantMapper.toPlantDTO(testPlant)).thenReturn(testPlantDTO);
 
     // When
-    PlantDTO result = plantService.waterPlant(1L, waterDate);
+    final PlantDTO result = plantService.waterPlant(1L, waterDate);
 
     // Then
     assertNotNull(result);
@@ -282,7 +282,7 @@ class PlantServiceTest {
   @Test
   void waterPlant_ShouldThrowException_WhenPlantNotExists() {
     // Given
-    LocalDate waterDate = LocalDate.now();
+    final LocalDate waterDate = LocalDate.now();
     when(plantRepository.findById(999L)).thenReturn(Optional.empty());
 
     // When & Then
@@ -294,7 +294,7 @@ class PlantServiceTest {
   @Test
   void sendWateringNotification_ShouldNotSendEmail_WhenNoPlantsToWater() {
     // Given
-    LocalDate today = LocalDate.now();
+    final LocalDate today = LocalDate.now();
     when(plantRepository.findByNextWateredDate(today)).thenReturn(List.of());
 
     // When
@@ -308,24 +308,24 @@ class PlantServiceTest {
   @Test
   void sendWateringNotification_ShouldSendEmail_WhenPlantsToWaterExist() {
     // Given
-    LocalDate today = LocalDate.now();
+    final LocalDate today = LocalDate.now();
 
-    Plant plantToWater1 = new Plant();
+    final Plant plantToWater1 = new Plant();
     plantToWater1.setId(1);
     plantToWater1.setName("Rose");
     plantToWater1.setLocation(PlantLocation.LIVING_ROOM);
 
-    Plant plantToWater2 = new Plant();
+    final Plant plantToWater2 = new Plant();
     plantToWater2.setId(2);
     plantToWater2.setName("Tulip");
     plantToWater2.setLocation(PlantLocation.KITCHEN);
 
-    Collection<Plant> plantsToWater = List.of(plantToWater1, plantToWater2);
+    final Collection<Plant> plantsToWater = List.of(plantToWater1, plantToWater2);
     when(plantRepository.findByNextWateredDate(today)).thenReturn(plantsToWater);
 
     // Use reflection to set the private mailUsername field
     try {
-      java.lang.reflect.Field field = PlantService.class.getDeclaredField("mailUsername");
+      final java.lang.reflect.Field field = PlantService.class.getDeclaredField("mailUsername");
       field.setAccessible(true);
       field.set(plantService, testMailUsername);
     } catch (Exception e) {
@@ -339,11 +339,11 @@ class PlantServiceTest {
     verify(plantRepository).findByNextWateredDate(today);
     verify(mailSender).send(any(SimpleMailMessage.class));
 
-    ArgumentCaptor<SimpleMailMessage> messageCaptor = ArgumentCaptor.forClass(
+    final ArgumentCaptor<SimpleMailMessage> messageCaptor = ArgumentCaptor.forClass(
         SimpleMailMessage.class);
     verify(mailSender).send(messageCaptor.capture());
 
-    SimpleMailMessage sentMessage = messageCaptor.getValue();
+    final SimpleMailMessage sentMessage = messageCaptor.getValue();
     assertEquals(testMailUsername, sentMessage.getFrom());
     assertEquals(testMailUsername, sentMessage.getTo()[0]);
     assertEquals("Plants to water at: " + today, sentMessage.getSubject());
@@ -354,28 +354,28 @@ class PlantServiceTest {
   @Test
   void waterPlant_ShouldCalculateNextWateringDateCorrectly() {
     // Given
-    Plant testPlant = new Plant();
-    testPlant.setId(1);
-    testPlant.setWateringFrequency(5);
+    final Plant localTestPlant = new Plant();
+    localTestPlant.setId(1);
+    localTestPlant.setWateringFrequency(5);
 
-    LocalDate waterDate = LocalDate.of(2023, 6, 15);
-    LocalDate expectedNextWaterDate = LocalDate.of(2023, 6, 20);
+    final LocalDate waterDate = LocalDate.of(2023, 6, 15);
+    final LocalDate expectedNextWaterDate = LocalDate.of(2023, 6, 20);
 
-    when(plantRepository.findById(1L)).thenReturn(Optional.of(testPlant));
-    when(plantMapper.toPlantDTO(testPlant)).thenReturn(testPlantDTO);
+    when(plantRepository.findById(1L)).thenReturn(Optional.of(localTestPlant));
+    when(plantMapper.toPlantDTO(localTestPlant)).thenReturn(testPlantDTO);
 
     // When
     plantService.waterPlant(1L, waterDate);
 
     // Then
-    assertEquals(waterDate, testPlant.getLastWateredDate());
-    assertEquals(expectedNextWaterDate, testPlant.getNextWateredDate());
+    assertEquals(waterDate, localTestPlant.getLastWateredDate());
+    assertEquals(expectedNextWaterDate, localTestPlant.getNextWateredDate());
   }
 
   @Test
   void updatePlant_ShouldThrowException_WhenLastWateredDateIsNull() {
     // Given
-    PlantDTO updateDTO = new PlantDTO(
+    final PlantDTO updateDTO = new PlantDTO(
         1L,
         "Updated Plant",
         "Updated Species",
@@ -400,24 +400,24 @@ class PlantServiceTest {
   @Test
   void sendWateringNotification_ShouldHandleMultiplePlantsWithSameLocation() {
     // Given
-    LocalDate today = LocalDate.now();
+    final LocalDate today = LocalDate.now();
 
-    Plant plant1 = new Plant();
+    final Plant plant1 = new Plant();
     plant1.setId(1);
     plant1.setName("Rose");
     plant1.setLocation(PlantLocation.LIVING_ROOM);
 
-    Plant plant2 = new Plant();
+    final Plant plant2 = new Plant();
     plant2.setId(2);
     plant2.setName("Lily");
     plant2.setLocation(PlantLocation.LIVING_ROOM);
 
-    Collection<Plant> plantsToWater = List.of(plant1, plant2);
+    final Collection<Plant> plantsToWater = List.of(plant1, plant2);
     when(plantRepository.findByNextWateredDate(today)).thenReturn(plantsToWater);
 
     // Use reflection to set the private mailUsername field
     try {
-      java.lang.reflect.Field field = PlantService.class.getDeclaredField("mailUsername");
+      final java.lang.reflect.Field field = PlantService.class.getDeclaredField("mailUsername");
       field.setAccessible(true);
       field.set(plantService, testMailUsername);
     } catch (Exception e) {
@@ -428,12 +428,12 @@ class PlantServiceTest {
     plantService.sendWateringNotification();
 
     // Then
-    ArgumentCaptor<SimpleMailMessage> messageCaptor = ArgumentCaptor.forClass(
+    final ArgumentCaptor<SimpleMailMessage> messageCaptor = ArgumentCaptor.forClass(
         SimpleMailMessage.class);
     verify(mailSender).send(messageCaptor.capture());
 
-    SimpleMailMessage sentMessage = messageCaptor.getValue();
-    String emailText = sentMessage.getText();
+    final SimpleMailMessage sentMessage = messageCaptor.getValue();
+    final String emailText = sentMessage.getText();
     assertTrue(emailText.contains("Plant: Rose, Location: LIVING_ROOM"));
     assertTrue(emailText.contains("Plant: Lily, Location: LIVING_ROOM"));
   }
@@ -441,7 +441,7 @@ class PlantServiceTest {
   @Test
   void createPlant_ShouldHandleNullImageUuid() {
     // Given
-    PlantDTO plantDto = new PlantDTO(
+    final PlantDTO plantDto = new PlantDTO(
         0L,
         "New Plant",
         "New Species",
@@ -454,7 +454,7 @@ class PlantServiceTest {
         null
     );
 
-    Plant newPlant = new Plant();
+    final Plant newPlant = new Plant();
     newPlant.setId(2);
     newPlant.setName("New Plant");
     newPlant.setSpecies("New Species");
@@ -468,7 +468,7 @@ class PlantServiceTest {
     when(plantRepository.save(newPlant)).thenReturn(newPlant);
 
     // When
-    long result = plantService.createPlant(plantDto, null);
+    final long result = plantService.createPlant(plantDto, null);
 
     // Then
     assertEquals(2L, result);
