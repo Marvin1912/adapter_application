@@ -4,6 +4,7 @@ import com.generated.deepl.ApiClient;
 import com.generated.deepl.api.TranslateTextApi;
 import com.generated.deepl.model.SourceLanguageText;
 import com.generated.deepl.model.TargetLanguageText;
+import com.generated.deepl.model.TranslateText200ResponseTranslationsInner;
 import com.generated.deepl.model.TranslateTextRequest;
 import com.marvin.vocabulary.dictionaryapi.DictionaryClient;
 import com.marvin.vocabulary.dto.DictionaryEntry;
@@ -452,7 +453,7 @@ public class FlashcardController {
 
     return translateTextApi.translateText(translationRequest)
         .flatMapMany(translationResponse -> {
-          List<com.generated.deepl.model.TranslateText200ResponseTranslationsInner> deepLTranslations = translationResponse.getTranslations();
+          List<TranslateText200ResponseTranslationsInner> deepLTranslations = translationResponse.getTranslations();
 
           if (deepLTranslations == null || deepLTranslations.isEmpty()) {
             return Flux.empty();

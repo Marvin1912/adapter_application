@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -17,9 +18,9 @@ import reactor.core.publisher.Mono;
 @Component
 public class DictionaryClient {
 
-  private static final ParameterizedTypeReference<Map<String, List<WiktionaryResponseMapper.WiktionaryDefinition>>> WIKTIONARY_REFERENCE =
-      new ParameterizedTypeReference<>() {
-      };
+  private static final ParameterizedTypeReference<Map<String, List<WiktionaryResponseMapper.WiktionaryDefinition>>>
+      WIKTIONARY_REFERENCE = new ParameterizedTypeReference<>() {
+  };
 
   private final WebClient webClient;
   private final WiktionaryResponseMapper responseMapper;
@@ -60,7 +61,7 @@ public class DictionaryClient {
             response -> Mono.error(new InvalidWordException(word))
         )
         .onStatus(
-            status -> status.is4xxClientError(),
+            HttpStatusCode::is4xxClientError,
             response -> Mono.error(new DictionaryApiException(
                 "Client error occurred while fetching dictionary entry for word: "
                     + word,
@@ -69,7 +70,7 @@ public class DictionaryClient {
             ))
         )
         .onStatus(
-            status -> status.is5xxServerError(),
+            HttpStatusCode::is5xxServerError,
             response -> Mono.error(new DictionaryApiException(
                 "Server error occurred while fetching dictionary entry for word: "
                     + word,
