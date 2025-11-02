@@ -3,8 +3,6 @@ package com.marvin.consul.repository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marvin.consul.model.ConsulKeyValueDTO;
-import org.apache.commons.lang3.StringUtils;
-
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -12,6 +10,7 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 
 public class BasicConsulRepository {
 
@@ -35,7 +34,8 @@ public class BasicConsulRepository {
                 .uri(new URI(url + "/v1/kv/" + keyPrefix + "?recurse=true"))
                 .build();
 
-        HttpResponse<String> httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+        HttpResponse<String> httpResponse = httpClient.send(httpRequest,
+                HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
 
         String responseBody = httpResponse.body();
 

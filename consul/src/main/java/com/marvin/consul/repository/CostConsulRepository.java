@@ -2,23 +2,20 @@ package com.marvin.consul.repository;
 
 import com.marvin.consul.model.ConsulKeyValueDTO;
 import jakarta.annotation.PostConstruct;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.scheduling.annotation.Scheduled;
-
 import java.util.Collections;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.scheduling.annotation.Scheduled;
 
 public abstract class CostConsulRepository implements ConsulRepository {
 
     private static final Logger LOGGER = Logger.getLogger(CostConsulRepository.class.getName());
-
-    protected Map<String, String> properties;
-
     private final BasicConsulRepository consulRepository;
     private final String keyPrefix;
+    protected Map<String, String> properties;
 
     public CostConsulRepository(BasicConsulRepository consulRepository, String keyPrefix) {
         this.consulRepository = consulRepository;

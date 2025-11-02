@@ -8,14 +8,13 @@ import com.marvin.vocabulary.dto.FlashcardCsvDTO;
 import com.marvin.vocabulary.model.FlashcardEntity;
 import com.marvin.vocabulary.repository.FlashcardRepository;
 import jakarta.transaction.Transactional;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
@@ -76,7 +75,8 @@ public class FlashcardService {
                             f.setUpdated(flashcard.isUpdated());
                         },
                         () -> {
-                            throw new IllegalArgumentException("No flashcard found with id: " + flashcard.getId());
+                            throw new IllegalArgumentException(
+                                    "No flashcard found with id: " + flashcard.getId());
                         }
                 );
         return flashcard.getId();
@@ -147,7 +147,8 @@ public class FlashcardService {
         return count.get();
     }
 
-    private void importFlashcard(Set<String> allAnkiIds, FlashcardCsvDTO flashcardCsvDto, AtomicInteger count) {
+    private void importFlashcard(Set<String> allAnkiIds, FlashcardCsvDTO flashcardCsvDto,
+            AtomicInteger count) {
         if (!allAnkiIds.contains(flashcardCsvDto.guid())) {
             flashcardRepository
                     .findByFrontAndBack(flashcardCsvDto.front(), flashcardCsvDto.back())

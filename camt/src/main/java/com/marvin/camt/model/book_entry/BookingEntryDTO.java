@@ -15,4 +15,5 @@ public record BookingEntryDTO(
         String creditIban,
         String additionalInfo
 ) {
+
 }

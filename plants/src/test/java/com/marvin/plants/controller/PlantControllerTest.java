@@ -1,68 +1,68 @@
 package com.marvin.plants.controller;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.marvin.image.service.ImageService;
 import com.marvin.plants.dto.PlantDTO;
 import com.marvin.plants.dto.PlantLocation;
 import com.marvin.plants.service.PlantService;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatchers;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.core.io.buffer.DataBuffer;
-import org.springframework.core.io.buffer.DefaultDataBufferFactory;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.codec.multipart.FilePart;
-import org.springframework.mock.http.server.reactive.MockServerHttpRequest;
-import org.springframework.mock.web.server.MockServerWebExchange;
-import org.springframework.web.reactive.function.BodyInserters;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-import reactor.test.StepVerifier;
-
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DefaultDataBufferFactory;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.codec.multipart.FilePart;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Plant Controller Tests")
 class PlantControllerTest {
 
+    private final UUID testImageUuid = UUID.randomUUID();
     @Mock
     private PlantService plantService;
-
     @Mock
     private ImageService imageService;
-
     @InjectMocks
     private PlantController plantController;
-
     private PlantDTO testPlantDTO;
-    private final UUID testImageUuid = UUID.randomUUID();
 
     @BeforeEach
     void setUp() {
         testPlantDTO = new PlantDTO(
-            1L,
-            "Test Plant",
-            "Test Species",
-            "Test Description",
-            "Test Care Instructions",
-            PlantLocation.LIVING_ROOM,
-            7,
-            LocalDate.now().minusDays(3),
-            LocalDate.now().plusDays(4),
-            testImageUuid.toString()
+                1L,
+                "Test Plant",
+                "Test Species",
+                "Test Description",
+                "Test Care Instructions",
+                PlantLocation.LIVING_ROOM,
+                7,
+                LocalDate.now().minusDays(3),
+                LocalDate.now().plusDays(4),
+                testImageUuid.toString()
         );
     }
 
@@ -71,30 +71,32 @@ class PlantControllerTest {
     void createPlant_ShouldReturnCreatedStatus_WhenValidPlantWithoutImage() {
         // Given
         PlantDTO newPlantDTO = new PlantDTO(
-            0L,
-            "New Plant",
-            "New Species",
-            "New Description",
-            "New Care Instructions",
-            PlantLocation.BEDROOM,
-            5,
-            null,
-            null,
-            null
+                0L,
+                "New Plant",
+                "New Species",
+                "New Description",
+                "New Care Instructions",
+                PlantLocation.BEDROOM,
+                5,
+                null,
+                null,
+                null
         );
 
         when(plantService.createPlant(any(PlantDTO.class), eq(""))).thenReturn(2L);
 
         // When
-        Mono<ResponseEntity<Object>> result = plantController.createPlant(Mono.empty(), Mono.just(newPlantDTO), null);
+        Mono<ResponseEntity<Object>> result = plantController.createPlant(Mono.empty(),
+                Mono.just(newPlantDTO), null);
 
         // Then
         StepVerifier.create(result)
-            .assertNext(response -> {
-                assertEquals(201, response.getStatusCode().value());
-                assertTrue(response.getHeaders().getLocation().toString().contains("/plants/2"));
-            })
-            .verifyComplete();
+                .assertNext(response -> {
+                    assertEquals(201, response.getStatusCode().value());
+                    assertTrue(
+                            response.getHeaders().getLocation().toString().contains("/plants/2"));
+                })
+                .verifyComplete();
 
         verify(plantService).createPlant(any(PlantDTO.class), eq(""));
     }
@@ -104,38 +106,42 @@ class PlantControllerTest {
     void createPlant_ShouldReturnCreatedStatus_WhenValidPlantWithImage() {
         // Given
         PlantDTO newPlantDTO = new PlantDTO(
-            0L,
-            "New Plant",
-            "New Species",
-            "New Description",
-            "New Care Instructions",
-            PlantLocation.BEDROOM,
-            5,
-            null,
-            null,
-            null
+                0L,
+                "New Plant",
+                "New Species",
+                "New Description",
+                "New Care Instructions",
+                PlantLocation.BEDROOM,
+                5,
+                null,
+                null,
+                null
         );
 
         byte[] imageBytes = "test image content".getBytes(StandardCharsets.UTF_8);
         String contentType = "image/jpeg";
 
-        when(imageService.saveImage(eq(imageBytes), eq(contentType))).thenReturn(Mono.just(testImageUuid));
-        when(plantService.createPlant(any(PlantDTO.class), eq(testImageUuid.toString()))).thenReturn(1L);
+        when(imageService.saveImage(eq(imageBytes), eq(contentType))).thenReturn(
+                Mono.just(testImageUuid));
+        when(plantService.createPlant(any(PlantDTO.class),
+                eq(testImageUuid.toString()))).thenReturn(1L);
 
         FilePart filePart = mock(FilePart.class);
         DataBuffer dataBuffer = new DefaultDataBufferFactory().wrap(imageBytes);
         when(filePart.content()).thenReturn(Flux.just(dataBuffer));
 
         // When
-        Mono<ResponseEntity<Object>> result = plantController.createPlant(Mono.just(filePart), Mono.just(newPlantDTO), contentType);
+        Mono<ResponseEntity<Object>> result = plantController.createPlant(Mono.just(filePart),
+                Mono.just(newPlantDTO), contentType);
 
         // Then
         StepVerifier.create(result)
-            .assertNext(response -> {
-                assertEquals(201, response.getStatusCode().value());
-                assertTrue(response.getHeaders().getLocation().toString().contains("/plants/1"));
-            })
-            .verifyComplete();
+                .assertNext(response -> {
+                    assertEquals(201, response.getStatusCode().value());
+                    assertTrue(
+                            response.getHeaders().getLocation().toString().contains("/plants/1"));
+                })
+                .verifyComplete();
 
         verify(imageService).saveImage(eq(imageBytes), eq(contentType));
         verify(plantService).createPlant(any(PlantDTO.class), eq(testImageUuid.toString()));
@@ -146,16 +152,16 @@ class PlantControllerTest {
     void createPlant_ShouldHandleEmptyImageFile() {
         // Given
         PlantDTO newPlantDTO = new PlantDTO(
-            0L,
-            "New Plant",
-            "New Species",
-            "New Description",
-            "New Care Instructions",
-            PlantLocation.BEDROOM,
-            5,
-            null,
-            null,
-            null
+                0L,
+                "New Plant",
+                "New Species",
+                "New Description",
+                "New Care Instructions",
+                PlantLocation.BEDROOM,
+                5,
+                null,
+                null,
+                null
         );
 
         FilePart filePart = mock(FilePart.class);
@@ -164,15 +170,17 @@ class PlantControllerTest {
         when(plantService.createPlant(any(PlantDTO.class), eq(""))).thenReturn(1L);
 
         // When
-        Mono<ResponseEntity<Object>> result = plantController.createPlant(Mono.just(filePart), Mono.just(newPlantDTO), null);
+        Mono<ResponseEntity<Object>> result = plantController.createPlant(Mono.just(filePart),
+                Mono.just(newPlantDTO), null);
 
         // Then
         StepVerifier.create(result)
-            .assertNext(response -> {
-                assertEquals(201, response.getStatusCode().value());
-                assertTrue(response.getHeaders().getLocation().toString().contains("/plants/1"));
-            })
-            .verifyComplete();
+                .assertNext(response -> {
+                    assertEquals(201, response.getStatusCode().value());
+                    assertTrue(
+                            response.getHeaders().getLocation().toString().contains("/plants/1"));
+                })
+                .verifyComplete();
 
         verify(plantService).createPlant(any(PlantDTO.class), eq(""));
         verify(imageService, never()).saveImage(any(byte[].class), anyString());
@@ -183,16 +191,16 @@ class PlantControllerTest {
     void createPlant_ShouldProcessImageCorrectly() {
         // Given
         PlantDTO newPlantDTO = new PlantDTO(
-            0L,
-            "New Plant",
-            "New Species",
-            "New Description",
-            "New Care Instructions",
-            PlantLocation.BEDROOM,
-            5,
-            null,
-            null,
-            null
+                0L,
+                "New Plant",
+                "New Species",
+                "New Description",
+                "New Care Instructions",
+                PlantLocation.BEDROOM,
+                5,
+                null,
+                null,
+                null
         );
 
         when(plantService.createPlant(any(PlantDTO.class), eq(""))).thenReturn(1L);
@@ -201,16 +209,18 @@ class PlantControllerTest {
         FilePart filePart = mock(FilePart.class);
         when(filePart.content()).thenReturn(Flux.empty());
 
-        Mono<ResponseEntity<Object>> result = plantController.createPlant(Mono.just(filePart), Mono.just(newPlantDTO), null);
+        Mono<ResponseEntity<Object>> result = plantController.createPlant(Mono.just(filePart),
+                Mono.just(newPlantDTO), null);
 
         // Then
         StepVerifier.create(result)
-            .assertNext(response -> {
-                assertEquals(201, response.getStatusCode().value());
-                assertNotNull(response.getHeaders().getLocation());
-                assertTrue(response.getHeaders().getLocation().toString().contains("/plants/1"));
-            })
-            .verifyComplete();
+                .assertNext(response -> {
+                    assertEquals(201, response.getStatusCode().value());
+                    assertNotNull(response.getHeaders().getLocation());
+                    assertTrue(
+                            response.getHeaders().getLocation().toString().contains("/plants/1"));
+                })
+                .verifyComplete();
 
         verify(plantService).createPlant(any(PlantDTO.class), eq(""));
     }
@@ -220,16 +230,16 @@ class PlantControllerTest {
     void updatePlant_ShouldReturnNoContent_WhenValidPlantUpdate() {
         // Given
         PlantDTO updateDTO = new PlantDTO(
-            1L,
-            "Updated Plant",
-            "Updated Species",
-            "Updated Description",
-            "Updated Care Instructions",
-            PlantLocation.KITCHEN,
-            10,
-            LocalDate.now(),
-            LocalDate.now().plusDays(10),
-            "updated-image.jpg"
+                1L,
+                "Updated Plant",
+                "Updated Species",
+                "Updated Description",
+                "Updated Care Instructions",
+                PlantLocation.KITCHEN,
+                10,
+                LocalDate.now(),
+                LocalDate.now().plusDays(10),
+                "updated-image.jpg"
         );
 
         doNothing().when(plantService).updatePlant(any(PlantDTO.class));
@@ -239,10 +249,10 @@ class PlantControllerTest {
 
         // Then
         StepVerifier.create(result)
-            .assertNext(response -> {
-                assertEquals(204, response.getStatusCode().value());
-            })
-            .verifyComplete();
+                .assertNext(response -> {
+                    assertEquals(204, response.getStatusCode().value());
+                })
+                .verifyComplete();
 
         verify(plantService).updatePlant(updateDTO);
     }
@@ -252,16 +262,16 @@ class PlantControllerTest {
     void getPlants_ShouldReturnAllPlants_WhenPlantsExist() {
         // Given
         PlantDTO plant2DTO = new PlantDTO(
-            2L,
-            "Plant 2",
-            "Species 2",
-            "Description 2",
-            "Care 2",
-            PlantLocation.KITCHEN,
-            10,
-            null,
-            null,
-            null
+                2L,
+                "Plant 2",
+                "Species 2",
+                "Description 2",
+                "Care 2",
+                PlantLocation.KITCHEN,
+                10,
+                null,
+                null,
+                null
         );
 
         List<PlantDTO> plants = List.of(testPlantDTO, plant2DTO);
@@ -272,9 +282,9 @@ class PlantControllerTest {
 
         // Then
         StepVerifier.create(result)
-            .expectNext(testPlantDTO)
-            .expectNext(plant2DTO)
-            .verifyComplete();
+                .expectNext(testPlantDTO)
+                .expectNext(plant2DTO)
+                .verifyComplete();
 
         verify(plantService).getPlants();
     }
@@ -290,7 +300,7 @@ class PlantControllerTest {
 
         // Then
         StepVerifier.create(result)
-            .verifyComplete();
+                .verifyComplete();
 
         verify(plantService).getPlants();
     }
@@ -306,8 +316,8 @@ class PlantControllerTest {
 
         // Then
         StepVerifier.create(result)
-            .expectNext(testPlantDTO)
-            .verifyComplete();
+                .expectNext(testPlantDTO)
+                .verifyComplete();
 
         verify(plantService).getPlant(1L);
     }
@@ -323,7 +333,7 @@ class PlantControllerTest {
 
         // Then
         StepVerifier.create(result)
-            .verifyComplete();
+                .verifyComplete();
 
         verify(plantService).getPlant(999L);
     }
@@ -339,10 +349,10 @@ class PlantControllerTest {
 
         // Then
         StepVerifier.create(result)
-            .assertNext(response -> {
-                assertEquals(204, response.getStatusCode().value());
-            })
-            .verifyComplete();
+                .assertNext(response -> {
+                    assertEquals(204, response.getStatusCode().value());
+                })
+                .verifyComplete();
 
         verify(plantService).deletePlant(1L);
     }
@@ -353,16 +363,16 @@ class PlantControllerTest {
         // Given
         LocalDate waterDate = LocalDate.now();
         PlantDTO wateredPlantDTO = new PlantDTO(
-            1L,
-            "Test Plant",
-            "Test Species",
-            "Test Description",
-            "Test Care Instructions",
-            PlantLocation.LIVING_ROOM,
-            7,
-            waterDate,
-            waterDate.plusDays(7),
-            testImageUuid.toString()
+                1L,
+                "Test Plant",
+                "Test Species",
+                "Test Description",
+                "Test Care Instructions",
+                PlantLocation.LIVING_ROOM,
+                7,
+                waterDate,
+                waterDate.plusDays(7),
+                testImageUuid.toString()
         );
 
         when(plantService.waterPlant(1L, waterDate)).thenReturn(wateredPlantDTO);
@@ -372,11 +382,11 @@ class PlantControllerTest {
 
         // Then
         StepVerifier.create(result)
-            .assertNext(response -> {
-                assertEquals(200, response.getStatusCode().value());
-                assertEquals(wateredPlantDTO, response.getBody());
-            })
-            .verifyComplete();
+                .assertNext(response -> {
+                    assertEquals(200, response.getStatusCode().value());
+                    assertEquals(wateredPlantDTO, response.getBody());
+                })
+                .verifyComplete();
 
         verify(plantService).waterPlant(1L, waterDate);
     }
@@ -387,16 +397,16 @@ class PlantControllerTest {
         // Given
         LocalDate pastDate = LocalDate.now().minusDays(1);
         PlantDTO wateredPlantDTO = new PlantDTO(
-            1L,
-            "Test Plant",
-            "Test Species",
-            "Test Description",
-            "Test Care Instructions",
-            PlantLocation.LIVING_ROOM,
-            7,
-            pastDate,
-            pastDate.plusDays(7),
-            testImageUuid.toString()
+                1L,
+                "Test Plant",
+                "Test Species",
+                "Test Description",
+                "Test Care Instructions",
+                PlantLocation.LIVING_ROOM,
+                7,
+                pastDate,
+                pastDate.plusDays(7),
+                testImageUuid.toString()
         );
 
         when(plantService.waterPlant(1L, pastDate)).thenReturn(wateredPlantDTO);
@@ -406,11 +416,11 @@ class PlantControllerTest {
 
         // Then
         StepVerifier.create(result)
-            .assertNext(response -> {
-                assertEquals(200, response.getStatusCode().value());
-                assertEquals(wateredPlantDTO, response.getBody());
-            })
-            .verifyComplete();
+                .assertNext(response -> {
+                    assertEquals(200, response.getStatusCode().value());
+                    assertEquals(wateredPlantDTO, response.getBody());
+                })
+                .verifyComplete();
 
         verify(plantService).waterPlant(1L, pastDate);
     }
@@ -421,16 +431,16 @@ class PlantControllerTest {
         // Given
         LocalDate futureDate = LocalDate.now().plusDays(1);
         PlantDTO wateredPlantDTO = new PlantDTO(
-            1L,
-            "Test Plant",
-            "Test Species",
-            "Test Description",
-            "Test Care Instructions",
-            PlantLocation.LIVING_ROOM,
-            7,
-            futureDate,
-            futureDate.plusDays(7),
-            testImageUuid.toString()
+                1L,
+                "Test Plant",
+                "Test Species",
+                "Test Description",
+                "Test Care Instructions",
+                PlantLocation.LIVING_ROOM,
+                7,
+                futureDate,
+                futureDate.plusDays(7),
+                testImageUuid.toString()
         );
 
         when(plantService.waterPlant(1L, futureDate)).thenReturn(wateredPlantDTO);
@@ -440,11 +450,11 @@ class PlantControllerTest {
 
         // Then
         StepVerifier.create(result)
-            .assertNext(response -> {
-                assertEquals(200, response.getStatusCode().value());
-                assertEquals(wateredPlantDTO, response.getBody());
-            })
-            .verifyComplete();
+                .assertNext(response -> {
+                    assertEquals(200, response.getStatusCode().value());
+                    assertEquals(wateredPlantDTO, response.getBody());
+                })
+                .verifyComplete();
 
         verify(plantService).waterPlant(1L, futureDate);
     }
@@ -455,7 +465,7 @@ class PlantControllerTest {
         // Given
         LocalDate waterDate = LocalDate.now();
         when(plantService.waterPlant(1L, waterDate))
-            .thenThrow(new RuntimeException("Plant not found"));
+                .thenThrow(new RuntimeException("Plant not found"));
 
         // When & Then
         assertThrows(RuntimeException.class, () -> {
@@ -471,16 +481,16 @@ class PlantControllerTest {
         // Given
         LocalDate waterDate = LocalDate.now();
         PlantDTO wateredPlantDTO = new PlantDTO(
-            1L,
-            "Test Plant",
-            "Test Species",
-            "Test Description",
-            "Test Care Instructions",
-            PlantLocation.LIVING_ROOM,
-            7,
-            waterDate,
-            waterDate.plusDays(7),
-            testImageUuid.toString()
+                1L,
+                "Test Plant",
+                "Test Species",
+                "Test Description",
+                "Test Care Instructions",
+                PlantLocation.LIVING_ROOM,
+                7,
+                waterDate,
+                waterDate.plusDays(7),
+                testImageUuid.toString()
         );
 
         when(plantService.waterPlant(1L, waterDate)).thenReturn(wateredPlantDTO);
@@ -490,11 +500,11 @@ class PlantControllerTest {
 
         // Then
         StepVerifier.create(result)
-            .assertNext(response -> {
-                assertEquals(200, response.getStatusCode().value());
-                assertEquals(wateredPlantDTO, response.getBody());
-            })
-            .verifyComplete();
+                .assertNext(response -> {
+                    assertEquals(200, response.getStatusCode().value());
+                    assertEquals(wateredPlantDTO, response.getBody());
+                })
+                .verifyComplete();
 
         verify(plantService).waterPlant(1L, waterDate);
     }
@@ -504,38 +514,42 @@ class PlantControllerTest {
     void createPlant_ShouldHandleContentTypeParameter() {
         // Given
         PlantDTO newPlantDTO = new PlantDTO(
-            0L,
-            "New Plant",
-            "New Species",
-            "New Description",
-            "New Care Instructions",
-            PlantLocation.BEDROOM,
-            5,
-            null,
-            null,
-            null
+                0L,
+                "New Plant",
+                "New Species",
+                "New Description",
+                "New Care Instructions",
+                PlantLocation.BEDROOM,
+                5,
+                null,
+                null,
+                null
         );
 
         byte[] imageBytes = "test image content".getBytes(StandardCharsets.UTF_8);
         String contentType = "image/jpeg";
 
-        when(imageService.saveImage(eq(imageBytes), eq(contentType))).thenReturn(Mono.just(testImageUuid));
-        when(plantService.createPlant(any(PlantDTO.class), eq(testImageUuid.toString()))).thenReturn(1L);
+        when(imageService.saveImage(eq(imageBytes), eq(contentType))).thenReturn(
+                Mono.just(testImageUuid));
+        when(plantService.createPlant(any(PlantDTO.class),
+                eq(testImageUuid.toString()))).thenReturn(1L);
 
         FilePart filePart = mock(FilePart.class);
         DataBuffer dataBuffer = new DefaultDataBufferFactory().wrap(imageBytes);
         when(filePart.content()).thenReturn(Flux.just(dataBuffer));
 
         // When
-        Mono<ResponseEntity<Object>> result = plantController.createPlant(Mono.just(filePart), Mono.just(newPlantDTO), contentType);
+        Mono<ResponseEntity<Object>> result = plantController.createPlant(Mono.just(filePart),
+                Mono.just(newPlantDTO), contentType);
 
         // Then
         StepVerifier.create(result)
-            .assertNext(response -> {
-                assertEquals(201, response.getStatusCode().value());
-                assertTrue(response.getHeaders().getLocation().toString().contains("/plants/1"));
-            })
-            .verifyComplete();
+                .assertNext(response -> {
+                    assertEquals(201, response.getStatusCode().value());
+                    assertTrue(
+                            response.getHeaders().getLocation().toString().contains("/plants/1"));
+                })
+                .verifyComplete();
 
         verify(imageService).saveImage(eq(imageBytes), eq(contentType));
         verify(plantService).createPlant(any(PlantDTO.class), eq(testImageUuid.toString()));
@@ -548,16 +562,16 @@ class PlantControllerTest {
         List<PlantDTO> largePlantList = new ArrayList<>();
         for (int i = 1; i <= 100; i++) {
             largePlantList.add(new PlantDTO(
-                (long) i,
-                "Plant " + i,
-                "Species " + i,
-                "Description " + i,
-                "Care " + i,
-                PlantLocation.values()[i % PlantLocation.values().length],
-                i % 30 + 1,
-                null,
-                null,
-                null
+                    (long) i,
+                    "Plant " + i,
+                    "Species " + i,
+                    "Description " + i,
+                    "Care " + i,
+                    PlantLocation.values()[i % PlantLocation.values().length],
+                    i % 30 + 1,
+                    null,
+                    null,
+                    null
             ));
         }
 
@@ -568,8 +582,8 @@ class PlantControllerTest {
 
         // Then
         StepVerifier.create(result)
-            .expectNextCount(100)
-            .verifyComplete();
+                .expectNextCount(100)
+                .verifyComplete();
 
         verify(plantService).getPlants();
     }
@@ -585,10 +599,10 @@ class PlantControllerTest {
 
         // Then
         StepVerifier.create(result)
-            .assertNext(response -> {
-                assertEquals(204, response.getStatusCode().value());
-            })
-            .verifyComplete();
+                .assertNext(response -> {
+                    assertEquals(204, response.getStatusCode().value());
+                })
+                .verifyComplete();
 
         verify(plantService).deletePlant(1L);
     }
@@ -597,7 +611,8 @@ class PlantControllerTest {
     @DisplayName("Should test getFileAsByteArray utility method")
     void testGetFileAsByteArray_WithValidFile() throws Exception {
         // Given - Using reflection to test the private method
-        java.lang.reflect.Method method = PlantController.class.getDeclaredMethod("getFileAsByteArray", Mono.class);
+        java.lang.reflect.Method method = PlantController.class.getDeclaredMethod(
+                "getFileAsByteArray", Mono.class);
         method.setAccessible(true);
 
         byte[] expectedBytes = "test content".getBytes(StandardCharsets.UTF_8);
@@ -610,15 +625,16 @@ class PlantControllerTest {
 
         // Then
         StepVerifier.create(result)
-            .expectNextMatches(bytes -> java.util.Arrays.equals(expectedBytes, bytes))
-            .verifyComplete();
+                .expectNextMatches(bytes -> java.util.Arrays.equals(expectedBytes, bytes))
+                .verifyComplete();
     }
 
     @Test
     @DisplayName("Should test getFileAsByteArray with empty file")
     void testGetFileAsByteArray_WithEmptyFile() throws Exception {
         // Given
-        java.lang.reflect.Method method = PlantController.class.getDeclaredMethod("getFileAsByteArray", Mono.class);
+        java.lang.reflect.Method method = PlantController.class.getDeclaredMethod(
+                "getFileAsByteArray", Mono.class);
         method.setAccessible(true);
 
         FilePart filePart = mock(FilePart.class);
@@ -629,15 +645,16 @@ class PlantControllerTest {
 
         // Then
         StepVerifier.create(result)
-            .expectNextMatches(bytes -> bytes.length == 0)
-            .verifyComplete();
+                .expectNextMatches(bytes -> bytes.length == 0)
+                .verifyComplete();
     }
 
     @Test
     @DisplayName("Should test getFileAsByteArray with error")
     void testGetFileAsByteArray_WithError() throws Exception {
         // Given
-        java.lang.reflect.Method method = PlantController.class.getDeclaredMethod("getFileAsByteArray", Mono.class);
+        java.lang.reflect.Method method = PlantController.class.getDeclaredMethod(
+                "getFileAsByteArray", Mono.class);
         method.setAccessible(true);
 
         FilePart filePart = mock(FilePart.class);
@@ -648,7 +665,7 @@ class PlantControllerTest {
 
         // Then
         StepVerifier.create(result)
-            .expectNextMatches(bytes -> bytes.length == 0)
-            .verifyComplete();
+                .expectNextMatches(bytes -> bytes.length == 0)
+                .verifyComplete();
     }
 }

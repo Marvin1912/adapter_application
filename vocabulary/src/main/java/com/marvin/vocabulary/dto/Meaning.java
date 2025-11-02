@@ -7,5 +7,7 @@ public record Meaning(
         List<Word> definitions,
         List<String> synonyms,
         List<String> antonyms
-) {}
+) {
+
+}
 

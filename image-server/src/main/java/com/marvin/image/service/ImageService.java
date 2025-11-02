@@ -2,11 +2,10 @@ package com.marvin.image.service;
 
 import com.marvin.image.entity.Image;
 import com.marvin.image.repository.ImageRepository;
+import java.util.UUID;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
-
-import java.util.UUID;
 
 @Service
 public class ImageService {
@@ -29,6 +28,7 @@ public class ImageService {
     public Mono<byte[]> getImage(UUID id) {
         return Mono.fromCallable(() -> imageRepository.findById(id))
                 .subscribeOn(Schedulers.boundedElastic())
-                .flatMap(image -> image.map(value -> Mono.just(value.getContent())).orElseGet(Mono::empty));
+                .flatMap(image -> image.map(value -> Mono.just(value.getContent()))
+                        .orElseGet(Mono::empty));
     }
 }

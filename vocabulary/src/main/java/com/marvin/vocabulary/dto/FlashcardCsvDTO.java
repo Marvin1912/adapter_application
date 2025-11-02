@@ -14,4 +14,5 @@ public record FlashcardCsvDTO(
         @JsonProperty("description")
         String description
 ) {
+
 }

@@ -7,10 +7,9 @@ import com.marvin.common.costs.SalaryDTO;
 import com.marvin.database.repository.SalaryRepository;
 import com.marvin.entities.costs.SalaryEntity;
 import com.marvin.influxdb.costs.salary.service.SalaryImport;
+import java.util.Optional;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
-
-import java.util.Optional;
 
 @Component
 public class SalaryImportService implements ImportService<SalaryDTO> {
@@ -45,7 +44,8 @@ public class SalaryImportService implements ImportService<SalaryDTO> {
 
     @Override
     public void importData(SalaryDTO salary) {
-        final Optional<SalaryEntity> persistedStateList = salaryRepository.findBySalaryDate(salary.salaryDate());
+        final Optional<SalaryEntity> persistedStateList = salaryRepository.findBySalaryDate(
+                salary.salaryDate());
         if (persistedStateList.isEmpty()) {
             SalaryEntity salaryEntity = new SalaryEntity(salary.salaryDate(), salary.value());
             salaryRepository.save(salaryEntity);

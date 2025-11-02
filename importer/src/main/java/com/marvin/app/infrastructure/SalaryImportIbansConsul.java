@@ -1,11 +1,10 @@
 package com.marvin.app.infrastructure;
 
 import com.marvin.consul.repository.SalaryConsulRepository;
+import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-
-import java.util.Set;
 
 @Component("salaryImportIbans")
 public class SalaryImportIbansConsul implements Ibans {

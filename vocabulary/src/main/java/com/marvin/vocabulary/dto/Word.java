@@ -7,5 +7,7 @@ public record Word(
         String example,
         List<String> synonyms,
         List<String> antonyms
-) {}
+) {
+
+}
 

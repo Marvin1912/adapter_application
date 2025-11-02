@@ -11,7 +11,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-
 import java.math.BigDecimal;
 import java.util.Objects;
 
@@ -82,9 +81,15 @@ public class SpecialCostEntryEntity extends BasicEntity {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        if (!super.equals(o)) {
+            return false;
+        }
         SpecialCostEntryEntity that = (SpecialCostEntryEntity) o;
         return id == that.id
                 && Objects.equals(description, that.description)

@@ -1,10 +1,5 @@
 package com.marvin.upload;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
@@ -15,13 +10,18 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 @Component
 public class Uploader {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Uploader.class);
 
-    private static final DateTimeFormatter FILE_DTF = DateTimeFormatter.ofPattern("yyyyMMdd_hhmmss");
+    private static final DateTimeFormatter FILE_DTF = DateTimeFormatter.ofPattern(
+            "yyyyMMdd_hhmmss");
 
     private final String costExportFolder;
     private final String parentFolderName;
@@ -42,9 +42,11 @@ public class Uploader {
         LOGGER.info("Going to zip and upload files!");
 
         final Path dirPath = Paths.get(costExportFolder);
-        final Path zipFilePath = dirPath.resolve("files_" + LocalDateTime.now().format(FILE_DTF) + ".zip");
+        final Path zipFilePath = dirPath.resolve(
+                "files_" + LocalDateTime.now().format(FILE_DTF) + ".zip");
 
-        try (ZipOutputStream zipOutputStream = new ZipOutputStream(Files.newOutputStream(zipFilePath))) {
+        try (ZipOutputStream zipOutputStream = new ZipOutputStream(
+                Files.newOutputStream(zipFilePath))) {
             zipOutputStream.setLevel(9);
             filesToZipAndUpload.stream()
                     .filter(path -> !Files.isDirectory(path))

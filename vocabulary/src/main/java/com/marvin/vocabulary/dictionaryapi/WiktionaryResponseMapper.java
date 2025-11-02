@@ -1,10 +1,14 @@
 package com.marvin.vocabulary.dictionaryapi;
 
-import com.marvin.vocabulary.dto.*;
-import org.springframework.stereotype.Component;
-
-import java.util.*;
+import com.marvin.vocabulary.dto.DictionaryEntry;
+import com.marvin.vocabulary.dto.Meaning;
+import com.marvin.vocabulary.dto.Word;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
+import org.springframework.stereotype.Component;
 
 @Component
 public class WiktionaryResponseMapper {
@@ -15,7 +19,8 @@ public class WiktionaryResponseMapper {
         this.htmlCleaner = htmlCleaner;
     }
 
-    public List<DictionaryEntry> mapToDictionaryEntries(String word, Map<String, List<WiktionaryDefinition>> wiktionaryResponse) {
+    public List<DictionaryEntry> mapToDictionaryEntries(String word,
+            Map<String, List<WiktionaryDefinition>> wiktionaryResponse) {
         if (wiktionaryResponse == null || !wiktionaryResponse.containsKey("en")) {
             return Collections.emptyList();
         }
@@ -99,6 +104,7 @@ public class WiktionaryResponseMapper {
 
     // Inner classes to represent Wiktionary API response structure
     public static class WiktionaryDefinition {
+
         private String partOfSpeech;
         private String language;
         private List<Definition> definitions;
@@ -128,6 +134,7 @@ public class WiktionaryResponseMapper {
         }
 
         public static class Definition {
+
             private String definition;
             private List<String> examples;
 

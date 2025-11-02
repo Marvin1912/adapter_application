@@ -4,16 +4,15 @@ import com.marvin.plants.dto.PlantDTO;
 import com.marvin.plants.entity.Plant;
 import com.marvin.plants.mapper.PlantMapper;
 import com.marvin.plants.repository.PlantRepository;
+import java.time.LocalDate;
+import java.util.Collection;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
-
-import java.time.LocalDate;
-import java.util.Collection;
-import java.util.stream.Collectors;
 
 @Service
 public class PlantService {
@@ -60,7 +59,8 @@ public class PlantService {
                     waterPlant(plant, dto.lastWateredDate());
                 },
                 () -> {
-                    throw new IllegalArgumentException("Plant with id %s not found".formatted(dto.id()));
+                    throw new IllegalArgumentException(
+                            "Plant with id %s not found".formatted(dto.id()));
                 }
         );
     }

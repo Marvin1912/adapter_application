@@ -3,6 +3,9 @@ package com.marvin.plants.controller;
 import com.marvin.image.service.ImageService;
 import com.marvin.plants.dto.PlantDTO;
 import com.marvin.plants.service.PlantService;
+import java.net.URI;
+import java.time.LocalDate;
+import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.buffer.DataBufferUtils;
@@ -23,13 +26,9 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
-import java.net.URI;
-import java.time.LocalDate;
-import java.util.UUID;
-
 /**
- * REST Controller for managing plants.
- * Provides endpoints for CRUD operations and plant care activities.
+ * REST Controller for managing plants. Provides endpoints for CRUD operations and plant care
+ * activities.
  */
 @RestController
 @RequestMapping(path = "/plants")
@@ -48,17 +47,17 @@ public class PlantController {
     }
 
     /**
-     * Converts a FilePart to a byte array.
-     * Handles empty files and errors gracefully by returning empty byte array.
+     * Converts a FilePart to a byte array. Handles empty files and errors gracefully by returning
+     * empty byte array.
      *
      * @param filePartMono Mono containing the file part to convert
      * @return Mono containing the byte array representation of the file
      */
     private static Mono<byte[]> getFileAsByteArray(Mono<FilePart> filePartMono) {
         return filePartMono
-            .flatMap(PlantController::extractBytesFromFilePart)
-            .switchIfEmpty(Mono.just(new byte[0]))
-            .onErrorResume(PlantController::handleFileReadError);
+                .flatMap(PlantController::extractBytesFromFilePart)
+                .switchIfEmpty(Mono.just(new byte[0]))
+                .onErrorResume(PlantController::handleFileReadError);
     }
 
     /**
@@ -69,12 +68,12 @@ public class PlantController {
      */
     private static Mono<byte[]> extractBytesFromFilePart(FilePart filePart) {
         return DataBufferUtils.join(filePart.content())
-            .flatMap(dataBuffer -> {
-                byte[] bytes = new byte[dataBuffer.readableByteCount()];
-                dataBuffer.read(bytes);
-                DataBufferUtils.release(dataBuffer);
-                return Mono.just(bytes);
-            });
+                .flatMap(dataBuffer -> {
+                    byte[] bytes = new byte[dataBuffer.readableByteCount()];
+                    dataBuffer.read(bytes);
+                    DataBufferUtils.release(dataBuffer);
+                    return Mono.just(bytes);
+                });
     }
 
     /**
@@ -92,8 +91,8 @@ public class PlantController {
      * Creates a new plant with optional image.
      *
      * @param filePartMono Optional image file
-     * @param plantMono Plant data
-     * @param contentType Content type of the image (optional)
+     * @param plantMono    Plant data
+     * @param contentType  Content type of the image (optional)
      * @return Mono containing ResponseEntity with location of created plant
      */
     @PostMapping
@@ -103,15 +102,15 @@ public class PlantController {
             @RequestParam(name = "content-type", required = false) String contentType
     ) {
         return Mono.zip(plantMono, getFileAsByteArray(filePartMono))
-            .doOnError(this::logPlantCreationError)
-            .flatMap(plantAndImage -> processImageAndCreatePlant(plantAndImage, contentType));
+                .doOnError(this::logPlantCreationError)
+                .flatMap(plantAndImage -> processImageAndCreatePlant(plantAndImage, contentType));
     }
 
     /**
      * Processes image and creates plant using the provided data.
      *
      * @param plantAndImage Tuple containing PlantDTO and image bytes
-     * @param contentType Content type of the image
+     * @param contentType   Content type of the image
      * @return Mono containing ResponseEntity with location of created plant
      */
     private Mono<ResponseEntity<Object>> processImageAndCreatePlant(
@@ -121,13 +120,13 @@ public class PlantController {
         byte[] imageBytes = plantAndImage.getT2();
 
         return saveImageIfNotEmpty(imageBytes, contentType)
-            .flatMap(imageUuid -> createPlantWithImage(plantDTO, imageUuid));
+                .flatMap(imageUuid -> createPlantWithImage(plantDTO, imageUuid));
     }
 
     /**
      * Saves image if bytes are not empty, otherwise returns empty UUID string.
      *
-     * @param imageBytes Image bytes to save
+     * @param imageBytes  Image bytes to save
      * @param contentType Content type of the image
      * @return Mono containing UUID string of saved image or empty string
      */
@@ -137,13 +136,13 @@ public class PlantController {
         }
 
         return imageService.saveImage(imageBytes, contentType)
-            .map(UUID::toString);
+                .map(UUID::toString);
     }
 
     /**
      * Creates plant with the provided image UUID.
      *
-     * @param plantDTO Plant data to create
+     * @param plantDTO  Plant data to create
      * @param imageUuid UUID of the saved image (empty string if no image)
      * @return Mono containing ResponseEntity with location of created plant
      */
@@ -193,10 +192,10 @@ public class PlantController {
      */
     private Mono<ResponseEntity<Object>> updatePlantSynchronously(PlantDTO plantDTO) {
         return Mono.fromCallable(() -> {
-                plantService.updatePlant(plantDTO);
-                return ResponseEntity.noContent().build();
-            })
-            .subscribeOn(Schedulers.boundedElastic());
+                    plantService.updatePlant(plantDTO);
+                    return ResponseEntity.noContent().build();
+                })
+                .subscribeOn(Schedulers.boundedElastic());
     }
 
     /**
@@ -210,8 +209,7 @@ public class PlantController {
     }
 
     /**
-     * Retrieves a specific plant by ID.
-     * Returns empty Mono if plant is not found.
+     * Retrieves a specific plant by ID. Returns empty Mono if plant is not found.
      *
      * @param id ID of the plant to retrieve
      * @return Mono containing the plant data or empty if not found
@@ -236,7 +234,7 @@ public class PlantController {
     /**
      * Records that a plant has been watered and updates watering schedule.
      *
-     * @param id ID of the plant to water
+     * @param id          ID of the plant to water
      * @param lastWatered Date when the plant was last watered
      * @return Mono containing ResponseEntity with updated plant data
      */
@@ -246,20 +244,20 @@ public class PlantController {
             @RequestParam("last-watered") LocalDate lastWatered
     ) {
         return Mono.just(id)
-            .flatMap(plantId -> updateWateringDate(plantId, lastWatered))
-            .map(ResponseEntity::ok);
+                .flatMap(plantId -> updateWateringDate(plantId, lastWatered))
+                .map(ResponseEntity::ok);
     }
 
     /**
-     * Updates the watering date for a plant.
-     * Runs on boundedElastic scheduler to avoid blocking the event loop.
+     * Updates the watering date for a plant. Runs on boundedElastic scheduler to avoid blocking the
+     * event loop.
      *
-     * @param plantId ID of the plant to update
+     * @param plantId     ID of the plant to update
      * @param lastWatered Date when the plant was last watered
      * @return Mono containing updated plant data
      */
     private Mono<PlantDTO> updateWateringDate(long plantId, LocalDate lastWatered) {
         return Mono.fromCallable(() -> plantService.waterPlant(plantId, lastWatered))
-            .subscribeOn(Schedulers.boundedElastic());
+                .subscribeOn(Schedulers.boundedElastic());
     }
 }

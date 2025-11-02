@@ -1,13 +1,12 @@
 package com.marvin.vocabulary.dictionaryapi;
 
 import com.marvin.vocabulary.dto.DictionaryEntry;
-import com.marvin.vocabulary.exceptions.*;
+import com.marvin.vocabulary.exceptions.InvalidWordException;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-
-import java.util.List;
 
 class DictionaryClientTest {
 
@@ -30,8 +29,9 @@ class DictionaryClientTest {
 
         StepVerifier.create(result)
                 .expectErrorMatches(throwable ->
-                    throwable instanceof InvalidWordException &&
-                    throwable.getMessage().contains("The word 'null' is invalid or contains unsupported characters")
+                        throwable instanceof InvalidWordException &&
+                                throwable.getMessage().contains(
+                                        "The word 'null' is invalid or contains unsupported characters")
                 )
                 .verify();
     }
@@ -44,8 +44,9 @@ class DictionaryClientTest {
 
         StepVerifier.create(result)
                 .expectErrorMatches(throwable ->
-                    throwable instanceof InvalidWordException &&
-                    throwable.getMessage().contains("The word '' is invalid or contains unsupported characters")
+                        throwable instanceof InvalidWordException &&
+                                throwable.getMessage().contains(
+                                        "The word '' is invalid or contains unsupported characters")
                 )
                 .verify();
     }
@@ -58,8 +59,9 @@ class DictionaryClientTest {
 
         StepVerifier.create(result)
                 .expectErrorMatches(throwable ->
-                    throwable instanceof InvalidWordException &&
-                    throwable.getMessage().contains("The word '   ' is invalid or contains unsupported characters")
+                        throwable instanceof InvalidWordException &&
+                                throwable.getMessage().contains(
+                                        "The word '   ' is invalid or contains unsupported characters")
                 )
                 .verify();
     }
@@ -72,8 +74,9 @@ class DictionaryClientTest {
 
         StepVerifier.create(result)
                 .expectErrorMatches(throwable ->
-                    throwable instanceof InvalidWordException &&
-                    throwable.getMessage().contains("The word 'hello123' is invalid or contains unsupported characters")
+                        throwable instanceof InvalidWordException &&
+                                throwable.getMessage().contains(
+                                        "The word 'hello123' is invalid or contains unsupported characters")
                 )
                 .verify();
     }
@@ -86,13 +89,14 @@ class DictionaryClientTest {
 
         StepVerifier.create(result)
                 .expectErrorMatches(throwable ->
-                    throwable instanceof InvalidWordException &&
-                    throwable.getMessage().contains("The word 'hello!@#' is invalid or contains unsupported characters")
+                        throwable instanceof InvalidWordException &&
+                                throwable.getMessage().contains(
+                                        "The word 'hello!@#' is invalid or contains unsupported characters")
                 )
                 .verify();
     }
 
-    
+
     @Test
     void invalidWordException_ShouldContainCorrectProperties() {
         String invalidWord = "test123";
@@ -114,9 +118,9 @@ class DictionaryClientTest {
         // Test that valid patterns don't immediately throw validation errors
         // Note: These might still fail at the API call level, but not due to validation
         String[] validWords = {
-            "hello",
-            "world",
-            "test"
+                "hello",
+                "world",
+                "test"
         };
 
         for (String word : validWords) {
@@ -133,19 +137,19 @@ class DictionaryClientTest {
     @Test
     void validation_ShouldRejectInvalidWordPatterns() {
         String[] invalidWords = {
-            "hello123",
-            "test@word",
-            "word#hash",
-            "123456",
-            "hello!",
-            "test.word",
-            "word$sign",
-            "",
-            "   ",
-            null,
-            "word@domain.com",
-            "test&case",
-            "hello%world"
+                "hello123",
+                "test@word",
+                "word#hash",
+                "123456",
+                "hello!",
+                "test.word",
+                "word$sign",
+                "",
+                "   ",
+                null,
+                "word@domain.com",
+                "test&case",
+                "hello%world"
         };
 
         for (String word : invalidWords) {

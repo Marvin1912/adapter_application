@@ -14,4 +14,5 @@ public record PlantDTO(
         LocalDate nextWateredDate,
         String image
 ) {
+
 }

@@ -7,13 +7,12 @@ import com.marvin.common.costs.MonthlyCostDTO;
 import com.marvin.database.repository.MonthlyCostRepository;
 import com.marvin.entities.costs.MonthlyCostEntity;
 import com.marvin.influxdb.costs.monthly.service.MonthlyCostImport;
+import java.math.BigDecimal;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
-
-import java.math.BigDecimal;
-import java.util.Optional;
 
 @Component
 public class MonthlyCostImportService implements ImportService<MonthlyCostDTO> {
@@ -48,7 +47,8 @@ public class MonthlyCostImportService implements ImportService<MonthlyCostDTO> {
                         .reduce(
                                 new MonthlyCostDTO(group.key(), BigDecimal.ZERO),
                                 (monthlyCostDTO, bookingEntryDTO) -> new MonthlyCostDTO(
-                                        monthlyCostDTO.costDate(), monthlyCostDTO.value().add(bookingEntryDTO.amount())
+                                        monthlyCostDTO.costDate(),
+                                        monthlyCostDTO.value().add(bookingEntryDTO.amount())
                                 )
                         )
                 )
@@ -58,16 +58,19 @@ public class MonthlyCostImportService implements ImportService<MonthlyCostDTO> {
 
     @Override
     public void importData(MonthlyCostDTO monthlyCost) {
-        final Optional<MonthlyCostEntity> persistedStateList = monthlyCostRepository.findByCostDate(monthlyCost.costDate());
+        final Optional<MonthlyCostEntity> persistedStateList = monthlyCostRepository.findByCostDate(
+                monthlyCost.costDate());
         if (persistedStateList.isEmpty()) {
-            MonthlyCostEntity monthlyCostEntity = new MonthlyCostEntity(monthlyCost.costDate(), monthlyCost.value());
+            MonthlyCostEntity monthlyCostEntity = new MonthlyCostEntity(monthlyCost.costDate(),
+                    monthlyCost.value());
             monthlyCostRepository.save(monthlyCostEntity);
         } else {
             BigDecimal newValue = monthlyCost.value();
             MonthlyCostEntity persistedState = persistedStateList.get();
             BigDecimal persistedValue = persistedState.getValue();
             if (newValue.compareTo(persistedValue) > 0) {
-                LOGGER.info("Updated value of {} from {} to {}!", persistedState.getCostDate(), newValue, persistedValue);
+                LOGGER.info("Updated value of {} from {} to {}!", persistedState.getCostDate(),
+                        newValue, persistedValue);
                 persistedState.setValue(newValue);
                 monthlyCostRepository.save(persistedState);
             }

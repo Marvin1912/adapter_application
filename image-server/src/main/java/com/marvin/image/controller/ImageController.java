@@ -1,6 +1,8 @@
 package com.marvin.image.controller;
 
 import com.marvin.image.service.ImageService;
+import java.net.URI;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.ResponseEntity;
@@ -13,9 +15,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
-
-import java.net.URI;
-import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -55,7 +54,8 @@ public class ImageController {
                 .doOnError(throwable -> log.error("", throwable))
                 .flatMap(rawBytes ->
                         imageService.saveImage(rawBytes, contentType)
-                                .map(uuid -> ResponseEntity.created(URI.create("/images/%s".formatted(uuid))).build())
+                                .map(uuid -> ResponseEntity.created(
+                                        URI.create("/images/%s".formatted(uuid))).build())
                 );
     }
 

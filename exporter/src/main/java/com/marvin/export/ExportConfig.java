@@ -1,9 +1,8 @@
 package com.marvin.export;
 
+import java.util.Objects;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
-import java.util.Objects;
 
 @Component
 public class ExportConfig {
@@ -22,8 +21,12 @@ public class ExportConfig {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         ExportConfig that = (ExportConfig) o;
         return Objects.equals(costExportFolder, that.costExportFolder);
     }

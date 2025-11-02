@@ -1,10 +1,9 @@
 package com.marvin.camt.maintenance;
 
 import com.marvin.camt.model.book_entry.BookingEntryDTO;
+import java.util.List;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
-
-import java.util.List;
 
 @Component
 public class DataMaintainer {

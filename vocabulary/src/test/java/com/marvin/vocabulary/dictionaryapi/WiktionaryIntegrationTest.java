@@ -4,8 +4,6 @@ import com.marvin.vocabulary.dto.DictionaryEntry;
 import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
-import java.util.List;
-
 class WiktionaryIntegrationTest {
 
     @Test
@@ -24,10 +22,10 @@ class WiktionaryIntegrationTest {
 
                     DictionaryEntry entry = entries.get(0);
                     return entry.word().equals(testWord) &&
-                           !entry.meanings().isEmpty() &&
-                           entry.meanings().get(0).partOfSpeech() != null &&
-                           !entry.meanings().get(0).definitions().isEmpty() &&
-                           entry.meanings().get(0).definitions().get(0).definition() != null;
+                            !entry.meanings().isEmpty() &&
+                            entry.meanings().get(0).partOfSpeech() != null &&
+                            !entry.meanings().get(0).definitions().isEmpty() &&
+                            entry.meanings().get(0).definitions().get(0).definition() != null;
                 })
                 .verifyComplete();
     }

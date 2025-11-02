@@ -7,7 +7,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
@@ -15,6 +14,17 @@ import java.util.Objects;
 @Entity
 @Table(name = "salary", schema = "public", catalog = "costs")
 public class SalaryEntity extends BasicEntity {
+
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @Column(name = "id", nullable = false)
+    private int id;
+    @Basic
+    @Column(name = "salary_date", nullable = false)
+    private LocalDate salaryDate;
+    @Basic
+    @Column(name = "value", nullable = false, precision = 2)
+    private BigDecimal value;
 
     public SalaryEntity() {
         // NOOP
@@ -24,19 +34,6 @@ public class SalaryEntity extends BasicEntity {
         this.salaryDate = salaryDate;
         this.value = value;
     }
-
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Id
-    @Column(name = "id", nullable = false)
-    private int id;
-
-    @Basic
-    @Column(name = "salary_date", nullable = false)
-    private LocalDate salaryDate;
-
-    @Basic
-    @Column(name = "value", nullable = false, precision = 2)
-    private BigDecimal value;
 
     public int getId() {
         return id;
@@ -64,11 +61,18 @@ public class SalaryEntity extends BasicEntity {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        if (!super.equals(o)) {
+            return false;
+        }
         SalaryEntity that = (SalaryEntity) o;
-        return id == that.id && Objects.equals(salaryDate, that.salaryDate) && Objects.equals(value, that.value);
+        return id == that.id && Objects.equals(salaryDate, that.salaryDate) && Objects.equals(value,
+                that.value);
     }
 
     @Override

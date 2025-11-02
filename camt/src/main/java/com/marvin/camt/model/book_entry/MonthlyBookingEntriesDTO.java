@@ -8,4 +8,5 @@ public record MonthlyBookingEntriesDTO(
         List<BookingEntryDTO> dailyCosts,
         List<BookingEntryDTO> incomes
 ) {
+
 }

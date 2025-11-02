@@ -16,6 +16,7 @@ public class SalaryImport extends AbstractCostImport<SalaryDTO, SalaryMeasuremen
 
     @Override
     protected SalaryMeasurement map(SalaryDTO salary) {
-        return new SalaryMeasurement(CostType.SALARY.getValue(), salary.value(), getAsInstant(salary.salaryDate()));
+        return new SalaryMeasurement(CostType.SALARY.getValue(), salary.value(),
+                getAsInstant(salary.salaryDate()));
     }
 }

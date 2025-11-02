@@ -5,5 +5,7 @@ public record Phonetic(
         String audio,
         String sourceUrl,
         License license
-) {}
+) {
+
+}
 

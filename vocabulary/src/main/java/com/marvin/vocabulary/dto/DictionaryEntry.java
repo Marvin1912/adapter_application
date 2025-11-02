@@ -9,4 +9,6 @@ public record DictionaryEntry(
         List<Meaning> meanings,
         License license,
         List<String> sourceUrls
-) {}
+) {
+
+}
