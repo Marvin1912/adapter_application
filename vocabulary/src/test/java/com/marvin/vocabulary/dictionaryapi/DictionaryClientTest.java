@@ -22,10 +22,10 @@ class DictionaryClientTest {
   }
 
   @Test
-  void getWord_WhenNullWord_ShouldReturnInvalidWordException() {
-    String nullWord = null;
+  void getWordWhenNullWordShouldReturnInvalidWordException() {
+    final String nullWord = null;
 
-    Mono<List<DictionaryEntry>> result = dictionaryClient.getWord(nullWord);
+    final Mono<List<DictionaryEntry>> result = dictionaryClient.getWord(nullWord);
 
     StepVerifier.create(result)
         .expectErrorMatches(throwable ->
@@ -37,10 +37,10 @@ class DictionaryClientTest {
   }
 
   @Test
-  void getWord_WhenEmptyWord_ShouldReturnInvalidWordException() {
-    String emptyWord = "";
+  void getWordWhenEmptyWordShouldReturnInvalidWordException() {
+    final String emptyWord = "";
 
-    Mono<List<DictionaryEntry>> result = dictionaryClient.getWord(emptyWord);
+    final Mono<List<DictionaryEntry>> result = dictionaryClient.getWord(emptyWord);
 
     StepVerifier.create(result)
         .expectErrorMatches(throwable ->
@@ -52,10 +52,10 @@ class DictionaryClientTest {
   }
 
   @Test
-  void getWord_WhenBlankWord_ShouldReturnInvalidWordException() {
-    String blankWord = "   ";
+  void getWordWhenBlankWordShouldReturnInvalidWordException() {
+    final String blankWord = "   ";
 
-    Mono<List<DictionaryEntry>> result = dictionaryClient.getWord(blankWord);
+    final Mono<List<DictionaryEntry>> result = dictionaryClient.getWord(blankWord);
 
     StepVerifier.create(result)
         .expectErrorMatches(throwable ->
@@ -67,10 +67,10 @@ class DictionaryClientTest {
   }
 
   @Test
-  void getWord_WhenWordWithNumbers_ShouldReturnInvalidWordException() {
-    String wordWithNumbers = "hello123";
+  void getWordWhenWordWithNumbersShouldReturnInvalidWordException() {
+    final String wordWithNumbers = "hello123";
 
-    Mono<List<DictionaryEntry>> result = dictionaryClient.getWord(wordWithNumbers);
+    final Mono<List<DictionaryEntry>> result = dictionaryClient.getWord(wordWithNumbers);
 
     StepVerifier.create(result)
         .expectErrorMatches(throwable ->
@@ -82,10 +82,10 @@ class DictionaryClientTest {
   }
 
   @Test
-  void getWord_WhenWordWithSpecialCharacters_ShouldReturnInvalidWordException() {
-    String wordWithSpecialChars = "hello!@#";
+  void getWordWhenWordWithSpecialCharactersShouldReturnInvalidWordException() {
+    final String wordWithSpecialChars = "hello!@#";
 
-    Mono<List<DictionaryEntry>> result = dictionaryClient.getWord(wordWithSpecialChars);
+    final Mono<List<DictionaryEntry>> result = dictionaryClient.getWord(wordWithSpecialChars);
 
     StepVerifier.create(result)
         .expectErrorMatches(throwable ->
@@ -98,14 +98,14 @@ class DictionaryClientTest {
 
 
   @Test
-  void invalidWordException_ShouldContainCorrectProperties() {
-    String invalidWord = "test123";
+  void invalidWordExceptionShouldContainCorrectProperties() {
+    final String invalidWord = "test123";
 
-    Mono<List<DictionaryEntry>> result = dictionaryClient.getWord(invalidWord);
+    final Mono<List<DictionaryEntry>> result = dictionaryClient.getWord(invalidWord);
 
     StepVerifier.create(result)
         .consumeErrorWith(throwable -> {
-          InvalidWordException exception = (InvalidWordException) throwable;
+          final InvalidWordException exception = (InvalidWordException) throwable;
           assert exception.getWord().equals(invalidWord);
           assert exception.getStatusCode() == 400;
           assert exception.getErrorType().equals("INVALID_WORD");
@@ -114,16 +114,16 @@ class DictionaryClientTest {
   }
 
   @Test
-  void validation_ShouldAcceptValidWordPatterns() {
+  void validationShouldAcceptValidWordPatterns() {
     // Test that valid patterns don't immediately throw validation errors
     // Note: These might still fail at the API call level, but not due to validation
-    String[] validWords = {
+    final String[] validWords = {
         "hello",
         "world",
         "test"
     };
 
-    for (String word : validWords) {
+    for (final String word : validWords) {
       try {
         dictionaryClient.getWord(word);
         // If we get here without exception, validation passed
@@ -135,8 +135,8 @@ class DictionaryClientTest {
   }
 
   @Test
-  void validation_ShouldRejectInvalidWordPatterns() {
-    String[] invalidWords = {
+  void validationShouldRejectInvalidWordPatterns() {
+    final String[] invalidWords = {
         "hello123",
         "test@word",
         "word#hash",
@@ -152,8 +152,8 @@ class DictionaryClientTest {
         "hello%world"
     };
 
-    for (String word : invalidWords) {
-      Mono<List<DictionaryEntry>> result = dictionaryClient.getWord(word);
+    for (final String word : invalidWords) {
+      final Mono<List<DictionaryEntry>> result = dictionaryClient.getWord(word);
 
       // These should all fail validation with InvalidWordException
       StepVerifier.create(result)

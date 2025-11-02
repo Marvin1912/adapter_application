@@ -7,12 +7,12 @@ import reactor.test.StepVerifier;
 class WiktionaryIntegrationTest {
 
   @Test
-  void getWord_WithValidWord_ShouldReturnEntriesFromWiktionary() {
-    HtmlCleaner htmlCleaner = new HtmlCleaner();
-    WiktionaryResponseMapper responseMapper = new WiktionaryResponseMapper(htmlCleaner);
-    DictionaryClient dictionaryClient = new DictionaryClient(responseMapper);
+  void getWordWithValidWordShouldReturnEntriesFromWiktionary() {
+    final HtmlCleaner htmlCleaner = new HtmlCleaner();
+    final WiktionaryResponseMapper responseMapper = new WiktionaryResponseMapper(htmlCleaner);
+    final DictionaryClient dictionaryClient = new DictionaryClient(responseMapper);
 
-    String testWord = "hello";
+    final String testWord = "hello";
 
     StepVerifier.create(dictionaryClient.getWord(testWord))
         .expectNextMatches(entries -> {
@@ -20,7 +20,7 @@ class WiktionaryIntegrationTest {
             return false;
           }
 
-          DictionaryEntry entry = entries.get(0);
+          final DictionaryEntry entry = entries.get(0);
           return entry.word().equals(testWord) &&
               !entry.meanings().isEmpty() &&
               entry.meanings().get(0).partOfSpeech() != null &&
