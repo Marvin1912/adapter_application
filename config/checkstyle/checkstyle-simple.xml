@@ -8,6 +8,11 @@
     <property name="severity" value="warning"/>
     <property name="fileExtensions" value="java"/>
 
+    <!-- Exclude generated source files from checkstyle scanning -->
+    <module name="BeforeExecutionExclusionFileFilter">
+        <property name="fileNamePattern" value=".*[\\/]build[\\/]generated[\\/].*"/>
+    </module>
+
     <!-- Line length should be at Checker level -->
     <module name="LineLength">
         <property name="max" value="120"/>
