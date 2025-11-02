@@ -17,90 +17,90 @@ import reactor.core.publisher.Flux;
 @Service
 public class PlantService {
 
-    private final String mailUsername;
-    private final PlantRepository plantRepository;
-    private final PlantMapper plantMapper;
-    private final JavaMailSender mailSender;
+  private final String mailUsername;
+  private final PlantRepository plantRepository;
+  private final PlantMapper plantMapper;
+  private final JavaMailSender mailSender;
 
-    public PlantService(
-            @Value("${spring.mail.username}") String mailUsername,
-            PlantRepository plantRepository,
-            PlantMapper plantMapper,
-            JavaMailSender mailSender
-    ) {
-        this.mailUsername = mailUsername;
-        this.plantRepository = plantRepository;
-        this.plantMapper = plantMapper;
-        this.mailSender = mailSender;
-    }
+  public PlantService(
+      @Value("${spring.mail.username}") String mailUsername,
+      PlantRepository plantRepository,
+      PlantMapper plantMapper,
+      JavaMailSender mailSender
+  ) {
+    this.mailUsername = mailUsername;
+    this.plantRepository = plantRepository;
+    this.plantMapper = plantMapper;
+    this.mailSender = mailSender;
+  }
 
-    public long createPlant(PlantDTO plantDto, String imageUuid) {
-        return plantRepository.save(plantMapper.toPlant(plantDto, imageUuid)).getId();
-    }
+  public long createPlant(PlantDTO plantDto, String imageUuid) {
+    return plantRepository.save(plantMapper.toPlant(plantDto, imageUuid)).getId();
+  }
 
-    public PlantDTO getPlant(long id) {
-        final Plant plant = plantRepository.findById(id).orElse(null);
-        return plantMapper.toPlantDTO(plant);
-    }
+  public PlantDTO getPlant(long id) {
+    final Plant plant = plantRepository.findById(id).orElse(null);
+    return plantMapper.toPlantDTO(plant);
+  }
 
-    public Flux<PlantDTO> getPlants() {
-        return Flux.fromIterable(plantRepository.findAll()).map(plantMapper::toPlantDTO);
-    }
+  public Flux<PlantDTO> getPlants() {
+    return Flux.fromIterable(plantRepository.findAll()).map(plantMapper::toPlantDTO);
+  }
 
-    public void deletePlant(long id) {
-        plantRepository.deleteById(id);
-    }
+  public void deletePlant(long id) {
+    plantRepository.deleteById(id);
+  }
 
-    @Transactional
-    public void updatePlant(PlantDTO dto) {
-        plantRepository.findById(dto.id()).ifPresentOrElse(
-                plant -> {
-                    plantMapper.toPlant(plant, dto);
-                    waterPlant(plant, dto.lastWateredDate());
-                },
-                () -> {
-                    throw new IllegalArgumentException(
-                            "Plant with id %s not found".formatted(dto.id()));
-                }
-        );
-    }
-
-    @Transactional
-    public PlantDTO waterPlant(long id, LocalDate lastWatered) {
-
-        final Plant plant = plantRepository.findById(id).orElseThrow();
-        waterPlant(plant, lastWatered);
-
-        return plantMapper.toPlantDTO(plant);
-    }
-
-    private void waterPlant(Plant plant, LocalDate lastWatered) {
-        plant.setLastWateredDate(lastWatered);
-        plant.setNextWateredDate(lastWatered.plusDays(plant.getWateringFrequency()));
-    }
-
-    public void sendWateringNotification() {
-
-        final LocalDate today = LocalDate.now();
-
-        final Collection<Plant> plantsToWater = plantRepository.findByNextWateredDate(today);
-        if (plantsToWater.isEmpty()) {
-            return;
+  @Transactional
+  public void updatePlant(PlantDTO dto) {
+    plantRepository.findById(dto.id()).ifPresentOrElse(
+        plant -> {
+          plantMapper.toPlant(plant, dto);
+          waterPlant(plant, dto.lastWateredDate());
+        },
+        () -> {
+          throw new IllegalArgumentException(
+              "Plant with id %s not found".formatted(dto.id()));
         }
+    );
+  }
 
-        final String text = plantsToWater.stream()
-                .map(plant -> """
-                        Plant: %s, Location: %s
-                        """.formatted(plant.getName(), plant.getLocation())
-                )
-                .collect(Collectors.joining("\n"));
+  @Transactional
+  public PlantDTO waterPlant(long id, LocalDate lastWatered) {
 
-        final SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom(mailUsername);
-        message.setTo(mailUsername);
-        message.setSubject("Plants to water at: %s".formatted(today));
-        message.setText(text);
+    final Plant plant = plantRepository.findById(id).orElseThrow();
+    waterPlant(plant, lastWatered);
 
-        mailSender.send(message);
+    return plantMapper.toPlantDTO(plant);
+  }
+
+  private void waterPlant(Plant plant, LocalDate lastWatered) {
+    plant.setLastWateredDate(lastWatered);
+    plant.setNextWateredDate(lastWatered.plusDays(plant.getWateringFrequency()));
+  }
+
+  public void sendWateringNotification() {
+
+    final LocalDate today = LocalDate.now();
+
+    final Collection<Plant> plantsToWater = plantRepository.findByNextWateredDate(today);
+    if (plantsToWater.isEmpty()) {
+      return;
     }
+
+    final String text = plantsToWater.stream()
+        .map(plant -> """
+            Plant: %s, Location: %s
+            """.formatted(plant.getName(), plant.getLocation())
+        )
+        .collect(Collectors.joining("\n"));
+
+    final SimpleMailMessage message = new SimpleMailMessage();
+    message.setFrom(mailUsername);
+    message.setTo(mailUsername);
+    message.setSubject("Plants to water at: %s".formatted(today));
+    message.setText(text);
+
+    mailSender.send(message);
+  }
 }

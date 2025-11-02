@@ -12,33 +12,33 @@ import org.springframework.scheduling.annotation.Scheduled;
 
 public abstract class CostConsulRepository implements ConsulRepository {
 
-    private static final Logger LOGGER = Logger.getLogger(CostConsulRepository.class.getName());
-    private final BasicConsulRepository consulRepository;
-    private final String keyPrefix;
-    protected Map<String, String> properties;
+  private static final Logger LOGGER = Logger.getLogger(CostConsulRepository.class.getName());
+  private final BasicConsulRepository consulRepository;
+  private final String keyPrefix;
+  protected Map<String, String> properties;
 
-    public CostConsulRepository(BasicConsulRepository consulRepository, String keyPrefix) {
-        this.consulRepository = consulRepository;
-        this.keyPrefix = keyPrefix;
-    }
+  public CostConsulRepository(BasicConsulRepository consulRepository, String keyPrefix) {
+    this.consulRepository = consulRepository;
+    this.keyPrefix = keyPrefix;
+  }
 
-    @PostConstruct
-    @Scheduled(cron = "0 * * * * ?")
-    public void init() {
-        try {
-            this.properties = consulRepository.getPropertiesRecursively(keyPrefix)
-                    .stream()
-                    .filter(dto -> dto != null && dto.key() != null && dto.value() != null)
-                    .collect(Collectors.toMap(ConsulKeyValueDTO::key, ConsulKeyValueDTO::value));
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Error during initialization!!!", e);
-            this.properties = Collections.emptyMap();
-        }
+  @PostConstruct
+  @Scheduled(cron = "0 * * * * ?")
+  public void init() {
+    try {
+      this.properties = consulRepository.getPropertiesRecursively(keyPrefix)
+          .stream()
+          .filter(dto -> dto != null && dto.key() != null && dto.value() != null)
+          .collect(Collectors.toMap(ConsulKeyValueDTO::key, ConsulKeyValueDTO::value));
+    } catch (Exception e) {
+      LOGGER.log(Level.SEVERE, "Error during initialization!!!", e);
+      this.properties = Collections.emptyMap();
     }
+  }
 
-    @Override
-    public String getProperty(String key) {
-        final String value = properties.get(keyPrefix + "/" + key);
-        return StringUtils.isBlank(value) ? StringUtils.EMPTY : value;
-    }
+  @Override
+  public String getProperty(String key) {
+    final String value = properties.get(keyPrefix + "/" + key);
+    return StringUtils.isBlank(value) ? StringUtils.EMPTY : value;
+  }
 }

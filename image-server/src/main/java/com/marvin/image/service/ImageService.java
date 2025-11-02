@@ -10,25 +10,25 @@ import reactor.core.scheduler.Schedulers;
 @Service
 public class ImageService {
 
-    private final ImageRepository imageRepository;
+  private final ImageRepository imageRepository;
 
-    public ImageService(ImageRepository imageRepository) {
-        this.imageRepository = imageRepository;
-    }
+  public ImageService(ImageRepository imageRepository) {
+    this.imageRepository = imageRepository;
+  }
 
-    public Mono<UUID> saveImage(byte[] rawImage, String contentType) {
+  public Mono<UUID> saveImage(byte[] rawImage, String contentType) {
 
-        final Image image = new Image(rawImage, contentType);
+    final Image image = new Image(rawImage, contentType);
 
-        return Mono.fromCallable(() -> imageRepository.save(image))
-                .subscribeOn(Schedulers.boundedElastic())
-                .map(Image::getId);
-    }
+    return Mono.fromCallable(() -> imageRepository.save(image))
+        .subscribeOn(Schedulers.boundedElastic())
+        .map(Image::getId);
+  }
 
-    public Mono<byte[]> getImage(UUID id) {
-        return Mono.fromCallable(() -> imageRepository.findById(id))
-                .subscribeOn(Schedulers.boundedElastic())
-                .flatMap(image -> image.map(value -> Mono.just(value.getContent()))
-                        .orElseGet(Mono::empty));
-    }
+  public Mono<byte[]> getImage(UUID id) {
+    return Mono.fromCallable(() -> imageRepository.findById(id))
+        .subscribeOn(Schedulers.boundedElastic())
+        .flatMap(image -> image.map(value -> Mono.just(value.getContent()))
+            .orElseGet(Mono::empty));
+  }
 }

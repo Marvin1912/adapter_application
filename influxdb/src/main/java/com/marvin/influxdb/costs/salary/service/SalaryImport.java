@@ -10,13 +10,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class SalaryImport extends AbstractCostImport<SalaryDTO, SalaryMeasurement> {
 
-    public SalaryImport(InfluxDBClient influxDBClient) {
-        super(influxDBClient);
-    }
+  public SalaryImport(InfluxDBClient influxDBClient) {
+    super(influxDBClient);
+  }
 
-    @Override
-    protected SalaryMeasurement map(SalaryDTO salary) {
-        return new SalaryMeasurement(CostType.SALARY.getValue(), salary.value(),
-                getAsInstant(salary.salaryDate()));
-    }
+  @Override
+  protected SalaryMeasurement map(SalaryDTO salary) {
+    return new SalaryMeasurement(CostType.SALARY.getValue(), salary.value(),
+        getAsInstant(salary.salaryDate()));
+  }
 }

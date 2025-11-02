@@ -10,13 +10,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class MonthlyCostImport extends AbstractCostImport<MonthlyCostDTO, MonthlyCostMeasurement> {
 
-    public MonthlyCostImport(InfluxDBClient influxDBClient) {
-        super(influxDBClient);
-    }
+  public MonthlyCostImport(InfluxDBClient influxDBClient) {
+    super(influxDBClient);
+  }
 
-    @Override
-    protected MonthlyCostMeasurement map(MonthlyCostDTO monthlyCost) {
-        return new MonthlyCostMeasurement(CostType.MONTHLY.getValue(), monthlyCost.value(),
-                getAsInstant(monthlyCost.costDate()));
-    }
+  @Override
+  protected MonthlyCostMeasurement map(MonthlyCostDTO monthlyCost) {
+    return new MonthlyCostMeasurement(CostType.MONTHLY.getValue(), monthlyCost.value(),
+        getAsInstant(monthlyCost.costDate()));
+  }
 }

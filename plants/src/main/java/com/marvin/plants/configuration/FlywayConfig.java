@@ -8,15 +8,15 @@ import org.springframework.context.annotation.Configuration;
 @Configuration(value = "FlywayConfigPlants")
 public class FlywayConfig {
 
-    @Bean(initMethod = "migrate")
-    public Flyway flywayPlants(DataSource dataSource) {
-        return Flyway.configure()
-                .dataSource(dataSource)
-                .locations("classpath:db/migration/plants")
-                .schemas("plants")
-                .table("flyway_schema_history_plants")
-                .baselineOnMigrate(true)
-                .load();
-    }
+  @Bean(initMethod = "migrate")
+  public Flyway flywayPlants(DataSource dataSource) {
+    return Flyway.configure()
+        .dataSource(dataSource)
+        .locations("classpath:db/migration/plants")
+        .schemas("plants")
+        .table("flyway_schema_history_plants")
+        .baselineOnMigrate(true)
+        .load();
+  }
 
 }

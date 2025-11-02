@@ -10,13 +10,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class DailyCostImport extends AbstractCostImport<DailyCostDTO, DailyCostMeasurement> {
 
-    public DailyCostImport(InfluxDBClient influxDBClient) {
-        super(influxDBClient);
-    }
+  public DailyCostImport(InfluxDBClient influxDBClient) {
+    super(influxDBClient);
+  }
 
-    @Override
-    protected DailyCostMeasurement map(DailyCostDTO monthlyCost) {
-        return new DailyCostMeasurement(CostType.DAILY.getValue(), monthlyCost.value(),
-                getAsInstant(monthlyCost.costDate()));
-    }
+  @Override
+  protected DailyCostMeasurement map(DailyCostDTO monthlyCost) {
+    return new DailyCostMeasurement(CostType.DAILY.getValue(), monthlyCost.value(),
+        getAsInstant(monthlyCost.costDate()));
+  }
 }

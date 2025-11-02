@@ -7,9 +7,9 @@ import java.time.Instant;
 
 @Measurement(name = "costs")
 public record DailyCostMeasurement(
-        @Column(tag = true) String costType,
-        @Column BigDecimal value,
-        @Column(timestamp = true) Instant time
+    @Column(tag = true) String costType,
+    @Column BigDecimal value,
+    @Column(timestamp = true) Instant time
 ) {
 
 }
