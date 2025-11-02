@@ -9,9 +9,17 @@ import com.marvin.vocabulary.dictionaryapi.DictionaryClient;
 import com.marvin.vocabulary.dto.DictionaryEntry;
 import com.marvin.vocabulary.dto.Flashcard;
 import com.marvin.vocabulary.dto.Translation;
-import com.marvin.vocabulary.exceptions.*;
+import com.marvin.vocabulary.exceptions.DictionaryApiException;
+import com.marvin.vocabulary.exceptions.DictionaryServiceUnavailableException;
+import com.marvin.vocabulary.exceptions.InvalidWordException;
+import com.marvin.vocabulary.exceptions.RateLimitExceededException;
+import com.marvin.vocabulary.exceptions.WordNotFoundException;
 import com.marvin.vocabulary.model.FlashcardEntity;
 import com.marvin.vocabulary.service.FlashcardService;
+import java.net.URI;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Callable;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.buffer.DataBufferUtils;
@@ -34,15 +42,9 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
-import java.net.URI;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Callable;
-
 /**
- * REST controller for managing vocabulary flashcards and translations.
- * Provides endpoints for CRUD operations on flashcards, file operations,
- * and translation services via DeepL API.
+ * REST controller for managing vocabulary flashcards and translations. Provides endpoints for CRUD
+ * operations on flashcards, file operations, and translation services via DeepL API.
  */
 @Slf4j
 @RestController
@@ -63,8 +65,8 @@ public class FlashcardController {
     /**
      * Constructs a new FlashcardController with required dependencies.
      *
-     * @param deepLApiUrl the DeepL API URL
-     * @param deepLApiKey the DeepL API key
+     * @param deepLApiUrl      the DeepL API URL
+     * @param deepLApiKey      the DeepL API key
      * @param dictionaryClient the dictionary service client
      * @param flashcardService the flashcard service
      * @param translateTextApi the translation API client
@@ -87,7 +89,7 @@ public class FlashcardController {
      * Converts a blocking operation to a reactive Mono running on bounded elastic scheduler.
      *
      * @param callable the blocking operation to execute
-     * @param <T> the return type
+     * @param <T>      the return type
      * @return a Mono wrapping the callable result
      */
     private static <T> Mono<T> executeBlocking(Callable<T> callable) {
@@ -98,10 +100,11 @@ public class FlashcardController {
      * Creates a standardized error response for exceptions.
      *
      * @param throwable the exception that occurred
-     * @param message the error message
+     * @param message   the error message
      * @return a ResponseEntity with error details
      */
-    private static ResponseEntity<Map<String, String>> createErrorResponse(Throwable throwable, String message) {
+    private static ResponseEntity<Map<String, String>> createErrorResponse(Throwable throwable,
+            String message) {
         log.error("Request processing failed", throwable);
         return ResponseEntity.internalServerError().body(
                 Map.of(
@@ -187,22 +190,23 @@ public class FlashcardController {
      * @param apiClient the API client to configure
      */
     private void configureDeepLApiClient(ApiClient apiClient) {
-        apiClient.addDefaultHeader(HttpHeaders.AUTHORIZATION, String.format(DEEPL_AUTH_HEADER_FORMAT, deepLApiKey));
+        apiClient.addDefaultHeader(HttpHeaders.AUTHORIZATION,
+                String.format(DEEPL_AUTH_HEADER_FORMAT, deepLApiKey));
         apiClient.setBasePath(deepLApiUrl);
     }
 
     /**
      * Creates a TranslateTextRequest for the given parameters.
      *
-     * @param word the word to translate
-     * @param context the translation context
+     * @param word           the word to translate
+     * @param context        the translation context
      * @param sourceLanguage the source language
      * @param targetLanguage the target language
      * @return a configured TranslateTextRequest
      */
     private TranslateTextRequest createTranslationRequest(String word, String context,
-                                                        SourceLanguageText sourceLanguage,
-                                                        TargetLanguageText targetLanguage) {
+            SourceLanguageText sourceLanguage,
+            TargetLanguageText targetLanguage) {
         TranslateTextRequest request = new TranslateTextRequest();
         request.setText(List.of(word));
         request.setContext(context);
@@ -244,12 +248,14 @@ public class FlashcardController {
      * @return an error response
      */
     @ExceptionHandler
-    public ResponseEntity<Map<String, String>> handleWebClientResponseException(WebClientResponseException exception) {
+    public ResponseEntity<Map<String, String>> handleWebClientResponseException(
+            WebClientResponseException exception) {
         return createErrorResponse(exception, exception.getResponseBodyAsString());
     }
 
     @ExceptionHandler
-    public ResponseEntity<Map<String, String>> handleWordNotFoundException(WordNotFoundException ex) {
+    public ResponseEntity<Map<String, String>> handleWordNotFoundException(
+            WordNotFoundException ex) {
         log.warn("Word not found: {}", ex.getWord());
         return ResponseEntity.status(404).body(
                 Map.of(
@@ -273,7 +279,8 @@ public class FlashcardController {
     }
 
     @ExceptionHandler
-    public ResponseEntity<Map<String, String>> handleRateLimitExceededException(RateLimitExceededException ex) {
+    public ResponseEntity<Map<String, String>> handleRateLimitExceededException(
+            RateLimitExceededException ex) {
         log.warn("Rate limit exceeded");
         return ResponseEntity.status(429).body(
                 Map.of(
@@ -284,7 +291,8 @@ public class FlashcardController {
     }
 
     @ExceptionHandler
-    public ResponseEntity<Map<String, String>> handleDictionaryServiceUnavailableException(DictionaryServiceUnavailableException ex) {
+    public ResponseEntity<Map<String, String>> handleDictionaryServiceUnavailableException(
+            DictionaryServiceUnavailableException ex) {
         log.error("Dictionary service unavailable");
         return ResponseEntity.status(503).body(
                 Map.of(
@@ -295,7 +303,8 @@ public class FlashcardController {
     }
 
     @ExceptionHandler
-    public ResponseEntity<Map<String, String>> handleDictionaryApiException(DictionaryApiException ex) {
+    public ResponseEntity<Map<String, String>> handleDictionaryApiException(
+            DictionaryApiException ex) {
         log.error("Dictionary API error: {}", ex.getMessage());
         return ResponseEntity.status(ex.getStatusCode()).body(
                 Map.of(
@@ -404,11 +413,13 @@ public class FlashcardController {
      * @return a Mono with no content response
      */
     @PutMapping("/flashcards/file")
-    public Mono<ResponseEntity<Void>> updateFlashcards(@RequestPart(value = "file") Mono<FilePart> fileMono) {
+    public Mono<ResponseEntity<Void>> updateFlashcards(
+            @RequestPart(value = "file") Mono<FilePart> fileMono) {
         return fileMono
                 .flatMap(FlashcardController::convertFilePartToBytes)
                 .switchIfEmpty(Mono.just(new byte[0]))
-                .flatMap(fileBytes -> executeBlocking(() -> flashcardService.importFlashcards(fileBytes)))
+                .flatMap(fileBytes -> executeBlocking(
+                        () -> flashcardService.importFlashcards(fileBytes)))
                 .onErrorResume(exception -> {
                     log.error("Failed to import flashcards", exception);
                     return Mono.just(0);
@@ -419,8 +430,8 @@ public class FlashcardController {
     /**
      * Translates a word using DeepL API.
      *
-     * @param word the word to translate
-     * @param context the translation context
+     * @param word           the word to translate
+     * @param context        the translation context
      * @param sourceLanguage the source language (default: EN)
      * @param targetLanguage the target language (default: DE)
      * @return a Flux of translation results

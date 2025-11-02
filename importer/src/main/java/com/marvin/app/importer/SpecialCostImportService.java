@@ -8,16 +8,15 @@ import com.marvin.common.costs.SpecialCostEntryDTO;
 import com.marvin.database.repository.SpecialCostEntryRepository;
 import com.marvin.entities.costs.SpecialCostEntity;
 import com.marvin.entities.costs.SpecialCostEntryEntity;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
-
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 
 @Component
 public class SpecialCostImportService implements ImportService<SpecialCostDTO> {
@@ -57,7 +56,8 @@ public class SpecialCostImportService implements ImportService<SpecialCostDTO> {
                                 (specialCost, bookingEntry) -> {
                                     specialCost.entries()
                                             .add(new SpecialCostEntryDTO(
-                                                            bookingEntry.entryInfo() + " - " + bookingEntry.creditName(),
+                                                            bookingEntry.entryInfo() + " - "
+                                                                    + bookingEntry.creditName(),
                                                             bookingEntry.amount(),
                                                             bookingEntry.additionalInfo()
                                                     )
@@ -74,7 +74,8 @@ public class SpecialCostImportService implements ImportService<SpecialCostDTO> {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void importData(SpecialCostDTO specialCost) {
 
-        final List<SpecialCostEntryEntity> specialCostEntryEntities = specialCostEntryRepository.findBySpecialCostCostDate(specialCost.costDate());
+        final List<SpecialCostEntryEntity> specialCostEntryEntities = specialCostEntryRepository.findBySpecialCostCostDate(
+                specialCost.costDate());
 
         // This means no special costs exist, so new ones need to be created
         if (specialCostEntryEntities.isEmpty()) {
@@ -98,7 +99,8 @@ public class SpecialCostImportService implements ImportService<SpecialCostDTO> {
         }
     }
 
-    private void createAndPersistNewEntries(SpecialCostDTO specialCost, List<SpecialCostEntryEntity> existingEntities) {
+    private void createAndPersistNewEntries(SpecialCostDTO specialCost,
+            List<SpecialCostEntryEntity> existingEntities) {
 
         for (SpecialCostEntryDTO newEntry : specialCost.entries()) {
             boolean isDuplicate = false;
@@ -116,7 +118,8 @@ public class SpecialCostImportService implements ImportService<SpecialCostDTO> {
         }
     }
 
-    private void createAndPersist(SpecialCostEntity specialCostEntity, SpecialCostEntryDTO newEntry) {
+    private void createAndPersist(SpecialCostEntity specialCostEntity,
+            SpecialCostEntryDTO newEntry) {
 
         final SpecialCostEntryEntity specialCostEntryEntity = new SpecialCostEntryEntity();
         specialCostEntryEntity.setDescription(newEntry.description());

@@ -16,6 +16,7 @@ public class MonthlyCostImport extends AbstractCostImport<MonthlyCostDTO, Monthl
 
     @Override
     protected MonthlyCostMeasurement map(MonthlyCostDTO monthlyCost) {
-        return new MonthlyCostMeasurement(CostType.MONTHLY.getValue(), monthlyCost.value(), getAsInstant(monthlyCost.costDate()));
+        return new MonthlyCostMeasurement(CostType.MONTHLY.getValue(), monthlyCost.value(),
+                getAsInstant(monthlyCost.costDate()));
     }
 }

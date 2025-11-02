@@ -5,11 +5,6 @@ import com.marvin.common.costs.DailyCostDTO;
 import com.marvin.common.costs.MonthlyCostDTO;
 import com.marvin.common.costs.SalaryDTO;
 import com.marvin.common.costs.SpecialCostDTO;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -18,13 +13,18 @@ import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 @Component
 public class CostImporter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CostImporter.class);
 
-    private static final Pattern FILE_NAME_PATTERN = Pattern.compile("([a-z_]+)_[0-9]{8}_[0-9]{6}\\.json");
+    private static final Pattern FILE_NAME_PATTERN = Pattern.compile(
+            "([a-z_]+)_[0-9]{8}_[0-9]{6}\\.json");
 
     private final String in;
     private final String done;
@@ -72,10 +72,14 @@ public class CostImporter {
 
         final String type = matcher.group(1);
         final Consumer<String> sender = switch (type) {
-            case "monthly_costs" -> c -> send(readValue(c, MonthlyCostDTO.class), monthlyCostImportService::importData);
-            case "salaries" -> c -> send(readValue(c, SalaryDTO.class), salaryImportService::importData);
-            case "special_costs" -> c -> send(readValue(c, SpecialCostDTO.class), specialCostImportService::importData);
-            case "daily_costs" -> c -> send(readValue(c, DailyCostDTO.class), dailyCostImportService::importData);
+            case "monthly_costs" -> c -> send(readValue(c, MonthlyCostDTO.class),
+                    monthlyCostImportService::importData);
+            case "salaries" ->
+                    c -> send(readValue(c, SalaryDTO.class), salaryImportService::importData);
+            case "special_costs" -> c -> send(readValue(c, SpecialCostDTO.class),
+                    specialCostImportService::importData);
+            case "daily_costs" ->
+                    c -> send(readValue(c, DailyCostDTO.class), dailyCostImportService::importData);
             default -> null;
         };
 
@@ -91,7 +95,8 @@ public class CostImporter {
         }
 
         try {
-            Files.move(path, Path.of(done).resolve(path.getFileName()), StandardCopyOption.REPLACE_EXISTING);
+            Files.move(path, Path.of(done).resolve(path.getFileName()),
+                    StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             LOGGER.error("Could not move file {} to done!", path);
         }

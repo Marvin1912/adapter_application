@@ -10,12 +10,11 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
+import java.time.LocalDate;
+import java.util.Objects;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.envers.Audited;
-
-import java.time.LocalDate;
-import java.util.Objects;
 
 @Getter
 @Setter
@@ -60,7 +59,9 @@ public class Plant {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         Plant plant = (Plant) o;
         return Objects.equals(id, plant.id);
     }

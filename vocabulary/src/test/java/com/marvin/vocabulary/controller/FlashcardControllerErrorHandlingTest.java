@@ -1,8 +1,15 @@
 package com.marvin.vocabulary.controller;
 
+import static org.mockito.Mockito.when;
+
 import com.marvin.vocabulary.dictionaryapi.DictionaryClient;
-import com.marvin.vocabulary.exceptions.*;
+import com.marvin.vocabulary.exceptions.DictionaryApiException;
+import com.marvin.vocabulary.exceptions.DictionaryServiceUnavailableException;
+import com.marvin.vocabulary.exceptions.InvalidWordException;
+import com.marvin.vocabulary.exceptions.RateLimitExceededException;
+import com.marvin.vocabulary.exceptions.WordNotFoundException;
 import com.marvin.vocabulary.service.FlashcardService;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,11 +18,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
-
-import java.util.Map;
-
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class FlashcardControllerErrorHandlingTest {
@@ -50,7 +52,8 @@ class FlashcardControllerErrorHandlingTest {
                 .expectBody(Map.class)
                 .value(response -> {
                     assert response.get("type").equals("WORD_NOT_FOUND");
-                    assert response.get("message").toString().contains("The word '" + word + "' was not found");
+                    assert response.get("message").toString()
+                            .contains("The word '" + word + "' was not found");
                     assert response.get("word").equals(word);
                 });
     }
@@ -69,7 +72,8 @@ class FlashcardControllerErrorHandlingTest {
                 .expectBody(Map.class)
                 .value(response -> {
                     assert response.get("type").equals("INVALID_WORD");
-                    assert response.get("message").toString().contains("The word '" + word + "' is invalid");
+                    assert response.get("message").toString()
+                            .contains("The word '" + word + "' is invalid");
                     assert response.get("word").equals(word);
                 });
     }
@@ -106,7 +110,8 @@ class FlashcardControllerErrorHandlingTest {
                 .expectBody(Map.class)
                 .value(response -> {
                     assert response.get("type").equals("SERVICE_UNAVAILABLE");
-                    assert response.get("message").toString().contains("Dictionary API service is currently unavailable");
+                    assert response.get("message").toString()
+                            .contains("Dictionary API service is currently unavailable");
                 });
     }
 
@@ -174,7 +179,8 @@ class FlashcardControllerErrorHandlingTest {
     void getWord_WhenCustomServiceUnavailableMessage_ShouldReturnCustomMessage() {
         String word = "test";
         String customMessage = "Dictionary API is under maintenance. Please try again in 5 minutes.";
-        DictionaryServiceUnavailableException exception = new DictionaryServiceUnavailableException(customMessage);
+        DictionaryServiceUnavailableException exception = new DictionaryServiceUnavailableException(
+                customMessage);
 
         when(dictionaryClient.getWord(word)).thenReturn(Mono.error(exception));
 
@@ -189,7 +195,7 @@ class FlashcardControllerErrorHandlingTest {
                 });
     }
 
-    
+
     @Test
     void verifyExceptionProperties_AreCorrectlyMapped() {
         String word = "testword";

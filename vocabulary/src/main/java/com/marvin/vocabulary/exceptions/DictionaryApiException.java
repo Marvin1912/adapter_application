@@ -1,6 +1,7 @@
 package com.marvin.vocabulary.exceptions;
 
 public class DictionaryApiException extends RuntimeException {
+
     private final int statusCode;
     private final String errorType;
 
@@ -10,7 +11,8 @@ public class DictionaryApiException extends RuntimeException {
         this.errorType = errorType;
     }
 
-    public DictionaryApiException(String message, Throwable cause, int statusCode, String errorType) {
+    public DictionaryApiException(String message, Throwable cause, int statusCode,
+            String errorType) {
         super(message, cause);
         this.statusCode = statusCode;
         this.errorType = errorType;

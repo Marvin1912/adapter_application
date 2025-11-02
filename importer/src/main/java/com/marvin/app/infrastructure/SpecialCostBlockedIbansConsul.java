@@ -1,16 +1,16 @@
 package com.marvin.app.infrastructure;
 
 import com.marvin.consul.repository.SpecialCostConsulRepository;
+import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import java.util.Set;
-
 @Component("specialCostBlockedIbans")
 public class SpecialCostBlockedIbansConsul implements Ibans {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SpecialCostBlockedIbansConsul.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+            SpecialCostBlockedIbansConsul.class);
 
     private final Set<String> blockedIbans;
     private final SpecialCostConsulRepository specialCostConsulRepository;

@@ -5,11 +5,11 @@ public enum CreditDebitCodeDTO {
     CRDT,
     DBIT;
 
-    public String value() {
-        return name();
-    }
-
     public static CreditDebitCodeDTO fromValue(String v) {
         return valueOf(v);
+    }
+
+    public String value() {
+        return name();
     }
 }

@@ -1,10 +1,27 @@
 package com.marvin.plants.service;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.marvin.plants.dto.PlantDTO;
 import com.marvin.plants.dto.PlantLocation;
 import com.marvin.plants.entity.Plant;
 import com.marvin.plants.mapper.PlantMapper;
 import com.marvin.plants.repository.PlantRepository;
+import java.time.LocalDate;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,34 +32,21 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 
-import java.time.LocalDate;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
-
 @ExtendWith(MockitoExtension.class)
 class PlantServiceTest {
 
-    @Mock
-    private PlantRepository plantRepository;
-
-    @Mock
-    private PlantMapper plantMapper;
-
-    @Mock
-    private JavaMailSender mailSender;
-
-    @InjectMocks
-    private PlantService plantService;
-
-    private Plant testPlant;
-    private PlantDTO testPlantDTO;
     private final String testMailUsername = "test@example.com";
     private final String testImageUuid = "test-uuid-123";
+    @Mock
+    private PlantRepository plantRepository;
+    @Mock
+    private PlantMapper plantMapper;
+    @Mock
+    private JavaMailSender mailSender;
+    @InjectMocks
+    private PlantService plantService;
+    private Plant testPlant;
+    private PlantDTO testPlantDTO;
 
     @BeforeEach
     void setUp() {
@@ -59,16 +63,16 @@ class PlantServiceTest {
         testPlant.setImage("test-image.jpg");
 
         testPlantDTO = new PlantDTO(
-            1L,
-            "Test Plant",
-            "Test Species",
-            "Test Description",
-            "Test Care Instructions",
-            PlantLocation.LIVING_ROOM,
-            7,
-            LocalDate.now().minusDays(3),
-            LocalDate.now().plusDays(4),
-            "test-image.jpg"
+                1L,
+                "Test Plant",
+                "Test Species",
+                "Test Description",
+                "Test Care Instructions",
+                PlantLocation.LIVING_ROOM,
+                7,
+                LocalDate.now().minusDays(3),
+                LocalDate.now().plusDays(4),
+                "test-image.jpg"
         );
     }
 
@@ -76,16 +80,16 @@ class PlantServiceTest {
     void createPlant_ShouldReturnPlantId_WhenValidInput() {
         // Given
         PlantDTO plantDto = new PlantDTO(
-            0L,
-            "New Plant",
-            "New Species",
-            "New Description",
-            "New Care Instructions",
-            PlantLocation.BEDROOM,
-            5,
-            null,
-            null,
-            null
+                0L,
+                "New Plant",
+                "New Species",
+                "New Description",
+                "New Care Instructions",
+                PlantLocation.BEDROOM,
+                5,
+                null,
+                null,
+                null
         );
 
         Plant newPlant = new Plant();
@@ -156,16 +160,16 @@ class PlantServiceTest {
         plant2.setWateringFrequency(10);
 
         PlantDTO plantDTO2 = new PlantDTO(
-            2L,
-            "Plant 2",
-            "Species 2",
-            "Description 2",
-            "Care 2",
-            PlantLocation.KITCHEN,
-            10,
-            null,
-            null,
-            null
+                2L,
+                "Plant 2",
+                "Species 2",
+                "Description 2",
+                "Care 2",
+                PlantLocation.KITCHEN,
+                10,
+                null,
+                null,
+                null
         );
 
         List<Plant> plants = List.of(testPlant, plant2);
@@ -200,16 +204,16 @@ class PlantServiceTest {
         // Given
         LocalDate waterDate = LocalDate.now();
         PlantDTO updateDTO = new PlantDTO(
-            1L,
-            "Updated Plant",
-            "Updated Species",
-            "Updated Description",
-            "Updated Care Instructions",
-            PlantLocation.KITCHEN,
-            10,
-            waterDate,
-            waterDate.plusDays(10),
-            "updated-image.jpg"
+                1L,
+                "Updated Plant",
+                "Updated Species",
+                "Updated Description",
+                "Updated Care Instructions",
+                PlantLocation.KITCHEN,
+                10,
+                waterDate,
+                waterDate.plusDays(10),
+                "updated-image.jpg"
         );
 
         when(plantRepository.findById(1L)).thenReturn(Optional.of(testPlant));
@@ -230,24 +234,24 @@ class PlantServiceTest {
     void updatePlant_ShouldThrowException_WhenPlantNotExists() {
         // Given
         PlantDTO updateDTO = new PlantDTO(
-            999L,
-            "Updated Plant",
-            "Updated Species",
-            "Updated Description",
-            "Updated Care Instructions",
-            PlantLocation.KITCHEN,
-            10,
-            LocalDate.now(),
-            LocalDate.now().plusDays(10),
-            "updated-image.jpg"
+                999L,
+                "Updated Plant",
+                "Updated Species",
+                "Updated Description",
+                "Updated Care Instructions",
+                PlantLocation.KITCHEN,
+                10,
+                LocalDate.now(),
+                LocalDate.now().plusDays(10),
+                "updated-image.jpg"
         );
 
         when(plantRepository.findById(999L)).thenReturn(Optional.empty());
 
         // When & Then
         IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
-            () -> plantService.updatePlant(updateDTO)
+                IllegalArgumentException.class,
+                () -> plantService.updatePlant(updateDTO)
         );
 
         assertEquals("Plant with id 999 not found", exception.getMessage());
@@ -335,7 +339,8 @@ class PlantServiceTest {
         verify(plantRepository).findByNextWateredDate(today);
         verify(mailSender).send(any(SimpleMailMessage.class));
 
-        ArgumentCaptor<SimpleMailMessage> messageCaptor = ArgumentCaptor.forClass(SimpleMailMessage.class);
+        ArgumentCaptor<SimpleMailMessage> messageCaptor = ArgumentCaptor.forClass(
+                SimpleMailMessage.class);
         verify(mailSender).send(messageCaptor.capture());
 
         SimpleMailMessage sentMessage = messageCaptor.getValue();
@@ -371,16 +376,16 @@ class PlantServiceTest {
     void updatePlant_ShouldThrowException_WhenLastWateredDateIsNull() {
         // Given
         PlantDTO updateDTO = new PlantDTO(
-            1L,
-            "Updated Plant",
-            "Updated Species",
-            "Updated Description",
-            "Updated Care Instructions",
-            PlantLocation.KITCHEN,
-            10,
-            null,
-            null,
-            "updated-image.jpg"
+                1L,
+                "Updated Plant",
+                "Updated Species",
+                "Updated Description",
+                "Updated Care Instructions",
+                PlantLocation.KITCHEN,
+                10,
+                null,
+                null,
+                "updated-image.jpg"
         );
 
         when(plantRepository.findById(1L)).thenReturn(Optional.of(testPlant));
@@ -423,7 +428,8 @@ class PlantServiceTest {
         plantService.sendWateringNotification();
 
         // Then
-        ArgumentCaptor<SimpleMailMessage> messageCaptor = ArgumentCaptor.forClass(SimpleMailMessage.class);
+        ArgumentCaptor<SimpleMailMessage> messageCaptor = ArgumentCaptor.forClass(
+                SimpleMailMessage.class);
         verify(mailSender).send(messageCaptor.capture());
 
         SimpleMailMessage sentMessage = messageCaptor.getValue();
@@ -436,16 +442,16 @@ class PlantServiceTest {
     void createPlant_ShouldHandleNullImageUuid() {
         // Given
         PlantDTO plantDto = new PlantDTO(
-            0L,
-            "New Plant",
-            "New Species",
-            "New Description",
-            "New Care Instructions",
-            PlantLocation.BEDROOM,
-            5,
-            null,
-            null,
-            null
+                0L,
+                "New Plant",
+                "New Species",
+                "New Description",
+                "New Care Instructions",
+                PlantLocation.BEDROOM,
+                5,
+                null,
+                null,
+                null
         );
 
         Plant newPlant = new Plant();

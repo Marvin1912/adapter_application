@@ -2,7 +2,6 @@ package com.marvin.influxdb.costs.monthly.dto;
 
 import com.influxdb.annotations.Column;
 import com.influxdb.annotations.Measurement;
-
 import java.math.BigDecimal;
 import java.time.Instant;
 
@@ -12,4 +11,5 @@ public record MonthlyCostMeasurement(
         @Column BigDecimal value,
         @Column(timestamp = true) Instant time
 ) {
+
 }

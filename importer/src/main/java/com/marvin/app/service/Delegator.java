@@ -9,14 +9,13 @@ import com.marvin.camt.maintenance.DataMaintainer;
 import com.marvin.camt.model.book_entry.BookingEntryDTO;
 import com.marvin.camt.parser.CamtFileParser;
 import com.marvin.camt.parser.DocumentUnmarshaller;
+import java.io.InputStream;
+import java.nio.file.Files;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
-
-import java.io.InputStream;
-import java.nio.file.Files;
 
 @Component
 public class Delegator {
@@ -52,7 +51,8 @@ public class Delegator {
     @EventListener(NewFileEvent.class)
     public void startUpWatchService(NewFileEvent newFileEvent) throws Exception {
 
-        Flux<BookingEntryDTO> bookingEntryStream = getBookingEntries(Files.newInputStream(newFileEvent.path()))
+        Flux<BookingEntryDTO> bookingEntryStream = getBookingEntries(
+                Files.newInputStream(newFileEvent.path()))
                 .publish().autoConnect(4);
 
         monthlyCostImportService.importMonthlyCost(bookingEntryStream)

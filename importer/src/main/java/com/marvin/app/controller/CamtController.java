@@ -7,6 +7,13 @@ import com.marvin.camt.model.book_entry.CreditDebitCodeDTO;
 import com.marvin.camt.model.book_entry.MonthlyBookingEntriesDTO;
 import com.marvin.camt.parser.CamtFileParser;
 import com.marvin.camt.parser.DocumentUnmarshaller;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
@@ -16,21 +23,14 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
-
 @RestController
 public class CamtController {
 
     private final CamtFileParser camtFileParser;
     private final DocumentUnmarshaller documentUnmarshaller;
 
-    public CamtController(CamtFileParser camtFileParser, DocumentUnmarshaller documentUnmarshaller) {
+    public CamtController(CamtFileParser camtFileParser,
+            DocumentUnmarshaller documentUnmarshaller) {
         this.camtFileParser = camtFileParser;
         this.documentUnmarshaller = documentUnmarshaller;
     }

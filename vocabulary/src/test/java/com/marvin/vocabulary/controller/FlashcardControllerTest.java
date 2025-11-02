@@ -1,10 +1,17 @@
 package com.marvin.vocabulary.controller;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.when;
+
 import com.marvin.vocabulary.dictionaryapi.DictionaryClient;
 import com.marvin.vocabulary.dto.DictionaryEntry;
 import com.marvin.vocabulary.dto.Flashcard;
 import com.marvin.vocabulary.model.FlashcardEntity;
 import com.marvin.vocabulary.service.FlashcardService;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,14 +26,6 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Map;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class FlashcardControllerTest {
@@ -166,7 +165,8 @@ class FlashcardControllerTest {
 
     @Test
     void getFile_ShouldReturnCsvFile() throws Exception {
-        byte[] expectedFileContent = "#separator:tab\n#html:false\n#guid column:1\ntest-content".getBytes(StandardCharsets.UTF_8);
+        byte[] expectedFileContent = "#separator:tab\n#html:false\n#guid column:1\ntest-content".getBytes(
+                StandardCharsets.UTF_8);
 
         when(flashcardService.getFile()).thenReturn(expectedFileContent);
 
@@ -177,7 +177,8 @@ class FlashcardControllerTest {
                 .expectHeader().contentType("text/csv")
                 .expectHeader().valueEquals("Content-Disposition", "attachment")
                 .expectHeader().valueEquals("filename", "Standard.csv")
-                .expectHeader().valueEquals("Content-Length", String.valueOf(expectedFileContent.length))
+                .expectHeader()
+                .valueEquals("Content-Length", String.valueOf(expectedFileContent.length))
                 .expectBody(byte[].class)
                 .isEqualTo(expectedFileContent);
     }
@@ -280,7 +281,8 @@ class FlashcardControllerTest {
         String csvContent = "invalid content";
         byte[] fileBytes = csvContent.getBytes(StandardCharsets.UTF_8);
 
-        lenient().when(flashcardService.importFlashcards(fileBytes)).thenThrow(new RuntimeException("Import failed"));
+        lenient().when(flashcardService.importFlashcards(fileBytes))
+                .thenThrow(new RuntimeException("Import failed"));
 
         FilePart filePart = createMockFilePart("test.csv", fileBytes);
 

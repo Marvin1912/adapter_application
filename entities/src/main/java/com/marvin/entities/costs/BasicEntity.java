@@ -3,11 +3,10 @@ package com.marvin.entities.costs;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-
 import java.time.LocalDateTime;
 import java.util.Objects;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 @MappedSuperclass
 public class BasicEntity {
@@ -40,10 +39,15 @@ public class BasicEntity {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         BasicEntity that = (BasicEntity) o;
-        return Objects.equals(creationDate, that.creationDate) && Objects.equals(lastModified, that.lastModified);
+        return Objects.equals(creationDate, that.creationDate) && Objects.equals(lastModified,
+                that.lastModified);
     }
 
     @Override

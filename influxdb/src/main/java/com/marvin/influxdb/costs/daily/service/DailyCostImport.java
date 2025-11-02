@@ -16,6 +16,7 @@ public class DailyCostImport extends AbstractCostImport<DailyCostDTO, DailyCostM
 
     @Override
     protected DailyCostMeasurement map(DailyCostDTO monthlyCost) {
-        return new DailyCostMeasurement(CostType.DAILY.getValue(), monthlyCost.value(), getAsInstant(monthlyCost.costDate()));
+        return new DailyCostMeasurement(CostType.DAILY.getValue(), monthlyCost.value(),
+                getAsInstant(monthlyCost.costDate()));
     }
 }

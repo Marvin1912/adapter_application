@@ -1,15 +1,18 @@
 package com.marvin.vocabulary.dictionaryapi;
 
 import com.marvin.vocabulary.dto.DictionaryEntry;
-import com.marvin.vocabulary.exceptions.*;
+import com.marvin.vocabulary.exceptions.DictionaryApiException;
+import com.marvin.vocabulary.exceptions.DictionaryServiceUnavailableException;
+import com.marvin.vocabulary.exceptions.InvalidWordException;
+import com.marvin.vocabulary.exceptions.RateLimitExceededException;
+import com.marvin.vocabulary.exceptions.WordNotFoundException;
+import java.util.List;
+import java.util.Map;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
-
-import java.util.List;
-import java.util.Map;
 
 @Component
 public class DictionaryClient {
@@ -41,36 +44,38 @@ public class DictionaryClient {
                 .uri("/page/definition/" + word.trim())
                 .retrieve()
                 .onStatus(
-                    HttpStatus.NOT_FOUND::equals,
-                    response -> Mono.error(new WordNotFoundException(word))
+                        HttpStatus.NOT_FOUND::equals,
+                        response -> Mono.error(new WordNotFoundException(word))
                 )
                 .onStatus(
-                    HttpStatus.TOO_MANY_REQUESTS::equals,
-                    response -> Mono.error(new RateLimitExceededException())
+                        HttpStatus.TOO_MANY_REQUESTS::equals,
+                        response -> Mono.error(new RateLimitExceededException())
                 )
                 .onStatus(
-                    HttpStatus.SERVICE_UNAVAILABLE::equals,
-                    response -> Mono.error(new DictionaryServiceUnavailableException())
+                        HttpStatus.SERVICE_UNAVAILABLE::equals,
+                        response -> Mono.error(new DictionaryServiceUnavailableException())
                 )
                 .onStatus(
-                    HttpStatus.BAD_REQUEST::equals,
-                    response -> Mono.error(new InvalidWordException(word))
+                        HttpStatus.BAD_REQUEST::equals,
+                        response -> Mono.error(new InvalidWordException(word))
                 )
                 .onStatus(
-                    status -> status.is4xxClientError(),
-                    response -> Mono.error(new DictionaryApiException(
-                        "Client error occurred while fetching dictionary entry for word: " + word,
-                        response.statusCode().value(),
-                        "CLIENT_ERROR"
-                    ))
+                        status -> status.is4xxClientError(),
+                        response -> Mono.error(new DictionaryApiException(
+                                "Client error occurred while fetching dictionary entry for word: "
+                                        + word,
+                                response.statusCode().value(),
+                                "CLIENT_ERROR"
+                        ))
                 )
                 .onStatus(
-                    status -> status.is5xxServerError(),
-                    response -> Mono.error(new DictionaryApiException(
-                        "Server error occurred while fetching dictionary entry for word: " + word,
-                        response.statusCode().value(),
-                        "SERVER_ERROR"
-                    ))
+                        status -> status.is5xxServerError(),
+                        response -> Mono.error(new DictionaryApiException(
+                                "Server error occurred while fetching dictionary entry for word: "
+                                        + word,
+                                response.statusCode().value(),
+                                "SERVER_ERROR"
+                        ))
                 )
                 .bodyToMono(WIKTIONARY_REFERENCE)
                 .map(response -> responseMapper.mapToDictionaryEntries(word, response))
@@ -79,9 +84,10 @@ public class DictionaryClient {
                         return ex;
                     }
                     return new DictionaryApiException(
-                        "Unexpected error occurred while fetching dictionary entry for word: " + word,
-                        500,
-                        "UNEXPECTED_ERROR"
+                            "Unexpected error occurred while fetching dictionary entry for word: "
+                                    + word,
+                            500,
+                            "UNEXPECTED_ERROR"
                     );
                 });
     }
