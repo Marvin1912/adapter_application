@@ -6,27 +6,27 @@ import reactor.test.StepVerifier;
 
 class WiktionaryIntegrationTest {
 
-    @Test
-    void getWord_WithValidWord_ShouldReturnEntriesFromWiktionary() {
-        HtmlCleaner htmlCleaner = new HtmlCleaner();
-        WiktionaryResponseMapper responseMapper = new WiktionaryResponseMapper(htmlCleaner);
-        DictionaryClient dictionaryClient = new DictionaryClient(responseMapper);
+  @Test
+  void getWord_WithValidWord_ShouldReturnEntriesFromWiktionary() {
+    HtmlCleaner htmlCleaner = new HtmlCleaner();
+    WiktionaryResponseMapper responseMapper = new WiktionaryResponseMapper(htmlCleaner);
+    DictionaryClient dictionaryClient = new DictionaryClient(responseMapper);
 
-        String testWord = "hello";
+    String testWord = "hello";
 
-        StepVerifier.create(dictionaryClient.getWord(testWord))
-                .expectNextMatches(entries -> {
-                    if (entries.isEmpty()) {
-                        return false;
-                    }
+    StepVerifier.create(dictionaryClient.getWord(testWord))
+        .expectNextMatches(entries -> {
+          if (entries.isEmpty()) {
+            return false;
+          }
 
-                    DictionaryEntry entry = entries.get(0);
-                    return entry.word().equals(testWord) &&
-                            !entry.meanings().isEmpty() &&
-                            entry.meanings().get(0).partOfSpeech() != null &&
-                            !entry.meanings().get(0).definitions().isEmpty() &&
-                            entry.meanings().get(0).definitions().get(0).definition() != null;
-                })
-                .verifyComplete();
-    }
+          DictionaryEntry entry = entries.get(0);
+          return entry.word().equals(testWord) &&
+              !entry.meanings().isEmpty() &&
+              entry.meanings().get(0).partOfSpeech() != null &&
+              !entry.meanings().get(0).definitions().isEmpty() &&
+              entry.meanings().get(0).definitions().get(0).definition() != null;
+        })
+        .verifyComplete();
+  }
 }

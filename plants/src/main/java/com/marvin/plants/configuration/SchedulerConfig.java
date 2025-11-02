@@ -9,16 +9,16 @@ import org.springframework.scheduling.annotation.Scheduled;
 @Configuration
 public class SchedulerConfig {
 
-    private final PlantService plantService;
+  private final PlantService plantService;
 
-    public SchedulerConfig(PlantService plantService) {
-        this.plantService = plantService;
-    }
+  public SchedulerConfig(PlantService plantService) {
+    this.plantService = plantService;
+  }
 
-    @Scheduled(cron = "0 0 2 * * *")
-    public void scheduleWatering() {
-        log.info("Scheduling watering");
-        plantService.sendWateringNotification();
-    }
+  @Scheduled(cron = "0 0 2 * * *")
+  public void scheduleWatering() {
+    log.info("Scheduling watering");
+    plantService.sendWateringNotification();
+  }
 
 }

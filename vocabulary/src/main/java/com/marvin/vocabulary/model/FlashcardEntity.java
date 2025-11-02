@@ -22,28 +22,28 @@ import org.hibernate.envers.Audited;
 @Audited
 public class FlashcardEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "flashcard_id_gen")
-    @SequenceGenerator(name = "flashcard_id_gen", sequenceName = "vocabulary.flashcard_id_seq", allocationSize = 1)
-    @Column(name = "id", nullable = false)
-    private Integer id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "flashcard_id_gen")
+  @SequenceGenerator(name = "flashcard_id_gen", sequenceName = "vocabulary.flashcard_id_seq", allocationSize = 1)
+  @Column(name = "id", nullable = false)
+  private Integer id;
 
-    @Column(name = "deck", nullable = false)
-    private String deck;
+  @Column(name = "deck", nullable = false)
+  private String deck;
 
-    @Column(name = "anki_id")
-    private String ankiId;
+  @Column(name = "anki_id")
+  private String ankiId;
 
-    @Column(name = "front", nullable = false)
-    private String front;
+  @Column(name = "front", nullable = false)
+  private String front;
 
-    @Column(name = "back", nullable = false)
-    private String back;
+  @Column(name = "back", nullable = false)
+  private String back;
 
-    @Column(name = "description", length = Integer.MAX_VALUE)
-    private String description;
+  @Column(name = "description", length = Integer.MAX_VALUE)
+  private String description;
 
-    @Column(name = "updated", nullable = false)
-    private boolean updated;
+  @Column(name = "updated", nullable = false)
+  private boolean updated;
 
 }

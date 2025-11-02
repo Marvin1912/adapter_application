@@ -10,8 +10,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface MonthlyCostRepository extends JpaRepository<MonthlyCostEntity, Integer> {
 
-    Optional<MonthlyCostEntity> findByCostDate(LocalDate costDate);
+  Optional<MonthlyCostEntity> findByCostDate(LocalDate costDate);
 
-    List<MonthlyCostEntity> findAllByOrderByCostDate();
+  List<MonthlyCostEntity> findAllByOrderByCostDate();
 
 }

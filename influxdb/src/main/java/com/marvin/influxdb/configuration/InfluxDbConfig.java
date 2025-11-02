@@ -11,15 +11,15 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class InfluxDbConfig {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(InfluxDbConfig.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(InfluxDbConfig.class);
 
-    @Bean
-    public InfluxDBClient influxDBClient(
-            @Value("${influxdb.token}") String token,
-            @Value("${influxdb.url}") String url
-    ) {
-        LOGGER.info("Creating influx db config for: {}", url);
-        return InfluxDBClientFactory.create(url, token.toCharArray());
-    }
+  @Bean
+  public InfluxDBClient influxDBClient(
+      @Value("${influxdb.token}") String token,
+      @Value("${influxdb.url}") String url
+  ) {
+    LOGGER.info("Creating influx db config for: {}", url);
+    return InfluxDBClientFactory.create(url, token.toCharArray());
+  }
 
 }

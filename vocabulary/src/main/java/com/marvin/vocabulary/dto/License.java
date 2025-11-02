@@ -1,8 +1,8 @@
 package com.marvin.vocabulary.dto;
 
 public record License(
-        String name,
-        String url
+    String name,
+    String url
 ) {
 
 }

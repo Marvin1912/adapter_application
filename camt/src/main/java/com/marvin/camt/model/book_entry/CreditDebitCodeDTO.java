@@ -2,14 +2,14 @@ package com.marvin.camt.model.book_entry;
 
 public enum CreditDebitCodeDTO {
 
-    CRDT,
-    DBIT;
+  CRDT,
+  DBIT;
 
-    public static CreditDebitCodeDTO fromValue(String v) {
-        return valueOf(v);
-    }
+  public static CreditDebitCodeDTO fromValue(String v) {
+    return valueOf(v);
+  }
 
-    public String value() {
-        return name();
-    }
+  public String value() {
+    return name();
+  }
 }

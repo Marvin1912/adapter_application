@@ -4,5 +4,5 @@ import java.util.Set;
 
 public interface Ibans {
 
-    Set<String> getIbans();
+  Set<String> getIbans();
 }

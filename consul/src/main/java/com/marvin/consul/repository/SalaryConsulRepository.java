@@ -5,9 +5,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class SalaryConsulRepository extends CostConsulRepository {
 
-    private static final String KEY_PREFIX = "costs/salary";
+  private static final String KEY_PREFIX = "costs/salary";
 
-    public SalaryConsulRepository(BasicConsulRepository consulRepository) {
-        super(consulRepository, KEY_PREFIX);
-    }
+  public SalaryConsulRepository(BasicConsulRepository consulRepository) {
+    super(consulRepository, KEY_PREFIX);
+  }
 }

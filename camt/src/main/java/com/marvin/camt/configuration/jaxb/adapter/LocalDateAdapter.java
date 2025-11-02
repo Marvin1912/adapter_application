@@ -5,13 +5,13 @@ import java.time.LocalDate;
 
 public class LocalDateAdapter extends XmlAdapter<String, LocalDate> {
 
-    @Override
-    public LocalDate unmarshal(String xmlGregorianCalendar) {
-        return LocalDate.parse(xmlGregorianCalendar);
-    }
+  @Override
+  public LocalDate unmarshal(String xmlGregorianCalendar) {
+    return LocalDate.parse(xmlGregorianCalendar);
+  }
 
-    @Override
-    public String marshal(LocalDate localDate) {
-        return localDate.toString();
-    }
+  @Override
+  public String marshal(LocalDate localDate) {
+    return localDate.toString();
+  }
 }

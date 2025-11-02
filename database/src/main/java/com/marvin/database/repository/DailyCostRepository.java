@@ -10,9 +10,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface DailyCostRepository extends JpaRepository<DailyCostEntity, Integer> {
 
-    Optional<DailyCostEntity> findByCostDateAndDescriptionOrderByCostDate(LocalDate costDate,
-            String description);
+  Optional<DailyCostEntity> findByCostDateAndDescriptionOrderByCostDate(LocalDate costDate,
+      String description);
 
-    List<DailyCostEntity> findByCostDateGreaterThanEqualOrderByCostDate(LocalDate localDate);
+  List<DailyCostEntity> findByCostDateGreaterThanEqualOrderByCostDate(LocalDate localDate);
 
 }
