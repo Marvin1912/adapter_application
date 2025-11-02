@@ -10,9 +10,9 @@ This project uses comprehensive code formatting and quality standards to ensure 
 
 The project includes multiple formatting configuration files to ensure consistent code style:
 
-1. **IntelliJ IDEA Code Style** (`.idea/codeStyles/`)
-   - `Project.xml`: Complete IntelliJ formatting rules aligned with Checkstyle
-   - `codeStyleConfig.xml`: Marks the Project style as shared for team consistency
+1. **IntelliJ IDEA Code Style** (`config/intellij/`)
+   - `code-style.xml`: Complete IntelliJ formatting rules aligned with Checkstyle
+   - `project-style-config.xml`: Project style configuration for team consistency
 
 2. **Cross-IDE Compatibility** (`.editorconfig`)
    - Basic formatting rules that work across different IDEs
@@ -36,10 +36,22 @@ The project includes multiple formatting configuration files to ensure consisten
 ### IDE Setup
 
 #### IntelliJ IDEA
-The project code style will be automatically detected when you open the project. Ensure:
-1. Checkstyle plugin is installed
-2. Project code style is selected in Settings → Editor → Code Style → Java
-3. Enable "Reformat on commit" for optimal consistency
+Since formatting rules are stored in `config/intellij/`, you need to manually import them:
+
+1. **Import Code Style**:
+   ```
+   File → Settings → Editor → Code Style → Java → Scheme → Import Scheme → IntelliJ IDEA code style XML
+   ```
+   - Select: `config/intellij/code-style.xml`
+   - Name the scheme: "Project"
+
+2. **Set as Default**:
+   - Select "Project" from the Scheme dropdown
+   - Click "Apply" and "OK"
+
+3. **Optional Setup**:
+   - Install Checkstyle plugin and configure it to use `config/checkstyle/checkstyle.xml`
+   - Enable "Reformat on commit" for optimal consistency
 
 #### Other IDEs
 Install EditorConfig support and the Checkstyle plugin to maintain consistent formatting.

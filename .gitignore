@@ -28,17 +28,7 @@ hs_err_pid*
 replay_pid*
 
 # IntelliJ
-.idea/*
-!.idea/codeStyles/
-.idea/workspace.xml
-.idea/tasks.xml
-.idea/dictionaries
-.idea/shelf
-.idea/uiDesigner.xml
-.idea/gradle.xml
-.idea/libraries
-.idea/modules.xml
-.idea/*.iml
+.idea/
 *.iml
 
 # Misc
