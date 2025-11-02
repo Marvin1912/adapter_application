@@ -97,7 +97,7 @@ subprojects {
 
 	// Configure Checkstyle for each subproject
 	checkstyle {
-		configFile = file("$rootDir/config/checkstyle/checkstyle-simple.xml")
+		configFile = file("$rootDir/config/checkstyle/checkstyle.xml")
 		maxWarnings = 0
 	}
 }
