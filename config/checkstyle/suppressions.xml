@@ -12,6 +12,7 @@
     <suppress checks="ParameterNumber" files=".*Test\.java"/>
     <suppress checks="MagicNumber" files=".*Test\.java"/>
     <suppress checks="Javadoc" files=".*Test\.java"/>
+    <suppress checks="MethodName" files=".*Test\.java"/>
 
     <!-- Suppress specific rules for utility classes -->
     <suppress checks="Javadoc" files=".*Util\.java"/>
