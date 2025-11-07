@@ -28,7 +28,7 @@ public class ExportFileWriter {
     try (BufferedWriter writer = Files.newBufferedWriter(target)) {
       dataStream.forEach(item -> {
         try {
-          String json = objectMapper.writeValueAsString(item);
+          final String json = objectMapper.writeValueAsString(item);
           writer.write(json);
           writer.newLine();
         } catch (IOException e) {
