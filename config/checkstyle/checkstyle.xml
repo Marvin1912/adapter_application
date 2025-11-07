@@ -41,6 +41,8 @@
     <module name="UnusedImports"/>
 
     <!-- Code Structure -->
+    <module name="Indentation"/>
+
     <module name="EmptyStatement"/>
     <module name="LeftCurly"/>
     <module name="RightCurly"/>
