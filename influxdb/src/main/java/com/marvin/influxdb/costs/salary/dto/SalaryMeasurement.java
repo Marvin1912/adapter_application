@@ -20,17 +20,8 @@ import java.time.Instant;
  */
 @Measurement(name = "costs")
 public record SalaryMeasurement(
-
-        /** The cost type tag used for categorizing the measurement. */
-        @Column(tag = true)
-        String costType,
-
-        /** The monetary value of the salary cost. */
-        @Column
-        BigDecimal value,
-
-        /** The timestamp when the cost measurement was recorded. */
-        @Column(timestamp = true)
-        Instant time
+        @Column(tag = true) String costType,
+        @Column BigDecimal value,
+        @Column(timestamp = true) Instant time
 ) {
 }
