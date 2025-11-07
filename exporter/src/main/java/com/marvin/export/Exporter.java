@@ -30,8 +30,8 @@ public class Exporter {
 
   public static final Function<SpecialCostEntryEntity, SpecialCostEntryDTO> SPECIAL_COST_ENTRY_MAPPER = e ->
       new SpecialCostEntryDTO(e.getDescription(), e.getValue(), e.getAdditionalInfo());
-  public static final Function<Map.Entry<LocalDate, List<SpecialCostEntryDTO>>, SpecialCostDTO> SPECIAL_COST_MAPPER = e ->
-      new SpecialCostDTO(e.getKey(), e.getValue());
+  public static final Function<Map.Entry<LocalDate, List<SpecialCostEntryDTO>>, SpecialCostDTO> SPECIAL_COST_MAPPER =
+      e -> new SpecialCostDTO(e.getKey(), e.getValue());
   public static final Function<SalaryEntity, SalaryDTO> SALARY_MAPPER = salaryEntity ->
       new SalaryDTO(salaryEntity.getSalaryDate(), salaryEntity.getValue());
   private static final DateTimeFormatter FILE_DTF = DateTimeFormatter.ofPattern(
@@ -66,8 +66,8 @@ public class Exporter {
 
   public List<Path> exportCosts() {
 
-    String now = LocalDateTime.now().format(FILE_DTF);
-    String costExportFolder = exportConfig.getCostExportFolder();
+    final String now = LocalDateTime.now().format(FILE_DTF);
+    final String costExportFolder = exportConfig.getCostExportFolder();
 
     final Path dailyCostsPath = Path.of(costExportFolder + "/daily_costs_" + now + ".json");
     exportCost(
