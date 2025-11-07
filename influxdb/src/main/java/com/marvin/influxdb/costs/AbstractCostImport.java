@@ -9,28 +9,80 @@ import java.time.ZoneId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Abstract base class for importing cost data into InfluxDB.
+ *
+ * <p>This class provides common functionality for importing different types of cost data
+ * into InfluxDB measurements. It handles the conversion between DTOs and measurements,
+ * and manages the writing of data to the InfluxDB database.</p>
+ *
+ * @param <DTO> the type of data transfer object to be imported
+ * @param <MEAS> the type of measurement to be written to InfluxDB
+ * @author Marvin Application
+ * @version 1.0
+ * @since 1.0
+ */
 public abstract class AbstractCostImport<DTO, MEAS> {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(AbstractCostImport.class);
+    /** Logger for this class. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractCostImport.class);
 
-  private final InfluxDBClient influxDBClient;
+    /** UTC timezone constant for date conversions. */
+    private static final String UTC_TIMEZONE = "UTC";
 
-  public AbstractCostImport(InfluxDBClient influxDBClient) {
-    this.influxDBClient = influxDBClient;
-  }
+    /** InfluxDB bucket name for costs. */
+    private static final String COSTS_BUCKET = "costs";
 
-  protected abstract MEAS map(DTO dto);
+    /** InfluxDB organization name. */
+    private static final String WILDFLY_DOMAIN_ORG = "wildfly_domain";
 
-  protected Instant getAsInstant(LocalDate localDate) {
-    return localDate.atStartOfDay(ZoneId.of("UTC")).toInstant();
-  }
+    /** The InfluxDB client instance. */
+    private final InfluxDBClient influxDBClient;
 
-  public void importCost(DTO dto) {
-    MEAS measurement = map(dto);
+    /**
+     * Constructs an AbstractCostImport with the specified InfluxDB client.
+     *
+     * @param influxDBClient the InfluxDB client to use for writing data
+     */
+    protected AbstractCostImport(final InfluxDBClient influxDBClient) {
+        this.influxDBClient = influxDBClient;
+    }
 
-    WriteApiBlocking writeApi = influxDBClient.getWriteApiBlocking();
-    writeApi.writeMeasurement("costs", "wildfly_domain", WritePrecision.NS, measurement);
+    /**
+     * Maps a DTO to its corresponding measurement type.
+     *
+     * <p>This method must be implemented by subclasses to define the specific
+     * mapping logic for each cost type.</p>
+     *
+     * @param dto the data transfer object to map
+     * @return the corresponding measurement object
+     */
+    protected abstract MEAS map(final DTO dto);
 
-    LOGGER.info("Imported InfluxDB measurement {}", measurement);
-  }
+    /**
+     * Converts a LocalDate to an Instant in UTC timezone.
+     *
+     * @param localDate the local date to convert
+     * @return the corresponding instant in UTC
+     */
+    protected Instant getAsInstant(final LocalDate localDate) {
+        return localDate.atStartOfDay(ZoneId.of(UTC_TIMEZONE)).toInstant();
+    }
+
+    /**
+     * Imports cost data from a DTO into InfluxDB.
+     *
+     * <p>This method maps the DTO to a measurement and writes it to the
+     * InfluxDB database using the costs bucket and wildfly_domain organization.</p>
+     *
+     * @param dto the data transfer object containing cost data to import
+     */
+    public void importCost(final DTO dto) {
+        final MEAS measurement = map(dto);
+
+        final WriteApiBlocking writeApi = influxDBClient.getWriteApiBlocking();
+        writeApi.writeMeasurement(COSTS_BUCKET, WILDFLY_DOMAIN_ORG, WritePrecision.NS, measurement);
+
+        LOGGER.info("Successfully imported InfluxDB measurement: {}", measurement);
+    }
 }
