@@ -7,39 +7,44 @@ import org.springframework.stereotype.Component;
 @Component
 public class ExportConfig {
 
-  private final String costExportFolder;
+    private final String costExportFolder;
 
-  public ExportConfig(
-      @Value("${exporter.folder}") String costExportFolder
-  ) {
-    this.costExportFolder = costExportFolder;
-  }
-
-  public String getCostExportFolder() {
-    return costExportFolder;
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
+    public ExportConfig(@Value("${exporter.folder}") String costExportFolder) {
+        this.costExportFolder = validateCostExportFolder(costExportFolder);
     }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
+
+    public String getCostExportFolder() {
+        return costExportFolder;
     }
-    final ExportConfig that = (ExportConfig) o;
-    return Objects.equals(costExportFolder, that.costExportFolder);
-  }
 
-  @Override
-  public int hashCode() {
-    return Objects.hash(costExportFolder);
-  }
+    private String validateCostExportFolder(String folder) {
+        if (folder == null || folder.trim().isEmpty()) {
+            throw new IllegalArgumentException("Export folder cannot be null or empty");
+        }
+        return folder.trim();
+    }
 
-  @Override
-  public String toString() {
-    return "ExportConfig{" +
-        "costExportFolder='" + costExportFolder + '\'' +
-        '}';
-  }
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        ExportConfig that = (ExportConfig) obj;
+        return Objects.equals(costExportFolder, that.costExportFolder);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(costExportFolder);
+    }
+
+    @Override
+    public String toString() {
+        return "ExportConfig{" +
+                "costExportFolder='" + costExportFolder + '\'' +
+                '}';
+    }
 }
