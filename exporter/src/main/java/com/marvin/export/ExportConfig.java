@@ -32,7 +32,7 @@ public class ExportConfig {
         if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
-        ExportConfig that = (ExportConfig) obj;
+        final ExportConfig that = (ExportConfig) obj;
         return Objects.equals(costExportFolder, that.costExportFolder);
     }
 

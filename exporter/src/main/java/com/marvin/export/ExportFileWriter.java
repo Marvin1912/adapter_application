@@ -50,7 +50,7 @@ public class ExportFileWriter {
 
     private <T> void writeJsonLine(BufferedWriter writer, T item) {
         try {
-            String json = objectMapper.writeValueAsString(item);
+            final String json = objectMapper.writeValueAsString(item);
             writer.write(json);
             writer.newLine();
         } catch (JsonProcessingException e) {
