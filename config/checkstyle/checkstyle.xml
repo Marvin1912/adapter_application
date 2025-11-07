@@ -77,6 +77,7 @@
     <!-- Documentation -->
     <module name="JavadocMethod"/>
     <module name="JavadocType"/>
+    <module name="InvalidJavadocPosition"/>
 
     <!--        &lt;!&ndash; Spring Boot Specific &ndash;&gt;-->
     <module name="AnonInnerLength"/>
