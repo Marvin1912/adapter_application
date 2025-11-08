@@ -1,0 +1,11 @@
+# Exporter Configuration
+exporter:
+  folder: "./exports"
+
+# InfluxDB Configuration
+influxdb:
+  url: "${INFLUXDB_URL:http://localhost:8086}"
+  token: "${INFLUXDB_TOKEN:}"
+  org: "${INFLUXDB_ORG:}"
+  export:
+    enabled: "${INFLUXDB_EXPORT_ENABLED:false}"
