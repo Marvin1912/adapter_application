@@ -18,11 +18,11 @@ Based on `buckets-documentation.md`, focus on these 4 user buckets:
 - [x] **1.3**: Extend `ExportConfig.java` with InfluxDB connection settings
 - [x] **1.4**: Add properties for URL, token, organization, and export preferences
 
-### Phase 2: Base Infrastructure
-- [ ] **2.1**: Create `AbstractInfluxExport<T>` generic base class
-- [ ] **2.2**: Create `InfluxQueryBuilder` utility class for Flux queries
-- [ ] **2.3**: Create bucket-specific export DTOs and measurement mappings
-- [ ] **2.4**: Handle different data types (system metrics, IoT sensors, aggregated data)
+### Phase 2: Base Infrastructure ✅ COMPLETED
+- [x] **2.1**: Create `AbstractInfluxExport<T>` generic base class
+- [x] **2.2**: Create `InfluxQueryBuilder` utility class for Flux queries
+- [x] **2.3**: Create bucket-specific export DTOs and measurement mappings
+- [x] **2.4**: Handle different data types (system metrics, IoT sensors, aggregated data)
 
 ### Phase 3: User Bucket Export Services
 - [ ] **3.1**: Create `SystemMetricsExportService` for `system_metrics` bucket
