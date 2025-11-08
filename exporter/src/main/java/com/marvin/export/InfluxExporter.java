@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
@@ -97,23 +96,23 @@ public class InfluxExporter {
                 final Path filePath = switch (bucket) {
                     case SYSTEM_METRICS -> exportBucket(
                             createFilePath(influxExportFolder, SYSTEM_METRICS_FILENAME_PREFIX, timestamp),
-                            () -> systemMetricsExportService.exportData(Optional.empty(), Optional.empty()).stream(),
+                            () -> systemMetricsExportService.exportData(null, null).stream(),
                             "system metrics"
                     );
                     case SENSOR_DATA -> exportBucket(
                             createFilePath(influxExportFolder, SENSOR_DATA_FILENAME_PREFIX, timestamp),
-                            () -> sensorDataExportService.exportData(Optional.empty(), Optional.empty()).stream(),
+                            () -> sensorDataExportService.exportData(null, null).stream(),
                             "sensor data"
                     );
                     case SENSOR_DATA_AGGREGATED -> exportBucket(
                             createFilePath(influxExportFolder, SENSOR_DATA_AGGREGATED_FILENAME_PREFIX, timestamp),
-                            () -> sensorDataAggregatedExportService.exportData(Optional.empty(), Optional.empty())
+                            () -> sensorDataAggregatedExportService.exportData(null, null)
                                     .stream(),
                             "aggregated sensor data"
                     );
                     case COSTS -> exportBucket(
                             createFilePath(influxExportFolder, COSTS_FILENAME_PREFIX, timestamp),
-                            () -> costsExportService.exportData(Optional.empty(), Optional.empty()).stream(),
+                            () -> costsExportService.exportData(null, null).stream(),
                             "costs"
                     );
                 };
@@ -141,7 +140,7 @@ public class InfluxExporter {
      * @param endTime Optional end time (defaults to now)
      * @return Path to the generated file
      */
-    public Path exportBucketWithTimeRange(InfluxBucket bucket, Optional<Instant> startTime, Optional<Instant> endTime) {
+    public Path exportBucketWithTimeRange(InfluxBucket bucket, Instant startTime, Instant endTime) {
         LOGGER.info("Starting export of bucket {} with custom time range", bucket);
 
         final String timestamp = LocalDateTime.now().format(FILE_DATE_TIME_FORMATTER);

@@ -43,8 +43,8 @@ public class SensorDataExportService extends AbstractInfluxExport<SensorDataDTO>
     protected Optional<SensorDataDTO> convertRecord(FluxRecord record) {
         try {
             // Use the DataTypeHandler to convert the record
-            final Optional<?> converted = DataTypeHandler.convertRecord(record, BUCKET_NAME);
-            if (converted.isPresent() && converted.get() instanceof SensorDataDTO dto) {
+            final Object converted = DataTypeHandler.convertRecord(record, BUCKET_NAME);
+            if (converted != null && converted instanceof SensorDataDTO dto) {
                 // Validate the DTO using DataTypeHandler
                 if (DataTypeHandler.validateDTO(dto, BUCKET_NAME)) {
                     return Optional.of(dto);
@@ -189,9 +189,9 @@ public class SensorDataExportService extends AbstractInfluxExport<SensorDataDTO>
      * @param endTime the optional end time for export
      * @return list of humidity sensor data objects
      */
-    public java.util.List<SensorDataDTO> exportHumiditySensors(Optional<Instant> startTime, Optional<Instant> endTime) {
-        final Instant actualStartTime = startTime.orElse(getDefaultStartTime());
-        final Instant actualEndTime = endTime.orElse(getDefaultEndTime());
+    public java.util.List<SensorDataDTO> exportHumiditySensors(Instant startTime, Instant endTime) {
+        final Instant actualStartTime = startTime != null ? startTime : getDefaultStartTime();
+        final Instant actualEndTime = endTime != null ? endTime : getDefaultEndTime();
 
         final String query = buildHumiditySensorQuery(actualStartTime, actualEndTime);
         return executeQueryAndConvert(query);
@@ -205,9 +205,9 @@ public class SensorDataExportService extends AbstractInfluxExport<SensorDataDTO>
      * @return list of energy monitoring data objects
      */
     public java.util.List<SensorDataDTO> exportEnergyMonitoring(
-            Optional<Instant> startTime, Optional<Instant> endTime) {
-        final Instant actualStartTime = startTime.orElse(getDefaultStartTime());
-        final Instant actualEndTime = endTime.orElse(getDefaultEndTime());
+            Instant startTime, Instant endTime) {
+        final Instant actualStartTime = startTime != null ? startTime : getDefaultStartTime();
+        final Instant actualEndTime = endTime != null ? endTime : getDefaultEndTime();
 
         final String query = buildEnergyMonitoringQuery(actualStartTime, actualEndTime);
         return executeQueryAndConvert(query);
@@ -221,9 +221,9 @@ public class SensorDataExportService extends AbstractInfluxExport<SensorDataDTO>
      * @return list of temperature sensor data objects
      */
     public java.util.List<SensorDataDTO> exportTemperatureSensors(
-            Optional<Instant> startTime, Optional<Instant> endTime) {
-        final Instant actualStartTime = startTime.orElse(getDefaultStartTime());
-        final Instant actualEndTime = endTime.orElse(getDefaultEndTime());
+            Instant startTime, Instant endTime) {
+        final Instant actualStartTime = startTime != null ? startTime : getDefaultStartTime();
+        final Instant actualEndTime = endTime != null ? endTime : getDefaultEndTime();
 
         final String query = buildTemperatureSensorQuery(actualStartTime, actualEndTime);
         return executeQueryAndConvert(query);
@@ -236,9 +236,9 @@ public class SensorDataExportService extends AbstractInfluxExport<SensorDataDTO>
      * @param endTime the optional end time for export
      * @return list of Xiaomi sensor data objects
      */
-    public java.util.List<SensorDataDTO> exportXiaomiSensors(Optional<Instant> startTime, Optional<Instant> endTime) {
-        final Instant actualStartTime = startTime.orElse(getDefaultStartTime());
-        final Instant actualEndTime = endTime.orElse(getDefaultEndTime());
+    public java.util.List<SensorDataDTO> exportXiaomiSensors(Instant startTime, Instant endTime) {
+        final Instant actualStartTime = startTime != null ? startTime : getDefaultStartTime();
+        final Instant actualEndTime = endTime != null ? endTime : getDefaultEndTime();
 
         final String query = buildXiaomiSensorQuery(actualStartTime, actualEndTime);
         return executeQueryAndConvert(query);
@@ -251,9 +251,9 @@ public class SensorDataExportService extends AbstractInfluxExport<SensorDataDTO>
      * @param endTime the optional end time for export
      * @return list of Tasmota device data objects
      */
-    public java.util.List<SensorDataDTO> exportTasmotaDevices(Optional<Instant> startTime, Optional<Instant> endTime) {
-        final Instant actualStartTime = startTime.orElse(getDefaultStartTime());
-        final Instant actualEndTime = endTime.orElse(getDefaultEndTime());
+    public java.util.List<SensorDataDTO> exportTasmotaDevices(Instant startTime, Instant endTime) {
+        final Instant actualStartTime = startTime != null ? startTime : getDefaultStartTime();
+        final Instant actualEndTime = endTime != null ? endTime : getDefaultEndTime();
 
         final String query = buildTasmotaDeviceQuery(actualStartTime, actualEndTime);
         return executeQueryAndConvert(query);
@@ -268,9 +268,9 @@ public class SensorDataExportService extends AbstractInfluxExport<SensorDataDTO>
      * @return list of sensor data objects for the specified location
      */
     public java.util.List<SensorDataDTO> exportByLocation(
-            String location, Optional<Instant> startTime, Optional<Instant> endTime) {
-        final Instant actualStartTime = startTime.orElse(getDefaultStartTime());
-        final Instant actualEndTime = endTime.orElse(getDefaultEndTime());
+            String location, Instant startTime, Instant endTime) {
+        final Instant actualStartTime = startTime != null ? startTime : getDefaultStartTime();
+        final Instant actualEndTime = endTime != null ? endTime : getDefaultEndTime();
 
         final String query = buildLocationSensorQuery(location, actualStartTime, actualEndTime);
         return executeQueryAndConvert(query);
@@ -285,9 +285,9 @@ public class SensorDataExportService extends AbstractInfluxExport<SensorDataDTO>
      * @return list of sensor data objects for the specified device class
      */
     public java.util.List<SensorDataDTO> exportByDeviceClass(
-            String deviceClass, Optional<Instant> startTime, Optional<Instant> endTime) {
-        final Instant actualStartTime = startTime.orElse(getDefaultStartTime());
-        final Instant actualEndTime = endTime.orElse(getDefaultEndTime());
+            String deviceClass, Instant startTime, Instant endTime) {
+        final Instant actualStartTime = startTime != null ? startTime : getDefaultStartTime();
+        final Instant actualEndTime = endTime != null ? endTime : getDefaultEndTime();
 
         final String query = buildDeviceClassQuery(deviceClass, actualStartTime, actualEndTime);
         return executeQueryAndConvert(query);

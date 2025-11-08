@@ -35,11 +35,11 @@ public abstract class AbstractInfluxExport<T> {
      * Template method that defines the standard export workflow.
      * This method orchestrates the entire export process.
      *
-     * @param startTime The start time for the export range (optional)
-     * @param endTime The end time for the export range (optional)
+     * @param startTime The start time for the export range (null for default)
+     * @param endTime The end time for the export range (null for default)
      * @return List of exported DTOs
      */
-    public List<T> exportData(Optional<Instant> startTime, Optional<Instant> endTime) {
+    public List<T> exportData(Instant startTime, Instant endTime) {
         try {
             LOGGER.info("Starting export for bucket: {}", getBucketName());
 
@@ -47,8 +47,8 @@ public abstract class AbstractInfluxExport<T> {
             validateConfiguration();
 
             // Set default time range if not provided
-            final Instant actualStartTime = startTime.orElse(getDefaultStartTime());
-            final Instant actualEndTime = endTime.orElse(getDefaultEndTime());
+            final Instant actualStartTime = startTime != null ? startTime : getDefaultStartTime();
+            final Instant actualEndTime = endTime != null ? endTime : getDefaultEndTime();
 
             LOGGER.info("Exporting data from {} to {}", actualStartTime, actualEndTime);
 

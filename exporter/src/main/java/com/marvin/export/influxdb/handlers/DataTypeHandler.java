@@ -13,7 +13,6 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * Handles the conversion of FluxRecord objects to appropriate DTOs based on data type.
@@ -28,23 +27,23 @@ public class DataTypeHandler {
      *
      * @param record The FluxRecord to convert
      * @param bucketName The name of the bucket the record came from
-     * @return Optional containing the appropriate DTO if conversion was successful
+     * @return the appropriate DTO if conversion was successful, null otherwise
      */
-    public static Optional<?> convertRecord(FluxRecord record, String bucketName) {
+    public static Object convertRecord(FluxRecord record, String bucketName) {
         try {
             return switch (bucketName.toLowerCase()) {
-                case "system_metrics" -> Optional.of(convertToSystemMetricsDTO(record));
-                case "sensor_data" -> Optional.of(convertToSensorDataDTO(record));
-                case "sensor_data_30m" -> Optional.of(convertToSensorDataAggregatedDTO(record));
-                case "costs" -> Optional.of(convertToCostsDTO(record));
+                case "system_metrics" -> convertToSystemMetricsDTO(record);
+                case "sensor_data" -> convertToSensorDataDTO(record);
+                case "sensor_data_30m" -> convertToSensorDataAggregatedDTO(record);
+                case "costs" -> convertToCostsDTO(record);
                 default -> {
                     LOGGER.warn("Unknown bucket name: {}", bucketName);
-                    yield Optional.empty();
+                    yield null;
                 }
             };
         } catch (Exception e) {
             LOGGER.error("Failed to convert record from bucket: {}", bucketName, e);
-            return Optional.empty();
+            return null;
         }
     }
 
