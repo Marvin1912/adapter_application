@@ -3,5 +3,5 @@ version = '0.0.1-SNAPSHOT'
 
 dependencies {
     implementation project(':common')
-    implementation "com.influxdb:influxdb-client-java:6.6.0"
+    api "com.influxdb:influxdb-client-java:6.6.0"
 }
