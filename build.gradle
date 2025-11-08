@@ -97,6 +97,7 @@ subprojects {
 
 	// Configure Checkstyle for each subproject
 	checkstyle {
+        toolVersion = "12.1.1"
 		configFile = file("$rootDir/config/checkstyle/checkstyle.xml")
 		maxWarnings = 0
 	}
