@@ -12,13 +12,10 @@ package com.marvin.influxdb.costs;
  */
 public enum CostType {
 
-    /** Daily cost type for operational expenses. */
     DAILY("daily"),
 
-    /** Monthly cost type for recurring monthly expenses. */
     MONTHLY("monthly"),
 
-    /** Salary cost type for employee compensation. */
     SALARY("salary");
 
     private final String value;
