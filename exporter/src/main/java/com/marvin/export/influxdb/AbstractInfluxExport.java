@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
  */
 public abstract class AbstractInfluxExport<T> {
 
-    private static final Logger logger = LoggerFactory.getLogger(AbstractInfluxExport.class);
+    protected static final Logger logger = LoggerFactory.getLogger(AbstractInfluxExport.class);
 
     @Autowired
     protected InfluxDBClient influxDBClient;

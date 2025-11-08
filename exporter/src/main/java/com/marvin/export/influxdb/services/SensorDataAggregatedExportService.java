@@ -246,12 +246,7 @@ public class SensorDataAggregatedExportService extends AbstractInfluxExport<Sens
         Instant endTime = Instant.now();
         Instant startTime = endTime.minusSeconds(24 * 60 * 60); // 24 hours ago
 
-        return InfluxQueryBuilder.from(BUCKET_NAME)
-                .timeRange(startTime, endTime)
-                .measurements("sensor_aggregated", "sensor_mean")
-                .tag("window", DEFAULT_AGGREGATION_WINDOW)
-                .sort("desc")
-                .build();
+        return exportData(Optional.of(startTime), Optional.of(endTime));
     }
 
     /**
