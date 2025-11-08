@@ -24,11 +24,11 @@ Based on `buckets-documentation.md`, focus on these 4 user buckets:
 - [x] **2.3**: Create bucket-specific export DTOs and measurement mappings
 - [x] **2.4**: Handle different data types (system metrics, IoT sensors, aggregated data)
 
-### Phase 3: User Bucket Export Services
-- [ ] **3.1**: Create `SystemMetricsExportService` for `system_metrics` bucket
-- [ ] **3.2**: Create `SensorDataExportService` for `sensor_data` bucket
-- [ ] **3.3**: Create `SensorDataAggregatedExportService` for `sensor_data_30m` bucket
-- [ ] **3.4**: Create `CostsExportService` for `costs` bucket (future preparation)
+### Phase 3: User Bucket Export Services ✅ COMPLETED
+- [x] **3.1**: Create `SystemMetricsExportService` for `system_metrics` bucket
+- [x] **3.2**: Create `SensorDataExportService` for `sensor_data` bucket
+- [x] **3.3**: Create `SensorDataAggregatedExportService` for `sensor_data_30m` bucket
+- [x] **3.4**: Create `CostsExportService` for `costs` bucket (future preparation)
 
 ### Phase 4: Main Export Orchestrator
 - [ ] **4.1**: Create `InfluxExporter.java` main service
