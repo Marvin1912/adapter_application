@@ -10,14 +10,14 @@ This document provides comprehensive information about all buckets configured in
 
 ## Bucket Summary
 
-| Bucket Name | Type | Retention Period | Created | Labels |
-|-------------|------|------------------|---------|--------|
-| `_tasks` | System | 3 days | 2024-03-28 | 0 |
-| `_monitoring` | System | 7 days | 2024-03-28 | 0 |
-| `system_metrics` | User | Infinite | 2024-07-21 | 0 |
-| `costs` | User | Infinite | 2024-03-28 | 0 |
-| `sensor_data` | User | 180 days | 2024-03-28 | 0 |
-| `sensor_data_30m` | User | Infinite | 2025-08-19 | 0 |
+| Bucket Name | Type | Retention Period | Created | Data Status | Labels |
+|-------------|------|------------------|---------|-------------|--------|
+| `_tasks` | System | 3 days | 2024-03-28 | Empty | 0 |
+| `_monitoring` | System | 7 days | 2024-03-28 | Empty | 0 |
+| `system_metrics` | User | Infinite | 2024-07-21 | Active | 0 |
+| `costs` | User | Infinite | 2024-03-28 | Empty | 0 |
+| `sensor_data` | User | 180 days | 2024-03-28 | Active | 0 |
+| `sensor_data_30m` | User | Infinite | 2025-08-19 | Active | 0 |
 
 ## Detailed Bucket Information
 
@@ -34,6 +34,7 @@ This document provides comprehensive information about all buckets configured in
   - Shard Group Duration: 86400 seconds (1 day)
 - **Labels**: None
 - **Write Endpoint**: `/api/v2/write?org=wildfly_domain&bucket=588f3f54b63ec812`
+- **Data Status**: Currently empty
 - **Purpose**: Stores InfluxDB task execution logs and system task-related data
 
 #### 2. `_monitoring`
@@ -47,6 +48,7 @@ This document provides comprehensive information about all buckets configured in
   - Shard Group Duration: 86400 seconds (1 day)
 - **Labels**: None
 - **Write Endpoint**: `/api/v2/write?org=wildfly_domain&bucket=a2b515e0896b2660`
+- **Data Status**: Currently empty
 - **Purpose**: Stores InfluxDB internal monitoring metrics and logs
 
 ### User Buckets
@@ -62,7 +64,10 @@ This document provides comprehensive information about all buckets configured in
   - Shard Group Duration: 604800 seconds (7 days)
 - **Labels**: None
 - **Write Endpoint**: `/api/v2/write?org=wildfly_domain&bucket=6a14b3923c1e1a85`
-- **Purpose**: Likely stores system-level metrics from external sources
+- **Data Status**: Active with system monitoring data
+- **Data Content**: CPU usage metrics, memory, and system performance data from host `home-server`
+- **Data Range**: Recent data from system monitoring
+- **Purpose**: Stores system-level metrics from Telegraf or similar monitoring agents
 
 #### 4. `costs`
 - **ID**: `d63df5a4f2bda1e1`
@@ -75,7 +80,8 @@ This document provides comprehensive information about all buckets configured in
   - Shard Group Duration: 604800 seconds (7 days)
 - **Labels**: None
 - **Write Endpoint**: `/api/v2/write?org=wildfly_domain&bucket=d63df5a4f2bda1e1`
-- **Purpose**: Likely stores cost-related metrics and financial data
+- **Data Status**: Currently empty
+- **Purpose**: Designed for cost-related metrics and financial data (currently unused)
 
 #### 5. `sensor_data`
 - **ID**: `e0e298907f1abbce`
@@ -89,7 +95,15 @@ This document provides comprehensive information about all buckets configured in
   - Shard Group Duration: 604800 seconds (7 days)
 - **Labels**: None
 - **Write Endpoint**: `/api/v2/write?org=wildfly_domain&bucket=e0e298907f1abbce`
-- **Purpose**: Main sensor data storage with 6-month retention
+- **Data Status**: Active with extensive IoT sensor data
+- **Data Content**:
+  - **Humidity Sensors**: Multiple Xiaomi Aqara weather sensors (bathroom, hallway, kitchen, bedroom, living room)
+  - **Energy Monitoring**: Tasmota energy monitors with current, voltage, power, energy consumption data
+  - **Data Sources**: Home Assistant integration (source: "HA")
+  - **Measurement Types**: % (humidity), A (current), V (voltage), W (power), kWh (energy), VA (apparent power)
+- **Data Range**: From 2025-08-17 to present (active real-time data)
+- **Update Frequency**: Real-time sensor readings
+- **Purpose**: Main IoT sensor data storage from Home Assistant with 6-month retention
 
 #### 6. `sensor_data_30m`
 - **ID**: `f22d9d3440ec874b`
@@ -102,7 +116,13 @@ This document provides comprehensive information about all buckets configured in
   - Shard Group Duration: 604800 seconds (7 days)
 - **Labels**: None
 - **Write Endpoint**: `/api/v2/write?org=wildfly_domain&bucket=f22d9d3440ec874b`
-- **Purpose**: Likely stores downsampled/aggregated sensor data (30-minute intervals)
+- **Data Status**: Active with aggregated sensor data
+- **Data Content**: Downsampled humidity sensor data averaged to 30-minute intervals
+- **Data Sources**: Same IoT sensors as `sensor_data` but with time-based aggregation
+- **Measurement Types**: % (aggregated humidity values)
+- **Data Range**: From 2025-10-09 to present
+- **Update Frequency**: 30-minute intervals (downsampled from real-time data)
+- **Purpose**: Long-term storage of aggregated sensor data for trend analysis (infinite retention)
 
 ## Retention Policy Summary
 
@@ -111,6 +131,24 @@ This document provides comprehensive information about all buckets configured in
 - **Shortest Retention**: 3 days (system task logs)
 - **Longest Finite Retention**: 180 days (main sensor data)
 
+## Data Volume Summary
+
+| Bucket | Data Status | Data Range | Update Frequency | Primary Data Types |
+|--------|-------------|------------|------------------|-------------------|
+| `_tasks` | Empty | N/A | N/A | System task logs |
+| `_monitoring` | Empty | N/A | N/A | InfluxDB monitoring |
+| `system_metrics` | Active | Recent | ~10 seconds | CPU, memory, system metrics |
+| `costs` | Empty | N/A | N/A | Cost/financial data |
+| `sensor_data` | Active | 2025-08-17 to present | Real-time | IoT sensors, energy monitoring |
+| `sensor_data_30m` | Active | 2025-10-09 to present | 30 minutes | Aggregated sensor data |
+
+### Data Sources Integration
+- **Home Assistant**: Primary data source for IoT sensors
+- **Tasmota Devices**: Energy monitoring integration
+- **Xiaomi Aqara**: Weather/humidity sensors
+- **Telegraf**: System metrics collection
+- **Location**: Home environment (multiple rooms)
+
 ## Storage Configuration
 
 - **Shard Group Duration**:
@@ -118,6 +156,7 @@ This document provides comprehensive information about all buckets configured in
   - User buckets: 7 days (604800 seconds)
 - **Organization**: wildfly_domain
 - **Total Buckets**: 6 (4 user, 2 system)
+- **Active Data Sources**: Home Assistant, Telegraf, Tasmota devices
 
 ## API Access
 
@@ -146,9 +185,13 @@ from(bucket: "sensor_data")
 
 - All buckets have 0 labels assigned
 - No bucket descriptions are provided for user buckets
-- The `sensor_data_30m` bucket was created much later (2025-08-19) suggesting data aggregation strategy
-- System buckets use shorter shard group durations (1 day) compared to user buckets (7 days)
-- Infinite retention buckets will require manual management or cleanup policies
+- **Data Collection Strategy**: Two-tier approach with real-time data (`sensor_data`) + aggregated long-term storage (`sensor_data_30m`)
+- **System buckets use shorter shard group durations** (1 day) compared to user buckets (7 days) for better performance
+- **3 buckets are currently empty**: `_tasks`, `_monitoring`, and `costs` - may be configured but not actively used
+- **Infinite retention buckets will require manual management** or cleanup policies for long-term storage planning
+- **Home Assistant Integration**: Primary data source appears to be Home Assistant with IoT and energy monitoring devices
+- **Data Freshness**: Most recent data from sensor buckets indicates active real-time collection
+- **Multi-language Setup**: German-friendly entity names suggest deployment in German-speaking environment
 
 ---
 **Last Updated**: 2025-11-08
