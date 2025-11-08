@@ -210,7 +210,8 @@ public class SensorDataAggregatedExportService extends AbstractInfluxExport<Sens
      * @param endTime optional end time for the export, defaults to configured default
      * @return list of aggregated humidity sensor data DTOs
      */
-    public List<SensorDataAggregatedDTO> exportAggregatedHumidity(Optional<Instant> startTime, Optional<Instant> endTime) {
+    public List<SensorDataAggregatedDTO> exportAggregatedHumidity(
+            Optional<Instant> startTime, Optional<Instant> endTime) {
         final Instant actualStartTime = startTime.orElse(getDefaultStartTime());
         final Instant actualEndTime = endTime.orElse(getDefaultEndTime());
 
@@ -225,7 +226,8 @@ public class SensorDataAggregatedExportService extends AbstractInfluxExport<Sens
      * @param endTime optional end time for the export, defaults to configured default
      * @return list of aggregated temperature sensor data DTOs
      */
-    public List<SensorDataAggregatedDTO> exportAggregatedTemperature(Optional<Instant> startTime, Optional<Instant> endTime) {
+    public List<SensorDataAggregatedDTO> exportAggregatedTemperature(
+            Optional<Instant> startTime, Optional<Instant> endTime) {
         final Instant actualStartTime = startTime.orElse(getDefaultStartTime());
         final Instant actualEndTime = endTime.orElse(getDefaultEndTime());
 
@@ -240,7 +242,8 @@ public class SensorDataAggregatedExportService extends AbstractInfluxExport<Sens
      * @param endTime optional end time for the export, defaults to configured default
      * @return list of aggregated energy monitoring sensor data DTOs
      */
-    public List<SensorDataAggregatedDTO> exportAggregatedEnergy(Optional<Instant> startTime, Optional<Instant> endTime) {
+    public List<SensorDataAggregatedDTO> exportAggregatedEnergy(
+            Optional<Instant> startTime, Optional<Instant> endTime) {
         final Instant actualStartTime = startTime.orElse(getDefaultStartTime());
         final Instant actualEndTime = endTime.orElse(getDefaultEndTime());
 
@@ -255,7 +258,8 @@ public class SensorDataAggregatedExportService extends AbstractInfluxExport<Sens
      * @param endTime optional end time for the export, defaults to configured default
      * @return list of statistical aggregation sensor data DTOs
      */
-    public List<SensorDataAggregatedDTO> exportStatisticalAggregations(Optional<Instant> startTime, Optional<Instant> endTime) {
+    public List<SensorDataAggregatedDTO> exportStatisticalAggregations(
+            Optional<Instant> startTime, Optional<Instant> endTime) {
         final Instant actualStartTime = startTime.orElse(getDefaultStartTime());
         final Instant actualEndTime = endTime.orElse(getDefaultEndTime());
 
@@ -271,7 +275,8 @@ public class SensorDataAggregatedExportService extends AbstractInfluxExport<Sens
      * @param endTime optional end time for the export, defaults to configured default
      * @return list of aggregated sensor data DTOs for the specified window
      */
-    public List<SensorDataAggregatedDTO> exportByAggregationWindow(String window, Optional<Instant> startTime, Optional<Instant> endTime) {
+    public List<SensorDataAggregatedDTO> exportByAggregationWindow(
+            String window, Optional<Instant> startTime, Optional<Instant> endTime) {
         final Instant actualStartTime = startTime.orElse(getDefaultStartTime());
         final Instant actualEndTime = endTime.orElse(getDefaultEndTime());
 
@@ -287,7 +292,8 @@ public class SensorDataAggregatedExportService extends AbstractInfluxExport<Sens
      * @param endTime optional end time for the export, defaults to configured default
      * @return list of aggregated sensor data DTOs for the specified location
      */
-    public List<SensorDataAggregatedDTO> exportAggregatedByLocation(String location, Optional<Instant> startTime, Optional<Instant> endTime) {
+    public List<SensorDataAggregatedDTO> exportAggregatedByLocation(
+            String location, Optional<Instant> startTime, Optional<Instant> endTime) {
         final Instant actualStartTime = startTime.orElse(getDefaultStartTime());
         final Instant actualEndTime = endTime.orElse(getDefaultEndTime());
 
@@ -303,7 +309,8 @@ public class SensorDataAggregatedExportService extends AbstractInfluxExport<Sens
      * @param endTime optional end time for the export, defaults to configured default
      * @return list of aggregated sensor data DTOs for the specified entity
      */
-    public List<SensorDataAggregatedDTO> exportAggregatedByEntity(String entityId, Optional<Instant> startTime, Optional<Instant> endTime) {
+    public List<SensorDataAggregatedDTO> exportAggregatedByEntity(
+            String entityId, Optional<Instant> startTime, Optional<Instant> endTime) {
         final Instant actualStartTime = startTime.orElse(getDefaultStartTime());
         final Instant actualEndTime = endTime.orElse(getDefaultEndTime());
 
