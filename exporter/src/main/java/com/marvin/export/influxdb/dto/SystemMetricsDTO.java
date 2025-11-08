@@ -7,6 +7,12 @@ import java.util.Map;
 /**
  * Data Transfer Object for system metrics data from the system_metrics bucket.
  * Contains CPU, memory, and system performance metrics from host home-server.
+ *
+ * @param measurement the InfluxDB measurement name
+ * @param host the hostname of the system being monitored
+ * @param timestamp the exact timestamp when the metrics were collected
+ * @param fields map of field names to their metric values
+ * @param tags map of tag names to their values
  */
 public record SystemMetricsDTO(
     String measurement,
@@ -17,52 +23,52 @@ public record SystemMetricsDTO(
 ) {
     // Common system metrics field getters
     public BigDecimal getCpuUsage() {
-        Object value = fields.get("cpu_usage");
+        final Object value = fields.get("cpu_usage");
         return value != null ? new BigDecimal(value.toString()) : null;
     }
 
     public BigDecimal getMemoryUsage() {
-        Object value = fields.get("memory_usage");
+        final Object value = fields.get("memory_usage");
         return value != null ? new BigDecimal(value.toString()) : null;
     }
 
     public BigDecimal getMemoryTotal() {
-        Object value = fields.get("memory_total");
+        final Object value = fields.get("memory_total");
         return value != null ? new BigDecimal(value.toString()) : null;
     }
 
     public BigDecimal getMemoryAvailable() {
-        Object value = fields.get("memory_available");
+        final Object value = fields.get("memory_available");
         return value != null ? new BigDecimal(value.toString()) : null;
     }
 
     public BigDecimal getLoadAverage() {
-        Object value = fields.get("load_average");
+        final Object value = fields.get("load_average");
         return value != null ? new BigDecimal(value.toString()) : null;
     }
 
     public Long getProcessCount() {
-        Object value = fields.get("process_count");
+        final Object value = fields.get("process_count");
         return value != null ? Long.valueOf(value.toString()) : null;
     }
 
     public BigDecimal getDiskUsage() {
-        Object value = fields.get("disk_usage");
+        final Object value = fields.get("disk_usage");
         return value != null ? new BigDecimal(value.toString()) : null;
     }
 
     public BigDecimal getDiskTotal() {
-        Object value = fields.get("disk_total");
+        final Object value = fields.get("disk_total");
         return value != null ? new BigDecimal(value.toString()) : null;
     }
 
     public BigDecimal getNetworkBytesIn() {
-        Object value = fields.get("network_bytes_in");
+        final Object value = fields.get("network_bytes_in");
         return value != null ? new BigDecimal(value.toString()) : null;
     }
 
     public BigDecimal getNetworkBytesOut() {
-        Object value = fields.get("network_bytes_out");
+        final Object value = fields.get("network_bytes_out");
         return value != null ? new BigDecimal(value.toString()) : null;
     }
 

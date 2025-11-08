@@ -45,17 +45,17 @@ public class CostsExportService extends AbstractInfluxExport<CostsDTO> {
     protected Optional<CostsDTO> convertRecord(FluxRecord record) {
         try {
             // Use the DataTypeHandler to convert the record
-            Optional<?> converted = DataTypeHandler.convertRecord(record, BUCKET_NAME);
+            final Optional<?> converted = DataTypeHandler.convertRecord(record, BUCKET_NAME);
             if (converted.isPresent() && converted.get() instanceof CostsDTO dto) {
                 // Validate the DTO using DataTypeHandler
                 if (DataTypeHandler.validateDTO(dto, BUCKET_NAME)) {
                     return Optional.of(dto);
                 } else {
-                    logger.debug("CostsDTO validation failed for record: {}", record);
+                    LOGGER.debug("CostsDTO validation failed for record: {}", record);
                 }
             }
         } catch (Exception e) {
-            logger.error("Failed to convert cost data record: {}", record, e);
+            LOGGER.error("Failed to convert cost data record: {}", record, e);
         }
         return Optional.empty();
     }
@@ -175,8 +175,8 @@ public class CostsExportService extends AbstractInfluxExport<CostsDTO> {
      * Builds a query for costs for a specific date.
      */
     public String buildCostsByDateQuery(LocalDate date) {
-        Instant startTime = date.atStartOfDay(ZoneId.systemDefault()).toInstant();
-        Instant endTime = date.plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant();
+        final Instant startTime = date.atStartOfDay(ZoneId.systemDefault()).toInstant();
+        final Instant endTime = date.plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant();
 
         return InfluxQueryBuilder.from(BUCKET_NAME)
                 .timeRange(startTime, endTime)
@@ -189,8 +189,8 @@ public class CostsExportService extends AbstractInfluxExport<CostsDTO> {
      * Builds a query for costs within a date range.
      */
     public String buildCostsByDateRangeQuery(LocalDate startDate, LocalDate endDate) {
-        Instant startTime = startDate.atStartOfDay(ZoneId.systemDefault()).toInstant();
-        Instant endTime = endDate.plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant();
+        final Instant startTime = startDate.atStartOfDay(ZoneId.systemDefault()).toInstant();
+        final Instant endTime = endDate.plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant();
 
         return InfluxQueryBuilder.from(BUCKET_NAME)
                 .timeRange(startTime, endTime)
@@ -203,10 +203,10 @@ public class CostsExportService extends AbstractInfluxExport<CostsDTO> {
      * Exports energy costs specifically.
      */
     public java.util.List<CostsDTO> exportEnergyCosts(Optional<Instant> startTime, Optional<Instant> endTime) {
-        Instant actualStartTime = startTime.orElse(getDefaultStartTime());
-        Instant actualEndTime = endTime.orElse(getDefaultEndTime());
+        final Instant actualStartTime = startTime.orElse(getDefaultStartTime());
+        final Instant actualEndTime = endTime.orElse(getDefaultEndTime());
 
-        String query = buildEnergyCostsQuery(actualStartTime, actualEndTime);
+        final String query = buildEnergyCostsQuery(actualStartTime, actualEndTime);
         return executeQueryAndConvert(query);
     }
 
@@ -214,10 +214,10 @@ public class CostsExportService extends AbstractInfluxExport<CostsDTO> {
      * Exports infrastructure costs specifically.
      */
     public java.util.List<CostsDTO> exportInfrastructureCosts(Optional<Instant> startTime, Optional<Instant> endTime) {
-        Instant actualStartTime = startTime.orElse(getDefaultStartTime());
-        Instant actualEndTime = endTime.orElse(getDefaultEndTime());
+        final Instant actualStartTime = startTime.orElse(getDefaultStartTime());
+        final Instant actualEndTime = endTime.orElse(getDefaultEndTime());
 
-        String query = buildInfrastructureCostsQuery(actualStartTime, actualEndTime);
+        final String query = buildInfrastructureCostsQuery(actualStartTime, actualEndTime);
         return executeQueryAndConvert(query);
     }
 
@@ -225,10 +225,10 @@ public class CostsExportService extends AbstractInfluxExport<CostsDTO> {
      * Exports license costs specifically.
      */
     public java.util.List<CostsDTO> exportLicenseCosts(Optional<Instant> startTime, Optional<Instant> endTime) {
-        Instant actualStartTime = startTime.orElse(getDefaultStartTime());
-        Instant actualEndTime = endTime.orElse(getDefaultEndTime());
+        final Instant actualStartTime = startTime.orElse(getDefaultStartTime());
+        final Instant actualEndTime = endTime.orElse(getDefaultEndTime());
 
-        String query = buildLicenseCostsQuery(actualStartTime, actualEndTime);
+        final String query = buildLicenseCostsQuery(actualStartTime, actualEndTime);
         return executeQueryAndConvert(query);
     }
 
@@ -236,10 +236,10 @@ public class CostsExportService extends AbstractInfluxExport<CostsDTO> {
      * Exports maintenance costs specifically.
      */
     public java.util.List<CostsDTO> exportMaintenanceCosts(Optional<Instant> startTime, Optional<Instant> endTime) {
-        Instant actualStartTime = startTime.orElse(getDefaultStartTime());
-        Instant actualEndTime = endTime.orElse(getDefaultEndTime());
+        final Instant actualStartTime = startTime.orElse(getDefaultStartTime());
+        final Instant actualEndTime = endTime.orElse(getDefaultEndTime());
 
-        String query = buildMaintenanceCostsQuery(actualStartTime, actualEndTime);
+        final String query = buildMaintenanceCostsQuery(actualStartTime, actualEndTime);
         return executeQueryAndConvert(query);
     }
 
@@ -247,10 +247,10 @@ public class CostsExportService extends AbstractInfluxExport<CostsDTO> {
      * Exports subscription costs specifically.
      */
     public java.util.List<CostsDTO> exportSubscriptionCosts(Optional<Instant> startTime, Optional<Instant> endTime) {
-        Instant actualStartTime = startTime.orElse(getDefaultStartTime());
-        Instant actualEndTime = endTime.orElse(getDefaultEndTime());
+        final Instant actualStartTime = startTime.orElse(getDefaultStartTime());
+        final Instant actualEndTime = endTime.orElse(getDefaultEndTime());
 
-        String query = buildSubscriptionCostsQuery(actualStartTime, actualEndTime);
+        final String query = buildSubscriptionCostsQuery(actualStartTime, actualEndTime);
         return executeQueryAndConvert(query);
     }
 
@@ -258,10 +258,10 @@ public class CostsExportService extends AbstractInfluxExport<CostsDTO> {
      * Exports costs by currency.
      */
     public java.util.List<CostsDTO> exportByCurrency(String currency, Optional<Instant> startTime, Optional<Instant> endTime) {
-        Instant actualStartTime = startTime.orElse(getDefaultStartTime());
-        Instant actualEndTime = endTime.orElse(getDefaultEndTime());
+        final Instant actualStartTime = startTime.orElse(getDefaultStartTime());
+        final Instant actualEndTime = endTime.orElse(getDefaultEndTime());
 
-        String query = buildCostsByCurrencyQuery(currency, actualStartTime, actualEndTime);
+        final String query = buildCostsByCurrencyQuery(currency, actualStartTime, actualEndTime);
         return executeQueryAndConvert(query);
     }
 
@@ -269,10 +269,10 @@ public class CostsExportService extends AbstractInfluxExport<CostsDTO> {
      * Exports costs by provider.
      */
     public java.util.List<CostsDTO> exportByProvider(String provider, Optional<Instant> startTime, Optional<Instant> endTime) {
-        Instant actualStartTime = startTime.orElse(getDefaultStartTime());
-        Instant actualEndTime = endTime.orElse(getDefaultEndTime());
+        final Instant actualStartTime = startTime.orElse(getDefaultStartTime());
+        final Instant actualEndTime = endTime.orElse(getDefaultEndTime());
 
-        String query = buildCostsByProviderQuery(provider, actualStartTime, actualEndTime);
+        final String query = buildCostsByProviderQuery(provider, actualStartTime, actualEndTime);
         return executeQueryAndConvert(query);
     }
 
@@ -280,10 +280,10 @@ public class CostsExportService extends AbstractInfluxExport<CostsDTO> {
      * Exports costs by billing period.
      */
     public java.util.List<CostsDTO> exportByBillingPeriod(String billingPeriod, Optional<Instant> startTime, Optional<Instant> endTime) {
-        Instant actualStartTime = startTime.orElse(getDefaultStartTime());
-        Instant actualEndTime = endTime.orElse(getDefaultEndTime());
+        final Instant actualStartTime = startTime.orElse(getDefaultStartTime());
+        final Instant actualEndTime = endTime.orElse(getDefaultEndTime());
 
-        String query = buildCostsByBillingPeriodQuery(billingPeriod, actualStartTime, actualEndTime);
+        final String query = buildCostsByBillingPeriodQuery(billingPeriod, actualStartTime, actualEndTime);
         return executeQueryAndConvert(query);
     }
 
@@ -291,7 +291,7 @@ public class CostsExportService extends AbstractInfluxExport<CostsDTO> {
      * Exports costs for a specific date.
      */
     public java.util.List<CostsDTO> exportByDate(LocalDate date) {
-        String query = buildCostsByDateQuery(date);
+        final String query = buildCostsByDateQuery(date);
         return executeQueryAndConvert(query);
     }
 
@@ -299,7 +299,7 @@ public class CostsExportService extends AbstractInfluxExport<CostsDTO> {
      * Exports costs within a date range.
      */
     public java.util.List<CostsDTO> exportByDateRange(LocalDate startDate, LocalDate endDate) {
-        String query = buildCostsByDateRangeQuery(startDate, endDate);
+        final String query = buildCostsByDateRangeQuery(startDate, endDate);
         return executeQueryAndConvert(query);
     }
 
@@ -307,8 +307,8 @@ public class CostsExportService extends AbstractInfluxExport<CostsDTO> {
      * Exports costs for the current month.
      */
     public java.util.List<CostsDTO> exportCurrentMonthCosts() {
-        LocalDate today = LocalDate.now();
-        LocalDate startOfMonth = today.withDayOfMonth(1);
+        final LocalDate today = LocalDate.now();
+        final LocalDate startOfMonth = today.withDayOfMonth(1);
 
         return exportByDateRange(startOfMonth, today);
     }
@@ -317,10 +317,10 @@ public class CostsExportService extends AbstractInfluxExport<CostsDTO> {
      * Exports costs for the previous month.
      */
     public java.util.List<CostsDTO> exportPreviousMonthCosts() {
-        LocalDate today = LocalDate.now();
-        LocalDate startOfCurrentMonth = today.withDayOfMonth(1);
-        LocalDate startOfPreviousMonth = startOfCurrentMonth.minusMonths(1);
-        LocalDate endOfPreviousMonth = startOfCurrentMonth.minusDays(1);
+        final LocalDate today = LocalDate.now();
+        final LocalDate startOfCurrentMonth = today.withDayOfMonth(1);
+        final LocalDate startOfPreviousMonth = startOfCurrentMonth.minusMonths(1);
+        final LocalDate endOfPreviousMonth = startOfCurrentMonth.minusDays(1);
 
         return exportByDateRange(startOfPreviousMonth, endOfPreviousMonth);
     }
@@ -337,7 +337,7 @@ public class CostsExportService extends AbstractInfluxExport<CostsDTO> {
                     .map(Optional::get)
                     .toList();
         } catch (Exception e) {
-            logger.error("Failed to execute cost data query: {}", query, e);
+            LOGGER.error("Failed to execute cost data query: {}", query, e);
             throw new InfluxExportException("Failed to execute cost data query", e);
         }
     }

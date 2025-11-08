@@ -1,11 +1,7 @@
 package com.marvin.export.influxdb.mappings;
 
-import com.marvin.export.influxdb.dto.SystemMetricsDTO;
-import com.marvin.export.influxdb.dto.SensorDataDTO;
-import com.marvin.export.influxdb.dto.SensorDataAggregatedDTO;
-import com.marvin.export.influxdb.dto.CostsDTO;
-import java.time.Instant;
-import java.util.*;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Contains measurement mappings and field definitions for each bucket type.

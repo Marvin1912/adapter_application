@@ -42,17 +42,17 @@ public class SystemMetricsExportService extends AbstractInfluxExport<SystemMetri
     protected Optional<SystemMetricsDTO> convertRecord(FluxRecord record) {
         try {
             // Use the DataTypeHandler to convert the record
-            Optional<?> converted = DataTypeHandler.convertRecord(record, BUCKET_NAME);
+            final Optional<?> converted = DataTypeHandler.convertRecord(record, BUCKET_NAME);
             if (converted.isPresent() && converted.get() instanceof SystemMetricsDTO dto) {
                 // Validate the DTO using DataTypeHandler
                 if (DataTypeHandler.validateDTO(dto, BUCKET_NAME)) {
                     return Optional.of(dto);
                 } else {
-                    logger.debug("SystemMetricsDTO validation failed for record: {}", record);
+                    LOGGER.debug("SystemMetricsDTO validation failed for record: {}", record);
                 }
             }
         } catch (Exception e) {
-            logger.error("Failed to convert system metrics record: {}", record, e);
+            LOGGER.error("Failed to convert system metrics record: {}", record, e);
         }
         return Optional.empty();
     }
@@ -144,10 +144,10 @@ public class SystemMetricsExportService extends AbstractInfluxExport<SystemMetri
      * Exports CPU metrics specifically.
      */
     public java.util.List<SystemMetricsDTO> exportCpuMetrics(Optional<Instant> startTime, Optional<Instant> endTime) {
-        Instant actualStartTime = startTime.orElse(getDefaultStartTime());
-        Instant actualEndTime = endTime.orElse(getDefaultEndTime());
+        final Instant actualStartTime = startTime.orElse(getDefaultStartTime());
+        final Instant actualEndTime = endTime.orElse(getDefaultEndTime());
 
-        String query = buildCpuMetricsQuery(actualStartTime, actualEndTime);
+        final String query = buildCpuMetricsQuery(actualStartTime, actualEndTime);
         return executeQueryAndConvert(query);
     }
 
@@ -155,10 +155,10 @@ public class SystemMetricsExportService extends AbstractInfluxExport<SystemMetri
      * Exports memory metrics specifically.
      */
     public java.util.List<SystemMetricsDTO> exportMemoryMetrics(Optional<Instant> startTime, Optional<Instant> endTime) {
-        Instant actualStartTime = startTime.orElse(getDefaultStartTime());
-        Instant actualEndTime = endTime.orElse(getDefaultEndTime());
+        final Instant actualStartTime = startTime.orElse(getDefaultStartTime());
+        final Instant actualEndTime = endTime.orElse(getDefaultEndTime());
 
-        String query = buildMemoryMetricsQuery(actualStartTime, actualEndTime);
+        final String query = buildMemoryMetricsQuery(actualStartTime, actualEndTime);
         return executeQueryAndConvert(query);
     }
 
@@ -166,10 +166,10 @@ public class SystemMetricsExportService extends AbstractInfluxExport<SystemMetri
      * Exports disk metrics specifically.
      */
     public java.util.List<SystemMetricsDTO> exportDiskMetrics(Optional<Instant> startTime, Optional<Instant> endTime) {
-        Instant actualStartTime = startTime.orElse(getDefaultStartTime());
-        Instant actualEndTime = endTime.orElse(getDefaultEndTime());
+        final Instant actualStartTime = startTime.orElse(getDefaultStartTime());
+        final Instant actualEndTime = endTime.orElse(getDefaultEndTime());
 
-        String query = buildDiskMetricsQuery(actualStartTime, actualEndTime);
+        final String query = buildDiskMetricsQuery(actualStartTime, actualEndTime);
         return executeQueryAndConvert(query);
     }
 
@@ -177,10 +177,10 @@ public class SystemMetricsExportService extends AbstractInfluxExport<SystemMetri
      * Exports network metrics specifically.
      */
     public java.util.List<SystemMetricsDTO> exportNetworkMetrics(Optional<Instant> startTime, Optional<Instant> endTime) {
-        Instant actualStartTime = startTime.orElse(getDefaultStartTime());
-        Instant actualEndTime = endTime.orElse(getDefaultEndTime());
+        final Instant actualStartTime = startTime.orElse(getDefaultStartTime());
+        final Instant actualEndTime = endTime.orElse(getDefaultEndTime());
 
-        String query = buildNetworkMetricsQuery(actualStartTime, actualEndTime);
+        final String query = buildNetworkMetricsQuery(actualStartTime, actualEndTime);
         return executeQueryAndConvert(query);
     }
 
@@ -188,10 +188,10 @@ public class SystemMetricsExportService extends AbstractInfluxExport<SystemMetri
      * Exports system-level metrics specifically.
      */
     public java.util.List<SystemMetricsDTO> exportSystemLevelMetrics(Optional<Instant> startTime, Optional<Instant> endTime) {
-        Instant actualStartTime = startTime.orElse(getDefaultStartTime());
-        Instant actualEndTime = endTime.orElse(getDefaultEndTime());
+        final Instant actualStartTime = startTime.orElse(getDefaultStartTime());
+        final Instant actualEndTime = endTime.orElse(getDefaultEndTime());
 
-        String query = buildSystemMetricsQuery(actualStartTime, actualEndTime);
+        final String query = buildSystemMetricsQuery(actualStartTime, actualEndTime);
         return executeQueryAndConvert(query);
     }
 
@@ -199,10 +199,10 @@ public class SystemMetricsExportService extends AbstractInfluxExport<SystemMetri
      * Exports process metrics specifically.
      */
     public java.util.List<SystemMetricsDTO> exportProcessMetrics(Optional<Instant> startTime, Optional<Instant> endTime) {
-        Instant actualStartTime = startTime.orElse(getDefaultStartTime());
-        Instant actualEndTime = endTime.orElse(getDefaultEndTime());
+        final Instant actualStartTime = startTime.orElse(getDefaultStartTime());
+        final Instant actualEndTime = endTime.orElse(getDefaultEndTime());
 
-        String query = buildProcessMetricsQuery(actualStartTime, actualEndTime);
+        final String query = buildProcessMetricsQuery(actualStartTime, actualEndTime);
         return executeQueryAndConvert(query);
     }
 
@@ -218,7 +218,7 @@ public class SystemMetricsExportService extends AbstractInfluxExport<SystemMetri
                     .map(Optional::get)
                     .toList();
         } catch (Exception e) {
-            logger.error("Failed to execute system metrics query: {}", query, e);
+            LOGGER.error("Failed to execute system metrics query: {}", query, e);
             throw new InfluxExportException("Failed to execute system metrics query", e);
         }
     }

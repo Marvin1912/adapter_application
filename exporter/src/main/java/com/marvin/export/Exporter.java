@@ -138,7 +138,7 @@ public class Exporter {
      * @return Combined list of all generated export file paths
      */
     public List<Path> exportAll() {
-        List<Path> allExports = new ArrayList<>();
+        final List<Path> allExports = new ArrayList<>();
         allExports.addAll(exportCosts());
         allExports.addAll(exportInfluxDB());
         return allExports;

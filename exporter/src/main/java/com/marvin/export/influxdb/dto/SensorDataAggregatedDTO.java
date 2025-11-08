@@ -8,6 +8,16 @@ import java.util.Map;
  * Data Transfer Object for aggregated sensor data from the sensor_data_30m bucket.
  * Contains downsampled humidity sensor data averaged to 30-minute intervals
  * for long-term trend analysis.
+ *
+ * @param measurement the InfluxDB measurement name
+ * @param entityId the unique identifier for the sensor entity
+ * @param friendlyName the human-readable name of the sensor
+ * @param deviceClass the class/type of the sensor device
+ * @param unitOfMeasurement the unit in which the sensor value is measured
+ * @param windowStart the start time of the aggregation window
+ * @param windowEnd the end time of the aggregation window
+ * @param fields map of field names to their aggregated values
+ * @param tags map of tag names to their values
  */
 public record SensorDataAggregatedDTO(
     String measurement,
@@ -22,90 +32,90 @@ public record SensorDataAggregatedDTO(
 ) {
     // Aggregated value getters
     public BigDecimal getMean() {
-        Object value = fields.get("mean");
+        final Object value = fields.get("mean");
         return value != null ? new BigDecimal(value.toString()) : null;
     }
 
     public BigDecimal getAverage() {
-        Object value = fields.get("average");
+        final Object value = fields.get("average");
         return value != null ? new BigDecimal(value.toString()) : null;
     }
 
     public BigDecimal getMin() {
-        Object value = fields.get("min");
+        final Object value = fields.get("min");
         return value != null ? new BigDecimal(value.toString()) : null;
     }
 
     public BigDecimal getMax() {
-        Object value = fields.get("max");
+        final Object value = fields.get("max");
         return value != null ? new BigDecimal(value.toString()) : null;
     }
 
     public BigDecimal getSum() {
-        Object value = fields.get("sum");
+        final Object value = fields.get("sum");
         return value != null ? new BigDecimal(value.toString()) : null;
     }
 
     public Long getCount() {
-        Object value = fields.get("count");
+        final Object value = fields.get("count");
         return value != null ? Long.valueOf(value.toString()) : null;
     }
 
     public BigDecimal getStandardDeviation() {
-        Object value = fields.get("stddev");
+        final Object value = fields.get("stddev");
         return value != null ? new BigDecimal(value.toString()) : null;
     }
 
     // Specific aggregated humidity sensor getters
     public BigDecimal getHumidityMean() {
-        Object value = fields.get("humidity_mean");
+        final Object value = fields.get("humidity_mean");
         return value != null ? new BigDecimal(value.toString()) : null;
     }
 
     public BigDecimal getHumidityMin() {
-        Object value = fields.get("humidity_min");
+        final Object value = fields.get("humidity_min");
         return value != null ? new BigDecimal(value.toString()) : null;
     }
 
     public BigDecimal getHumidityMax() {
-        Object value = fields.get("humidity_max");
+        final Object value = fields.get("humidity_max");
         return value != null ? new BigDecimal(value.toString()) : null;
     }
 
     // Specific aggregated temperature sensor getters
     public BigDecimal getTemperatureMean() {
-        Object value = fields.get("temperature_mean");
+        final Object value = fields.get("temperature_mean");
         return value != null ? new BigDecimal(value.toString()) : null;
     }
 
     public BigDecimal getTemperatureMin() {
-        Object value = fields.get("temperature_min");
+        final Object value = fields.get("temperature_min");
         return value != null ? new BigDecimal(value.toString()) : null;
     }
 
     public BigDecimal getTemperatureMax() {
-        Object value = fields.get("temperature_max");
+        final Object value = fields.get("temperature_max");
         return value != null ? new BigDecimal(value.toString()) : null;
     }
 
     // Specific aggregated energy monitoring getters
     public BigDecimal getPowerMean() {
-        Object value = fields.get("power_mean");
+        final Object value = fields.get("power_mean");
         return value != null ? new BigDecimal(value.toString()) : null;
     }
 
     public BigDecimal getEnergySum() {
-        Object value = fields.get("energy_sum");
+        final Object value = fields.get("energy_sum");
         return value != null ? new BigDecimal(value.toString()) : null;
     }
 
     public BigDecimal getCurrentMean() {
-        Object value = fields.get("current_mean");
+        final Object value = fields.get("current_mean");
         return value != null ? new BigDecimal(value.toString()) : null;
     }
 
     public BigDecimal getVoltageMean() {
-        Object value = fields.get("voltage_mean");
+        final Object value = fields.get("voltage_mean");
         return value != null ? new BigDecimal(value.toString()) : null;
     }
 

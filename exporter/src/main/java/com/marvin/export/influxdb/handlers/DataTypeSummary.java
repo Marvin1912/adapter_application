@@ -48,6 +48,9 @@ public final class DataTypeSummary {
      *    - Cost Categories: Energy, infrastructure, licenses, maintenance, operational
      *    - Tags: cost_type, category, currency, billing_period, provider, service
      */
+    private static void bucketTypesSummary() {
+        // Documentation method - see Javadoc above for details
+    }
 
     /**
      * Data Type Conversions Applied:
@@ -75,6 +78,9 @@ public final class DataTypeSummary {
      * - Rates and prices → Double
      * - Billing periods → String
      */
+    private static void dataTypeConversions() {
+        // Documentation method - see Javadoc above for details
+    }
 
     /**
      * Error Handling Strategy:
@@ -99,6 +105,9 @@ public final class DataTypeSummary {
      *    - Records are skipped but processing continues
      *    - Support for new bucket types can be easily added
      */
+    private static void errorHandlingStrategy() {
+        // Documentation method - see Javadoc above for details
+    }
 
     /**
      * Performance Considerations:
@@ -118,6 +127,9 @@ public final class DataTypeSummary {
      *    - Fail-fast approach for invalid data
      *    - Comprehensive validation only when needed
      */
+    private static void performanceConsiderations() {
+        // Documentation method - see Javadoc above for details
+    }
 
     /**
      * Extensibility Features:
@@ -137,6 +149,9 @@ public final class DataTypeSummary {
      *    - Update window estimation logic
      *    - Configure in query builder as needed
      */
+    private static void extensibilityFeatures() {
+        // Documentation method - see Javadoc above for details
+    }
 
     /**
      * Integration Points:
@@ -156,4 +171,7 @@ public final class DataTypeSummary {
      *    - Maintains JSON serialization compatibility
      *    - Supports timestamp-based file naming
      */
+    private static void integrationPoints() {
+        // Documentation method - see Javadoc above for details
+    }
 }

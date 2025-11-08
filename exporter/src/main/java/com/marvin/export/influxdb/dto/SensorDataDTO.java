@@ -8,6 +8,15 @@ import java.util.Map;
  * Data Transfer Object for IoT sensor data from the sensor_data bucket.
  * Contains humidity sensors, energy monitoring, and other IoT sensor readings
  * from Home Assistant integration.
+ *
+ * @param measurement the InfluxDB measurement name
+ * @param entityId the unique identifier for the sensor entity
+ * @param friendlyName the human-readable name of the sensor
+ * @param deviceClass the class/type of the sensor device
+ * @param unitOfMeasurement the unit in which the sensor value is measured
+ * @param timestamp the exact timestamp when the sensor reading was recorded
+ * @param fields map of field names to their values
+ * @param tags map of tag names to their values
  */
 public record SensorDataDTO(
     String measurement,
@@ -21,49 +30,49 @@ public record SensorDataDTO(
 ) {
     // Common sensor value getters
     public BigDecimal getValue() {
-        Object value = fields.get("value");
+        final Object value = fields.get("value");
         return value != null ? new BigDecimal(value.toString()) : null;
     }
 
     // Humidity sensor specific getters
     public BigDecimal getHumidity() {
-        Object value = fields.get("humidity");
+        final Object value = fields.get("humidity");
         return value != null ? new BigDecimal(value.toString()) : null;
     }
 
     public BigDecimal getTemperature() {
-        Object value = fields.get("temperature");
+        final Object value = fields.get("temperature");
         return value != null ? new BigDecimal(value.toString()) : null;
     }
 
     // Energy monitoring specific getters
     public BigDecimal getCurrent() {
-        Object value = fields.get("current");
+        final Object value = fields.get("current");
         return value != null ? new BigDecimal(value.toString()) : null;
     }
 
     public BigDecimal getVoltage() {
-        Object value = fields.get("voltage");
+        final Object value = fields.get("voltage");
         return value != null ? new BigDecimal(value.toString()) : null;
     }
 
     public BigDecimal getPower() {
-        Object value = fields.get("power");
+        final Object value = fields.get("power");
         return value != null ? new BigDecimal(value.toString()) : null;
     }
 
     public BigDecimal getEnergy() {
-        Object value = fields.get("energy");
+        final Object value = fields.get("energy");
         return value != null ? new BigDecimal(value.toString()) : null;
     }
 
     public BigDecimal getApparentPower() {
-        Object value = fields.get("apparent_power");
+        final Object value = fields.get("apparent_power");
         return value != null ? new BigDecimal(value.toString()) : null;
     }
 
     public BigDecimal getPowerFactor() {
-        Object value = fields.get("power_factor");
+        final Object value = fields.get("power_factor");
         return value != null ? new BigDecimal(value.toString()) : null;
     }
 

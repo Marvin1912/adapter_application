@@ -8,8 +8,6 @@ import com.marvin.export.influxdb.dto.CostsDTO;
 import com.marvin.export.influxdb.mappings.MeasurementMappings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -23,7 +21,7 @@ import java.util.Optional;
  */
 public class DataTypeHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(DataTypeHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DataTypeHandler.class);
 
     /**
      * Converts a FluxRecord to the appropriate DTO based on the bucket name.
@@ -40,25 +38,28 @@ public class DataTypeHandler {
                 case "sensor_data_30m" -> Optional.of(convertToSensorDataAggregatedDTO(record));
                 case "costs" -> Optional.of(convertToCostsDTO(record));
                 default -> {
-                    logger.warn("Unknown bucket name: {}", bucketName);
+                    LOGGER.warn("Unknown bucket name: {}", bucketName);
                     yield Optional.empty();
                 }
             };
         } catch (Exception e) {
-            logger.error("Failed to convert record from bucket: {}", bucketName, e);
+            LOGGER.error("Failed to convert record from bucket: {}", bucketName, e);
             return Optional.empty();
         }
     }
 
     /**
      * Converts a FluxRecord to SystemMetricsDTO.
+     *
+     * @param record the FluxRecord to convert
+     * @return SystemMetricsDTO the converted DTO
      */
     private static SystemMetricsDTO convertToSystemMetricsDTO(FluxRecord record) {
-        String measurement = record.getMeasurement();
-        Instant timestamp = record.getTime();
+        final String measurement = record.getMeasurement();
+        final Instant timestamp = record.getTime();
 
-        Map<String, Object> fields = new HashMap<>();
-        Map<String, String> tags = new HashMap<>();
+        final Map<String, Object> fields = new HashMap<>();
+        final Map<String, String> tags = new HashMap<>();
 
         // Extract fields and tags from the record
         record.getValues().forEach((key, value) -> {
@@ -88,13 +89,16 @@ public class DataTypeHandler {
 
     /**
      * Converts a FluxRecord to SensorDataDTO.
+     *
+     * @param record the FluxRecord to convert
+     * @return SensorDataDTO the converted DTO
      */
     private static SensorDataDTO convertToSensorDataDTO(FluxRecord record) {
-        String measurement = record.getMeasurement();
-        Instant timestamp = record.getTime();
+        final String measurement = record.getMeasurement();
+        final Instant timestamp = record.getTime();
 
-        Map<String, Object> fields = new HashMap<>();
-        Map<String, String> tags = new HashMap<>();
+        final Map<String, Object> fields = new HashMap<>();
+        final Map<String, String> tags = new HashMap<>();
 
         // Extract fields and tags from the record
         record.getValues().forEach((key, value) -> {
@@ -115,10 +119,10 @@ public class DataTypeHandler {
         }
 
         // Extract common sensor attributes from tags
-        String entityId = tags.get("entity_id");
-        String friendlyName = tags.get("friendly_name");
-        String deviceClass = tags.get("device_class");
-        String unitOfMeasurement = tags.get("unit_of_measurement");
+        final String entityId = tags.get("entity_id");
+        final String friendlyName = tags.get("friendly_name");
+        final String deviceClass = tags.get("device_class");
+        final String unitOfMeasurement = tags.get("unit_of_measurement");
 
         return new SensorDataDTO(measurement, entityId, friendlyName, deviceClass,
                                 unitOfMeasurement, timestamp, fields, tags);
@@ -126,13 +130,16 @@ public class DataTypeHandler {
 
     /**
      * Converts a FluxRecord to SensorDataAggregatedDTO.
+     *
+     * @param record the FluxRecord to convert
+     * @return SensorDataAggregatedDTO the converted DTO
      */
     private static SensorDataAggregatedDTO convertToSensorDataAggregatedDTO(FluxRecord record) {
-        String measurement = record.getMeasurement();
-        Instant timestamp = record.getTime();
+        final String measurement = record.getMeasurement();
+        final Instant timestamp = record.getTime();
 
-        Map<String, Object> fields = new HashMap<>();
-        Map<String, String> tags = new HashMap<>();
+        final Map<String, Object> fields = new HashMap<>();
+        final Map<String, String> tags = new HashMap<>();
 
         // Extract fields and tags from the record
         record.getValues().forEach((key, value) -> {
@@ -153,16 +160,16 @@ public class DataTypeHandler {
         }
 
         // Extract common sensor attributes from tags
-        String entityId = tags.get("entity_id");
-        String friendlyName = tags.get("friendly_name");
-        String deviceClass = tags.get("device_class");
-        String unitOfMeasurement = tags.get("unit_of_measurement");
+        final String entityId = tags.get("entity_id");
+        final String friendlyName = tags.get("friendly_name");
+        final String deviceClass = tags.get("device_class");
+        final String unitOfMeasurement = tags.get("unit_of_measurement");
 
         // For aggregated data, we'll use the record timestamp as window start
         // and estimate window end based on aggregation window tag
-        Instant windowStart = timestamp;
+        final Instant windowStart = timestamp;
         Instant windowEnd = timestamp;
-        String windowTag = tags.get("window");
+        final String windowTag = tags.get("window");
         if (windowTag != null) {
             windowEnd = estimateWindowEnd(timestamp, windowTag);
         }
@@ -174,13 +181,16 @@ public class DataTypeHandler {
 
     /**
      * Converts a FluxRecord to CostsDTO.
+     *
+     * @param record the FluxRecord to convert
+     * @return CostsDTO the converted DTO
      */
     private static CostsDTO convertToCostsDTO(FluxRecord record) {
-        String measurement = record.getMeasurement();
-        Instant timestamp = record.getTime();
+        final String measurement = record.getMeasurement();
+        final Instant timestamp = record.getTime();
 
-        Map<String, Object> fields = new HashMap<>();
-        Map<String, String> tags = new HashMap<>();
+        final Map<String, Object> fields = new HashMap<>();
+        final Map<String, String> tags = new HashMap<>();
 
         // Extract fields and tags from the record
         record.getValues().forEach((key, value) -> {
@@ -201,12 +211,12 @@ public class DataTypeHandler {
         }
 
         // Extract cost attributes from tags
-        String costType = tags.get("cost_type");
-        String category = tags.get("category");
-        String description = tags.get("description");
+        final String costType = tags.get("cost_type");
+        final String category = tags.get("category");
+        final String description = tags.get("description");
 
         // Convert timestamp to LocalDate for cost date
-        LocalDate costDate = timestamp.atZone(ZoneId.systemDefault()).toLocalDate();
+        final LocalDate costDate = timestamp.atZone(ZoneId.systemDefault()).toLocalDate();
 
         return new CostsDTO(measurement, costType, category, description, costDate,
                            timestamp, fields, tags);
@@ -214,21 +224,25 @@ public class DataTypeHandler {
 
     /**
      * Estimates the window end time based on the aggregation window tag.
+     *
+     * @param windowStart the starting time of the window
+     * @param windowTag the window tag indicating duration (e.g., "30m", "1h", "1d")
+     * @return the estimated window end time
      */
     private static Instant estimateWindowEnd(Instant windowStart, String windowTag) {
         try {
             if (windowTag.endsWith("m")) {
-                int minutes = Integer.parseInt(windowTag.substring(0, windowTag.length() - 1));
+                final int minutes = Integer.parseInt(windowTag.substring(0, windowTag.length() - 1));
                 return windowStart.plusSeconds(minutes * 60L);
             } else if (windowTag.endsWith("h")) {
-                int hours = Integer.parseInt(windowTag.substring(0, windowTag.length() - 1));
+                final int hours = Integer.parseInt(windowTag.substring(0, windowTag.length() - 1));
                 return windowStart.plusSeconds(hours * 3600L);
             } else if (windowTag.endsWith("d")) {
-                int days = Integer.parseInt(windowTag.substring(0, windowTag.length() - 1));
+                final int days = Integer.parseInt(windowTag.substring(0, windowTag.length() - 1));
                 return windowStart.plusSeconds(days * 86400L);
             }
         } catch (NumberFormatException e) {
-            logger.debug("Could not parse window tag: {}", windowTag);
+            LOGGER.debug("Could not parse window tag: {}", windowTag);
         }
 
         // Default to 30 minutes if parsing fails
@@ -237,6 +251,10 @@ public class DataTypeHandler {
 
     /**
      * Validates that a DTO contains required fields for its type.
+     *
+     * @param dto the data transfer object to validate
+     * @param bucketName the bucket name to determine validation rules
+     * @return true if the DTO is valid for its type, false otherwise
      */
     public static boolean validateDTO(Object dto, String bucketName) {
         try {
@@ -248,7 +266,7 @@ public class DataTypeHandler {
                 default -> false;
             };
         } catch (Exception e) {
-            logger.debug("DTO validation failed for bucket: {}", bucketName, e);
+            LOGGER.debug("DTO validation failed for bucket: {}", bucketName, e);
             return false;
         }
     }
@@ -280,6 +298,9 @@ public class DataTypeHandler {
 
     /**
      * Gets the data type description for logging purposes.
+     *
+     * @param bucketName the bucket name to get description for
+     * @return a human-readable description of the data type
      */
     public static String getDataTypeDescription(String bucketName) {
         return switch (bucketName.toLowerCase()) {

@@ -4,10 +4,6 @@ import com.marvin.export.influxdb.services.SystemMetricsExportService;
 import com.marvin.export.influxdb.services.SensorDataExportService;
 import com.marvin.export.influxdb.services.SensorDataAggregatedExportService;
 import com.marvin.export.influxdb.services.CostsExportService;
-import com.marvin.export.influxdb.dto.SystemMetricsDTO;
-import com.marvin.export.influxdb.dto.SensorDataDTO;
-import com.marvin.export.influxdb.dto.SensorDataAggregatedDTO;
-import com.marvin.export.influxdb.dto.CostsDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -16,7 +12,12 @@ import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -89,11 +90,11 @@ public class InfluxExporter {
         final String timestamp = LocalDateTime.now().format(FILE_DATE_TIME_FORMATTER);
         final String influxExportFolder = exportConfig.getCostExportFolder(); // Reuse same folder
 
-        List<Path> exportedFiles = new ArrayList<>();
+        final List<Path> exportedFiles = new ArrayList<>();
 
         for (InfluxBucket bucket : buckets) {
             try {
-                Path filePath = switch (bucket) {
+                final Path filePath = switch (bucket) {
                     case SYSTEM_METRICS -> exportBucket(
                             createFilePath(influxExportFolder, SYSTEM_METRICS_FILENAME_PREFIX, timestamp),
                             () -> systemMetricsExportService.exportData(Optional.empty(), Optional.empty()).stream(),
@@ -106,7 +107,8 @@ public class InfluxExporter {
                     );
                     case SENSOR_DATA_AGGREGATED -> exportBucket(
                             createFilePath(influxExportFolder, SENSOR_DATA_AGGREGATED_FILENAME_PREFIX, timestamp),
-                            () -> sensorDataAggregatedExportService.exportData(Optional.empty(), Optional.empty()).stream(),
+                            () -> sensorDataAggregatedExportService.exportData(Optional.empty(), Optional.empty())
+                                    .stream(),
                             "aggregated sensor data"
                     );
                     case COSTS -> exportBucket(
@@ -145,7 +147,7 @@ public class InfluxExporter {
         final String timestamp = LocalDateTime.now().format(FILE_DATE_TIME_FORMATTER);
         final String influxExportFolder = exportConfig.getCostExportFolder();
 
-        String filenamePrefix = switch (bucket) {
+        final String filenamePrefix = switch (bucket) {
             case SYSTEM_METRICS -> SYSTEM_METRICS_FILENAME_PREFIX;
             case SENSOR_DATA -> SENSOR_DATA_FILENAME_PREFIX;
             case SENSOR_DATA_AGGREGATED -> SENSOR_DATA_AGGREGATED_FILENAME_PREFIX;
@@ -184,7 +186,7 @@ public class InfluxExporter {
         LOGGER.info("Exporting {} to file: {}", description, path);
 
         try {
-            Stream<T> dataStream = dataSupplier.get();
+            final Stream<T> dataStream = dataSupplier.get();
             exportFileWriter.writeFile(path, dataStream);
             LOGGER.info("Successfully exported {} records to {}", description, path);
             return path;

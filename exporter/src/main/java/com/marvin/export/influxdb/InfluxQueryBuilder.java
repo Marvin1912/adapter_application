@@ -20,9 +20,9 @@ public class InfluxQueryBuilder {
     private final List<String> tagFilters = new ArrayList<>();
     private final List<String> rangeFilters = new ArrayList<>();
     private final List<String> aggregateFunctions = new ArrayList<>();
-    private String sortDirection = null;
-    private Integer limit = null;
-    private Integer offset = null;
+    private String sortDirection;
+    private Integer limit;
+    private Integer offset;
     private boolean keepOriginalColumns = true;
 
     private InfluxQueryBuilder(String bucket) {
@@ -45,26 +45,26 @@ public class InfluxQueryBuilder {
     /**
      * Sets the time range for the query.
      *
-     * @param startTime The start time (in ISO-8601 format or Flux duration)
-     * @param endTime The end time (in ISO-8601 format or Flux duration)
+     * @param start The start time (in ISO-8601 format or Flux duration)
+     * @param end The end time (in ISO-8601 format or Flux duration)
      * @return This builder for method chaining
      */
-    public InfluxQueryBuilder timeRange(String startTime, String endTime) {
-        this.startTime = startTime;
-        this.endTime = endTime;
+    public InfluxQueryBuilder timeRange(String start, String end) {
+        this.startTime = start;
+        this.endTime = end;
         return this;
     }
 
     /**
      * Sets the time range for the query using Instant objects.
      *
-     * @param startTime The start time
-     * @param endTime The end time
+     * @param start The start time
+     * @param end The end time
      * @return This builder for method chaining
      */
-    public InfluxQueryBuilder timeRange(Instant startTime, Instant endTime) {
-        this.startTime = startTime.truncatedTo(ChronoUnit.MILLIS).toString();
-        this.endTime = endTime.truncatedTo(ChronoUnit.MILLIS).toString();
+    public InfluxQueryBuilder timeRange(Instant start, Instant end) {
+        this.startTime = start.truncatedTo(ChronoUnit.MILLIS).toString();
+        this.endTime = end.truncatedTo(ChronoUnit.MILLIS).toString();
         return this;
     }
 
@@ -98,7 +98,7 @@ public class InfluxQueryBuilder {
      * @return This builder for method chaining
      */
     public InfluxQueryBuilder measurements(String... measurements) {
-        StringJoiner joiner = new StringJoiner(" or ");
+        final StringJoiner joiner = new StringJoiner(" or ");
         for (String measurement : measurements) {
             joiner.add(String.format("r._measurement == \"%s\"", measurement));
         }
@@ -124,7 +124,7 @@ public class InfluxQueryBuilder {
      * @return This builder for method chaining
      */
     public InfluxQueryBuilder fields(String... fields) {
-        StringJoiner joiner = new StringJoiner(" or ");
+        final StringJoiner joiner = new StringJoiner(" or ");
         for (String field : fields) {
             joiner.add(String.format("r._field == \"%s\"", field));
         }
@@ -189,7 +189,11 @@ public class InfluxQueryBuilder {
      * @return This builder for method chaining
      */
     public InfluxQueryBuilder aggregate(String function, String column) {
-        this.aggregateFunctions.add(String.format("|> aggregateWindow(every: inf, fn: %s, column: \"%s\")", function, column));
+        final String aggregate = String.format(
+                "|> aggregateWindow(every: inf, fn: %s, column: \"%s\")",
+                function, column
+        );
+        this.aggregateFunctions.add(aggregate);
         return this;
     }
 
@@ -201,7 +205,9 @@ public class InfluxQueryBuilder {
      * @return This builder for method chaining
      */
     public InfluxQueryBuilder timeWindow(String window, String function) {
-        this.aggregateFunctions.add(String.format("|> aggregateWindow(every: %s, fn: %s, createEmpty: false)", window, function));
+        final String windowAggregate = String.format(
+            "|> aggregateWindow(every: %s, fn: %s, createEmpty: false)", window, function);
+        this.aggregateFunctions.add(windowAggregate);
         return this;
     }
 
@@ -222,33 +228,33 @@ public class InfluxQueryBuilder {
     /**
      * Sets the maximum number of results to return.
      *
-     * @param limit The maximum number of results
+     * @param limitValue The maximum number of results
      * @return This builder for method chaining
      */
-    public InfluxQueryBuilder limit(int limit) {
-        this.limit = limit;
+    public InfluxQueryBuilder limit(int limitValue) {
+        this.limit = limitValue;
         return this;
     }
 
     /**
      * Sets the number of results to skip.
      *
-     * @param offset The number of results to skip
+     * @param offsetValue The number of results to skip
      * @return This builder for method chaining
      */
-    public InfluxQueryBuilder offset(int offset) {
-        this.offset = offset;
+    public InfluxQueryBuilder offset(int offsetValue) {
+        this.offset = offsetValue;
         return this;
     }
 
     /**
      * Keeps only the original columns (removes _start, _stop, _time).
      *
-     * @param keepOriginalColumns Whether to keep only original columns
+     * @param keepColumns Whether to keep only original columns
      * @return This builder for method chaining
      */
-    public InfluxQueryBuilder keepOriginalColumns(boolean keepOriginalColumns) {
-        this.keepOriginalColumns = keepOriginalColumns;
+    public InfluxQueryBuilder keepOriginalColumns(boolean keepColumns) {
+        this.keepOriginalColumns = keepColumns;
         return this;
     }
 
@@ -258,7 +264,7 @@ public class InfluxQueryBuilder {
      * @return The complete Flux query
      */
     public String build() {
-        StringBuilder query = new StringBuilder();
+        final StringBuilder query = new StringBuilder();
 
         // Start with from bucket
         query.append(String.format("from(bucket: \"%s\")", bucket));
@@ -272,7 +278,7 @@ public class InfluxQueryBuilder {
         }
 
         // Add filters
-        List<String> allFilters = new ArrayList<>();
+        final List<String> allFilters = new ArrayList<>();
         allFilters.addAll(measurementFilters);
         allFilters.addAll(fieldFilters);
         allFilters.addAll(tagFilters);

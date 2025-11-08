@@ -10,10 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -25,7 +23,7 @@ import java.util.stream.Collectors;
  */
 public abstract class AbstractInfluxExport<T> {
 
-    protected static final Logger logger = LoggerFactory.getLogger(AbstractInfluxExport.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(AbstractInfluxExport.class);
 
     @Autowired
     protected InfluxDBClient influxDBClient;
@@ -43,36 +41,36 @@ public abstract class AbstractInfluxExport<T> {
      */
     public List<T> exportData(Optional<Instant> startTime, Optional<Instant> endTime) {
         try {
-            logger.info("Starting export for bucket: {}", getBucketName());
+            LOGGER.info("Starting export for bucket: {}", getBucketName());
 
             // Validate configuration
             validateConfiguration();
 
             // Set default time range if not provided
-            Instant actualStartTime = startTime.orElse(getDefaultStartTime());
-            Instant actualEndTime = endTime.orElse(getDefaultEndTime());
+            final Instant actualStartTime = startTime.orElse(getDefaultStartTime());
+            final Instant actualEndTime = endTime.orElse(getDefaultEndTime());
 
-            logger.info("Exporting data from {} to {}", actualStartTime, actualEndTime);
+            LOGGER.info("Exporting data from {} to {}", actualStartTime, actualEndTime);
 
             // Build the query
-            String fluxQuery = buildQuery(actualStartTime, actualEndTime);
+            final String fluxQuery = buildQuery(actualStartTime, actualEndTime);
 
             // Execute the query
-            List<FluxTable> tables = executeQuery(fluxQuery);
+            final List<FluxTable> tables = executeQuery(fluxQuery);
 
             // Convert records to DTOs
-            List<T> result = tables.stream()
+            final List<T> result = tables.stream()
                     .flatMap(table -> table.getRecords().stream())
                     .map(record -> convertRecord(record))
                     .filter(Optional::isPresent)
                     .map(Optional::get)
                     .collect(Collectors.toList());
 
-            logger.info("Successfully exported {} records from bucket: {}", result.size(), getBucketName());
+            LOGGER.info("Successfully exported {} records from bucket: {}", result.size(), getBucketName());
             return result;
 
         } catch (Exception e) {
-            logger.error("Failed to export data from bucket: {}", getBucketName(), e);
+            LOGGER.error("Failed to export data from bucket: {}", getBucketName(), e);
             throw new InfluxExportException("Export failed for bucket: " + getBucketName(), e);
         }
     }
@@ -103,7 +101,7 @@ public abstract class AbstractInfluxExport<T> {
      */
     protected List<FluxTable> executeQuery(String fluxQuery) {
         try {
-            logger.debug("Executing Flux query: {}", fluxQuery);
+            LOGGER.debug("Executing Flux query: {}", fluxQuery);
             return influxDBClient.getQueryApi().query(fluxQuery, exportConfig.getInfluxdbOrg());
         } catch (Exception e) {
             throw new InfluxExportException("Failed to execute Flux query: " + fluxQuery, e);

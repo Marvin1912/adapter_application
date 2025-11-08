@@ -9,6 +9,15 @@ import java.util.Map;
  * Data Transfer Object for cost data from the costs bucket.
  * Currently prepared for future cost-related metrics and financial data.
  * This bucket is currently empty but structured for when cost data becomes available.
+ *
+ * @param measurement the InfluxDB measurement name
+ * @param costType the type of cost (e.g., "energy", "maintenance")
+ * @param category the cost category for classification
+ * @param description detailed description of the cost entry
+ * @param costDate the date when the cost was incurred
+ * @param timestamp the exact timestamp of the cost record
+ * @param fields map of field names to their values
+ * @param tags map of tag names to their values
  */
 public record CostsDTO(
     String measurement,
@@ -22,65 +31,65 @@ public record CostsDTO(
 ) {
     // Cost value getters
     public BigDecimal getValue() {
-        Object value = fields.get("value");
+        final Object value = fields.get("value");
         return value != null ? new BigDecimal(value.toString()) : null;
     }
 
     public BigDecimal getAmount() {
-        Object value = fields.get("amount");
+        final Object value = fields.get("amount");
         return value != null ? new BigDecimal(value.toString()) : null;
     }
 
     public BigDecimal getCost() {
-        Object value = fields.get("cost");
+        final Object value = fields.get("cost");
         return value != null ? new BigDecimal(value.toString()) : null;
     }
 
     // Cost breakdown getters
     public BigDecimal getBaseCost() {
-        Object value = fields.get("base_cost");
+        final Object value = fields.get("base_cost");
         return value != null ? new BigDecimal(value.toString()) : null;
     }
 
     public BigDecimal getVariableCost() {
-        Object value = fields.get("variable_cost");
+        final Object value = fields.get("variable_cost");
         return value != null ? new BigDecimal(value.toString()) : null;
     }
 
     public BigDecimal getFixedCost() {
-        Object value = fields.get("fixed_cost");
+        final Object value = fields.get("fixed_cost");
         return value != null ? new BigDecimal(value.toString()) : null;
     }
 
     public BigDecimal getTax() {
-        Object value = fields.get("tax");
+        final Object value = fields.get("tax");
         return value != null ? new BigDecimal(value.toString()) : null;
     }
 
     // Cost rate getters
     public BigDecimal getRate() {
-        Object value = fields.get("rate");
+        final Object value = fields.get("rate");
         return value != null ? new BigDecimal(value.toString()) : null;
     }
 
     public BigDecimal getPricePerUnit() {
-        Object value = fields.get("price_per_unit");
+        final Object value = fields.get("price_per_unit");
         return value != null ? new BigDecimal(value.toString()) : null;
     }
 
     // Usage/consumption getters
     public BigDecimal getUsage() {
-        Object value = fields.get("usage");
+        final Object value = fields.get("usage");
         return value != null ? new BigDecimal(value.toString()) : null;
     }
 
     public BigDecimal getConsumption() {
-        Object value = fields.get("consumption");
+        final Object value = fields.get("consumption");
         return value != null ? new BigDecimal(value.toString()) : null;
     }
 
     public String getUnit() {
-        Object value = fields.get("unit");
+        final Object value = fields.get("unit");
         return value != null ? value.toString() : null;
     }
 
@@ -147,7 +156,7 @@ public record CostsDTO(
      * Returns a formatted description of the cost entry.
      */
     public String getFormattedDescription() {
-        StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder();
 
         if (costType != null) {
             sb.append(costType);
