@@ -30,11 +30,11 @@ Based on `buckets-documentation.md`, focus on these 4 user buckets:
 - [x] **3.3**: Create `SensorDataAggregatedExportService` for `sensor_data_30m` bucket
 - [x] **3.4**: Create `CostsExportService` for `costs` bucket (future preparation)
 
-### Phase 4: Main Export Orchestrator
-- [ ] **4.1**: Create `InfluxExporter.java` main service
-- [ ] **4.2**: Implement bucket orchestration following existing `Exporter.java` patterns
-- [ ] **4.3**: Add timestamped output file generation
-- [ ] **4.4**: Support selective bucket exports
+### Phase 4: Main Export Orchestrator ✅ COMPLETED
+- [x] **4.1**: Create `InfluxExporter.java` main service
+- [x] **4.2**: Implement bucket orchestration following existing `Exporter.java` patterns
+- [x] **4.3**: Add timestamped output file generation
+- [x] **4.4**: Support selective bucket exports
 
 ### Phase 5: Integration and File Output
 - [ ] **5.1**: Integrate with existing `Exporter.java` workflow
