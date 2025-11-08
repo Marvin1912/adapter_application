@@ -24,19 +24,14 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractCostImport<DTO, MEAS> {
 
-    /** Logger for this class. */
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractCostImport.class);
 
-    /** UTC timezone constant for date conversions. */
     private static final String UTC_TIMEZONE = "UTC";
 
-    /** InfluxDB bucket name for costs. */
     private static final String COSTS_BUCKET = "costs";
 
-    /** InfluxDB organization name. */
     private static final String WILDFLY_DOMAIN_ORG = "wildfly_domain";
 
-    /** The InfluxDB client instance. */
     private final InfluxDBClient influxDBClient;
 
     /**
