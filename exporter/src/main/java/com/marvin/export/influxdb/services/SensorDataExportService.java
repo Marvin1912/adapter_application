@@ -73,9 +73,17 @@ public class SensorDataExportService extends AbstractInfluxExport<SensorDataDTO>
     public String buildHumiditySensorQuery(Instant startTime, Instant endTime) {
         return InfluxQueryBuilder.from(BUCKET_NAME)
                 .timeRange(startTime, endTime)
-                .measurements("sensor", "binary_sensor")
-                .fields(MeasurementMappings.SensorDataMappings.HUMIDITY_FIELDS.toArray(new String[0]))
-                .tag("device_class", "humidity")
+                .measurement("%")
+                .field("value")
+                .map("fn: (r) => ({\n" +
+                     "      r with friendly_name:\n" +
+                     "        if r.entity_id == \"lumi_lumi_weather_luftfeuchtigkeit\" then \"Badezimmer\"\n" +
+                     "        else if r.entity_id == \"lumi_lumi_weather_luftfeuchtigkeit_2\" then \"Flur\"\n" +
+                     "        else if r.entity_id == \"lumi_lumi_weather_luftfeuchtigkeit_3\" then \"Küche\"\n" +
+                     "        else if r.entity_id == \"lumi_lumi_weather_luftfeuchtigkeit_4\" then \"Schlafzimmer\"\n" +
+                     "        else if r.entity_id == \"lumi_lumi_weather_luftfeuchtigkeit_5\" then \"Wohnzimmer\"\n" +
+                     "        else \"Nicht bekannt\"\n" +
+                     "    })")
                 .sort("desc")
                 .build();
     }
