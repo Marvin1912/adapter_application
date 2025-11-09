@@ -61,7 +61,7 @@ public abstract class AbstractInfluxExport<T> {
             // Convert records to DTOs
             final List<T> result = tables.stream()
                     .flatMap(table -> table.getRecords().stream())
-                    .map(record -> convertRecord(record))
+                    .map(this::convertRecord)
                     .filter(Optional::isPresent)
                     .map(Optional::get)
                     .collect(Collectors.toList());

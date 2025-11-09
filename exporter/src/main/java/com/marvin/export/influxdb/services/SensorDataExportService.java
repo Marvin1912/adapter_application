@@ -32,6 +32,7 @@ public class SensorDataExportService extends AbstractInfluxExport<SensorDataDTO>
                 .timeRange(startTime, endTime)
                 .measurement("%")
                 .field("value")
+<<<<<<< Updated upstream
                 .map("fn: (r) => ({\n" +
                      "      r with friendly_name:\n" +
                      "        if r.entity_id == \"lumi_lumi_weather_luftfeuchtigkeit\" then \"Badezimmer\"\n" +
@@ -41,6 +42,19 @@ public class SensorDataExportService extends AbstractInfluxExport<SensorDataDTO>
                      "        else if r.entity_id == \"lumi_lumi_weather_luftfeuchtigkeit_5\" then \"Wohnzimmer\"\n" +
                      "        else \"Nicht bekannt\"\n" +
                      "    })")
+=======
+                .map("""
+                    fn: (r) => ({
+                          r with friendly_name:
+                            if r.entity_id == "lumi_lumi_weather_luftfeuchtigkeit" then "Badezimmer"
+                            else if r.entity_id == "lumi_lumi_weather_luftfeuchtigkeit_2" then "Flur"
+                            else if r.entity_id == "lumi_lumi_weather_luftfeuchtigkeit_3" then "Küche"
+                            else if r.entity_id == "lumi_lumi_weather_luftfeuchtigkeit_4" then "Schlafzimmer"
+                            else if r.entity_id == "lumi_lumi_weather_luftfeuchtigkeit_5" then "Wohnzimmer"
+                            else "Nicht bekannt"
+                        })""")
+                .keepOriginalColumns(false)
+>>>>>>> Stashed changes
                 .sort("desc") // Most recent first
                 .build();
     }
@@ -50,7 +64,7 @@ public class SensorDataExportService extends AbstractInfluxExport<SensorDataDTO>
         try {
             // Use the DataTypeHandler to convert the record
             final Object converted = DataTypeHandler.convertRecord(record, BUCKET_NAME);
-            if (converted != null && converted instanceof SensorDataDTO dto) {
+            if (converted instanceof SensorDataDTO dto) {
                 // Validate the DTO using DataTypeHandler
                 if (DataTypeHandler.validateDTO(dto, BUCKET_NAME)) {
                     return Optional.of(dto);
