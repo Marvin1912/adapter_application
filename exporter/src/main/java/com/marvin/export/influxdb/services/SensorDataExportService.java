@@ -30,10 +30,17 @@ public class SensorDataExportService extends AbstractInfluxExport<SensorDataDTO>
     protected String buildQuery(Instant startTime, Instant endTime) {
         return InfluxQueryBuilder.from(BUCKET_NAME)
                 .timeRange(startTime, endTime)
-                .measurements(
-                    // IoT sensor measurements we want to export
-                    "sensor", "binary_sensor", "climate", "energy", "power"
-                )
+                .measurement("%")
+                .field("value")
+                .map("fn: (r) => ({\n" +
+                     "      r with friendly_name:\n" +
+                     "        if r.entity_id == \"lumi_lumi_weather_luftfeuchtigkeit\" then \"Badezimmer\"\n" +
+                     "        else if r.entity_id == \"lumi_lumi_weather_luftfeuchtigkeit_2\" then \"Flur\"\n" +
+                     "        else if r.entity_id == \"lumi_lumi_weather_luftfeuchtigkeit_3\" then \"Küche\"\n" +
+                     "        else if r.entity_id == \"lumi_lumi_weather_luftfeuchtigkeit_4\" then \"Schlafzimmer\"\n" +
+                     "        else if r.entity_id == \"lumi_lumi_weather_luftfeuchtigkeit_5\" then \"Wohnzimmer\"\n" +
+                     "        else \"Nicht bekannt\"\n" +
+                     "    })")
                 .keepOriginalColumns(true)
                 .sort("desc") // Most recent first
                 .build();
