@@ -17,8 +17,10 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -60,6 +62,7 @@ public class Exporter {
 
     private final ExportConfig exportConfig;
     private final ExportFileWriter exportFileWriter;
+    private final InfluxExporter influxExporter;
     private final DailyCostRepository dailyCostRepository;
     private final MonthlyCostRepository monthlyCostRepository;
     private final SpecialCostEntryRepository specialCostEntryRepository;
@@ -68,12 +71,14 @@ public class Exporter {
     public Exporter(
             ExportConfig exportConfig,
             ExportFileWriter exportFileWriter,
+            InfluxExporter influxExporter,
             DailyCostRepository dailyCostRepository,
             MonthlyCostRepository monthlyCostRepository,
             SpecialCostEntryRepository specialCostEntryRepository,
             SalaryRepository salaryRepository) {
         this.exportConfig = exportConfig;
         this.exportFileWriter = exportFileWriter;
+        this.influxExporter = influxExporter;
         this.dailyCostRepository = dailyCostRepository;
         this.monthlyCostRepository = monthlyCostRepository;
         this.specialCostEntryRepository = specialCostEntryRepository;
@@ -106,6 +111,37 @@ public class Exporter {
                 .stream()
                 .map(Path::getFileName)
                 .toList();
+    }
+
+    /**
+     * Exports data from InfluxDB user buckets.
+     *
+     * @return List of generated InfluxDB export file paths
+     */
+    public List<Path> exportInfluxDB() {
+        return influxExporter.exportAllBuckets();
+    }
+
+    /**
+     * Exports data from selected InfluxDB buckets only.
+     *
+     * @param buckets The buckets to export
+     * @return List of generated InfluxDB export file paths
+     */
+    public List<Path> exportInfluxDB(Set<InfluxExporter.InfluxBucket> buckets) {
+        return influxExporter.exportSelectedBuckets(buckets);
+    }
+
+    /**
+     * Exports all data (costs and InfluxDB) in a single operation.
+     *
+     * @return Combined list of all generated export file paths
+     */
+    public List<Path> exportAll() {
+        final List<Path> allExports = new ArrayList<>();
+        allExports.addAll(exportCosts());
+        allExports.addAll(exportInfluxDB());
+        return allExports;
     }
 
     private Path createFilePath(String folder, String prefix, String timestamp) {

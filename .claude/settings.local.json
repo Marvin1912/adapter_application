@@ -20,7 +20,9 @@
       "Bash(gradle:*)",
       "WebFetch(domain:en.wiktionary.org)",
       "Bash(mvn compile test-compile:*)",
-      "Bash(mvn compile:*)"
+      "Bash(mvn compile:*)",
+      "Bash(mvn checkstyle:check:*)",
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": []
