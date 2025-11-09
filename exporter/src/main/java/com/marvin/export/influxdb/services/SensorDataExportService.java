@@ -41,7 +41,6 @@ public class SensorDataExportService extends AbstractInfluxExport<SensorDataDTO>
                      "        else if r.entity_id == \"lumi_lumi_weather_luftfeuchtigkeit_5\" then \"Wohnzimmer\"\n" +
                      "        else \"Nicht bekannt\"\n" +
                      "    })")
-                .keepOriginalColumns(true)
                 .sort("desc") // Most recent first
                 .build();
     }
