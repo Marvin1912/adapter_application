@@ -9,9 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import jakarta.validation.Valid;
 import java.nio.file.Path;
-import java.time.Instant;
 import java.util.List;
 
 /**
@@ -39,19 +37,19 @@ public class InfluxExportController {
         produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<InfluxExportResponse> exportInfluxBuckets(
-            @Valid @RequestBody InfluxExportRequest request) {
+            @RequestBody InfluxExportRequest request) {
 
         try {
-            List<Path> exportedFiles;
+            final List<Path> exportedFiles;
 
             if (request.getBuckets() == null || request.getBuckets().isEmpty()) {
                 // Export all buckets if none specified
                 exportedFiles = influxExporter.exportAllBuckets();
             } else {
                 // Export specific buckets
-                List<InfluxExporter.InfluxBucket> bucketEnums = request.getBuckets().stream()
+                final java.util.Set<InfluxExporter.InfluxBucket> bucketEnums = request.getBuckets().stream()
                     .map(InfluxExporter.InfluxBucket::valueOf)
-                    .toList();
+                    .collect(java.util.stream.Collectors.toSet());
                 exportedFiles = influxExporter.exportSelectedBuckets(bucketEnums);
             }
 

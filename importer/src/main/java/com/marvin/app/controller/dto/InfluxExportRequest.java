@@ -1,6 +1,5 @@
 package com.marvin.app.controller.dto;
 
-import jakarta.validation.constraints.Pattern;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -24,8 +23,6 @@ public class InfluxExportRequest {
      * If not provided, defaults to 24 hours ago for time-range exports.
      */
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "UTC")
-    @Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
-             message = "Start time must be in ISO-8601 format (yyyy-MM-dd'T'HH:mm:ss'Z')")
     private String startTime;
 
     /**
@@ -33,11 +30,9 @@ public class InfluxExportRequest {
      * If not provided, defaults to current time for time-range exports.
      */
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "UTC")
-    @Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
-             message = "End time must be in ISO-8601 format (yyyy-MM-dd'T'HH:mm:ss'Z')")
     private String endTime;
 
-    public InfluxExportRequest() {}
+    public InfluxExportRequest() { }
 
     public InfluxExportRequest(List<String> buckets, String startTime, String endTime) {
         this.buckets = buckets;

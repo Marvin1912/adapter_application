@@ -53,7 +53,7 @@ public class InfluxExportResponse {
      * @return Successful response
      */
     public static InfluxExportResponse success(String message, java.util.List<java.nio.file.Path> exportedFiles) {
-        List<String> fileNames = exportedFiles.stream()
+        final List<String> fileNames = exportedFiles.stream()
             .map(path -> path.getFileName().toString())
             .toList();
         return new InfluxExportResponse(true, message, fileNames, null);
