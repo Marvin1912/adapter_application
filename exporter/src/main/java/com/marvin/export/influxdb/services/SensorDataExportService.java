@@ -12,9 +12,8 @@ import java.time.Instant;
 import java.util.Optional;
 
 /**
- * Export service for IoT sensor data from the sensor_data bucket.
- * Handles humidity sensors, energy monitoring, and other IoT sensor readings
- * from Home Assistant integration.
+ * Export service for humidity sensor data from the sensor_data bucket.
+ * Handles humidity sensors (%) from Home Assistant integration.
  */
 @Service
 public class SensorDataExportService extends AbstractInfluxExport<SensorDataDTO> {
@@ -32,6 +31,7 @@ public class SensorDataExportService extends AbstractInfluxExport<SensorDataDTO>
                 .timeRange(startTime, endTime)
                 .measurement("%")
                 .field("value")
+                .tag("device_class", "humidity")
                 .map("""
                     fn: (r) => ({
                           r with friendly_name:
@@ -68,7 +68,7 @@ public class SensorDataExportService extends AbstractInfluxExport<SensorDataDTO>
 
     @Override
     protected String getDataTypeDescription() {
-        return "IoT sensor data (humidity, energy monitoring from Home Assistant)";
+        return "Humidity sensor data (%) from Home Assistant";
     }
 
     /**
@@ -83,6 +83,8 @@ public class SensorDataExportService extends AbstractInfluxExport<SensorDataDTO>
                 .timeRange(startTime, endTime)
                 .measurement("%")
                 .field("value")
+                .tag("device_class", "humidity")
+                .tag("unit_of_measurement", "%")
                 .map("""
                     fn: (r) => ({
                           r with friendly_name:
@@ -93,6 +95,7 @@ public class SensorDataExportService extends AbstractInfluxExport<SensorDataDTO>
                             else if r.entity_id == "lumi_lumi_weather_luftfeuchtigkeit_5" then "Wohnzimmer"
                             else "Nicht bekannt"
                         })""")
+                .keepOriginalColumns(false)
                 .sort("desc")
                 .build();
     }
@@ -114,23 +117,7 @@ public class SensorDataExportService extends AbstractInfluxExport<SensorDataDTO>
                 .build();
     }
 
-    /**
-     * Builds a query for temperature sensor data only.
-     *
-     * @param startTime the start time for the query
-     * @param endTime the end time for the query
-     * @return the Flux query string for temperature sensors
-     */
-    public String buildTemperatureSensorQuery(Instant startTime, Instant endTime) {
-        return InfluxQueryBuilder.from(BUCKET_NAME)
-                .timeRange(startTime, endTime)
-                .measurements("sensor", "climate")
-                .fields("temperature", "value")
-                .tagRegex("device_class", "(temperature|thermal)")
-                .sort("desc")
-                .build();
-    }
-
+    
     /**
      * Builds a query for Xiaomi Aqara sensors specifically.
      *
@@ -230,22 +217,7 @@ public class SensorDataExportService extends AbstractInfluxExport<SensorDataDTO>
         return executeQueryAndConvert(query);
     }
 
-    /**
-     * Exports temperature sensor data specifically.
-     *
-     * @param startTime the optional start time for export
-     * @param endTime the optional end time for export
-     * @return list of temperature sensor data objects
-     */
-    public java.util.List<SensorDataDTO> exportTemperatureSensors(
-            Instant startTime, Instant endTime) {
-        final Instant actualStartTime = startTime != null ? startTime : getDefaultStartTime();
-        final Instant actualEndTime = endTime != null ? endTime : getDefaultEndTime();
-
-        final String query = buildTemperatureSensorQuery(actualStartTime, actualEndTime);
-        return executeQueryAndConvert(query);
-    }
-
+    
     /**
      * Exports Xiaomi Aqara sensor data specifically.
      *
