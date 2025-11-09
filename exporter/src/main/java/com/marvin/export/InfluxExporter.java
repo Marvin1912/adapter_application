@@ -37,7 +37,7 @@ public class InfluxExporter {
     private static final String SENSOR_DATA_FILENAME_PREFIX = "sensor_data_";
     private static final String SENSOR_DATA_AGGREGATED_FILENAME_PREFIX = "sensor_data_30m_";
     private static final String COSTS_FILENAME_PREFIX = "costs_";
-    private static final String FILE_EXTENSION = ".json";
+    private static final String FILE_EXTENSION = ".jsonl";
 
     private final ExportConfig exportConfig;
     private final ExportFileWriter exportFileWriter;

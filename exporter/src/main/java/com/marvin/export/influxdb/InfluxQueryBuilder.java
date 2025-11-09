@@ -20,6 +20,7 @@ public class InfluxQueryBuilder {
     private final List<String> tagFilters = new ArrayList<>();
     private final List<String> rangeFilters = new ArrayList<>();
     private final List<String> aggregateFunctions = new ArrayList<>();
+    private final List<String> mapFunctions = new ArrayList<>();
     private String sortDirection;
     private Integer limit;
     private Integer offset;
@@ -212,6 +213,17 @@ public class InfluxQueryBuilder {
     }
 
     /**
+     * Adds a map function to transform records.
+     *
+     * @param mapFunction The map function as a string (e.g., "fn: (r) => ({ r with _value: r._value * 2 })")
+     * @return This builder for method chaining
+     */
+    public InfluxQueryBuilder map(String mapFunction) {
+        this.mapFunctions.add(String.format("|> map(%s)", mapFunction));
+        return this;
+    }
+
+    /**
      * Sets the sort order of results.
      *
      * @param direction "asc" for ascending or "desc" for descending
@@ -293,6 +305,11 @@ public class InfluxQueryBuilder {
         // Add aggregate functions
         for (String aggregate : aggregateFunctions) {
             query.append("\n  ").append(aggregate);
+        }
+
+        // Add map functions
+        for (String mapFunction : mapFunctions) {
+            query.append("\n  ").append(mapFunction);
         }
 
         // Add sorting

@@ -30,11 +30,19 @@ public class SensorDataExportService extends AbstractInfluxExport<SensorDataDTO>
     protected String buildQuery(Instant startTime, Instant endTime) {
         return InfluxQueryBuilder.from(BUCKET_NAME)
                 .timeRange(startTime, endTime)
-                .measurements(
-                    // IoT sensor measurements we want to export
-                    "sensor", "binary_sensor", "climate", "energy", "power"
-                )
-                .keepOriginalColumns(true)
+                .measurement("%")
+                .field("value")
+                .map("""
+                    fn: (r) => ({
+                          r with friendly_name:
+                            if r.entity_id == "lumi_lumi_weather_luftfeuchtigkeit" then "Badezimmer"
+                            else if r.entity_id == "lumi_lumi_weather_luftfeuchtigkeit_2" then "Flur"
+                            else if r.entity_id == "lumi_lumi_weather_luftfeuchtigkeit_3" then "Küche"
+                            else if r.entity_id == "lumi_lumi_weather_luftfeuchtigkeit_4" then "Schlafzimmer"
+                            else if r.entity_id == "lumi_lumi_weather_luftfeuchtigkeit_5" then "Wohnzimmer"
+                            else "Nicht bekannt"
+                        })""")
+                .keepOriginalColumns(false)
                 .sort("desc") // Most recent first
                 .build();
     }
@@ -44,7 +52,7 @@ public class SensorDataExportService extends AbstractInfluxExport<SensorDataDTO>
         try {
             // Use the DataTypeHandler to convert the record
             final Object converted = DataTypeHandler.convertRecord(record, BUCKET_NAME);
-            if (converted != null && converted instanceof SensorDataDTO dto) {
+            if (converted instanceof SensorDataDTO dto) {
                 // Validate the DTO using DataTypeHandler
                 if (DataTypeHandler.validateDTO(dto, BUCKET_NAME)) {
                     return Optional.of(dto);
@@ -73,9 +81,18 @@ public class SensorDataExportService extends AbstractInfluxExport<SensorDataDTO>
     public String buildHumiditySensorQuery(Instant startTime, Instant endTime) {
         return InfluxQueryBuilder.from(BUCKET_NAME)
                 .timeRange(startTime, endTime)
-                .measurements("sensor", "binary_sensor")
-                .fields(MeasurementMappings.SensorDataMappings.HUMIDITY_FIELDS.toArray(new String[0]))
-                .tag("device_class", "humidity")
+                .measurement("%")
+                .field("value")
+                .map("""
+                    fn: (r) => ({
+                          r with friendly_name:
+                            if r.entity_id == "lumi_lumi_weather_luftfeuchtigkeit" then "Badezimmer"
+                            else if r.entity_id == "lumi_lumi_weather_luftfeuchtigkeit_2" then "Flur"
+                            else if r.entity_id == "lumi_lumi_weather_luftfeuchtigkeit_3" then "Küche"
+                            else if r.entity_id == "lumi_lumi_weather_luftfeuchtigkeit_4" then "Schlafzimmer"
+                            else if r.entity_id == "lumi_lumi_weather_luftfeuchtigkeit_5" then "Wohnzimmer"
+                            else "Nicht bekannt"
+                        })""")
                 .sort("desc")
                 .build();
     }

@@ -67,12 +67,7 @@ public class DataTypeHandler {
                     fields.put(value.toString(), MeasurementMappings.DataTypeConverter
                         .convertToExpectedType(value.toString(), record.getValue(), "system_metrics"));
                 } else if (!key.startsWith("_") && !key.equals("table")) {
-                    if (value instanceof Number) {
-                        // This is likely a tag value that's numeric
-                        tags.put(key, value.toString());
-                    } else {
-                        tags.put(key, value.toString());
-                    }
+                  tags.put(key, value.toString());
                 }
             }
         });
@@ -230,15 +225,13 @@ public class DataTypeHandler {
      */
     private static Instant estimateWindowEnd(Instant windowStart, String windowTag) {
         try {
-            if (windowTag.endsWith("m")) {
-                final int minutes = Integer.parseInt(windowTag.substring(0, windowTag.length() - 1));
-                return windowStart.plusSeconds(minutes * 60L);
+          int rawTime = Integer.parseInt(windowTag.substring(0, windowTag.length() - 1));
+          if (windowTag.endsWith("m")) {
+            return windowStart.plusSeconds(rawTime * 60L);
             } else if (windowTag.endsWith("h")) {
-                final int hours = Integer.parseInt(windowTag.substring(0, windowTag.length() - 1));
-                return windowStart.plusSeconds(hours * 3600L);
+            return windowStart.plusSeconds(rawTime * 3600L);
             } else if (windowTag.endsWith("d")) {
-                final int days = Integer.parseInt(windowTag.substring(0, windowTag.length() - 1));
-                return windowStart.plusSeconds(days * 86400L);
+            return windowStart.plusSeconds(rawTime * 86400L);
             }
         } catch (NumberFormatException e) {
             LOGGER.debug("Could not parse window tag: {}", windowTag);
