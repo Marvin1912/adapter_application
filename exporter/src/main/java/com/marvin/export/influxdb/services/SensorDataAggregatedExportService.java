@@ -6,6 +6,8 @@ import com.marvin.export.influxdb.InfluxQueryBuilder;
 import com.marvin.export.influxdb.dto.SensorDataAggregatedDTO;
 import com.marvin.export.influxdb.handlers.DataTypeHandler;
 import com.marvin.export.influxdb.mappings.MeasurementMappings;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -73,16 +75,23 @@ public class SensorDataAggregatedExportService extends AbstractInfluxExport<Sens
      * @return the constructed Flux query string for humidity data
      */
     public String buildAggregatedHumidityQuery(Instant startTime, Instant endTime) {
-        final String[] humidityFields =
-            MeasurementMappings.SensorDataAggregatedMappings.HUMIDITY_AGGREGATED_FIELDS.toArray(new String[0]);
-        return InfluxQueryBuilder.from(BUCKET_NAME)
-                .timeRange(startTime, endTime)
-                .measurements("sensor_aggregated", "sensor_mean")
-                .fields(humidityFields)
-                .tag("device_class", "humidity")
-                .tag("window", DEFAULT_AGGREGATION_WINDOW)
-                .sort("desc")
-                .build();
+      return InfluxQueryBuilder.from(BUCKET_NAME)
+          .timeRange(startTime, endTime)
+          .measurement("%")
+          .field("value")
+          .map("""
+                    fn: (r) => ({
+                          r with friendly_name:
+                            if r.entity_id == "lumi_lumi_weather_luftfeuchtigkeit" then "Badezimmer"
+                            else if r.entity_id == "lumi_lumi_weather_luftfeuchtigkeit_2" then "Flur"
+                            else if r.entity_id == "lumi_lumi_weather_luftfeuchtigkeit_3" then "Küche"
+                            else if r.entity_id == "lumi_lumi_weather_luftfeuchtigkeit_4" then "Schlafzimmer"
+                            else if r.entity_id == "lumi_lumi_weather_luftfeuchtigkeit_5" then "Wohnzimmer"
+                            else "Nicht bekannt"
+                        })""")
+          .keepOriginalColumns(false)
+          .sort("desc")
+          .build();
     }
 
     /**

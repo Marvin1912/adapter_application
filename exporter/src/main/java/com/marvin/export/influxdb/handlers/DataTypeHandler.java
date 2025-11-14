@@ -115,11 +115,8 @@ public class DataTypeHandler {
         // Extract common sensor attributes from tags
         final String entityId = tags.get("entity_id");
         final String friendlyName = tags.get("friendly_name");
-        final String deviceClass = tags.get("device_class");
-        final String unitOfMeasurement = tags.get("unit_of_measurement");
 
-        return new SensorDataDTO(measurement, entityId, friendlyName, deviceClass,
-                                unitOfMeasurement, timestamp, fields, tags);
+      return new SensorDataDTO(measurement, entityId, friendlyName, timestamp, fields, tags);
     }
 
     /**

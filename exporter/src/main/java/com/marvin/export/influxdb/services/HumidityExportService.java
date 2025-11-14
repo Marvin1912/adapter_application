@@ -6,6 +6,8 @@ import com.marvin.export.influxdb.InfluxQueryBuilder;
 import com.marvin.export.influxdb.dto.SensorDataDTO;
 import com.marvin.export.influxdb.handlers.DataTypeHandler;
 import com.marvin.export.influxdb.mappings.MeasurementMappings;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -76,7 +78,6 @@ public class HumidityExportService extends AbstractInfluxExport<SensorDataDTO> {
                             else if r.entity_id == "lumi_lumi_weather_luftfeuchtigkeit_5" then "Wohnzimmer"
                             else "Nicht bekannt"
                         })""")
-                .tagRegex("device_class", "humidity")
                 .keepOriginalColumns(false)
                 .sort("desc")
                 .build();
