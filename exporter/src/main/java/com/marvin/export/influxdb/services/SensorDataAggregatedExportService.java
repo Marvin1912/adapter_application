@@ -350,6 +350,30 @@ public class SensorDataAggregatedExportService extends AbstractInfluxExport<Sens
     }
 
     /**
+     * Main export method that returns temperature data for streaming.
+     * Wrapper method for exportAggregatedTemperature to match interface.
+     *
+     * @param startTime the optional start time for export
+     * @param endTime the optional end time for export
+     * @return stream of temperature sensor data objects
+     */
+    public java.util.stream.Stream<SensorDataAggregatedDTO> exportTemperatureData(Instant startTime, Instant endTime) {
+        return exportAggregatedTemperature(startTime, endTime).stream();
+    }
+
+    /**
+     * Main export method that returns humidity data for streaming.
+     * Wrapper method for exportAggregatedHumidity to match interface.
+     *
+     * @param startTime the optional start time for export
+     * @param endTime the optional end time for export
+     * @return stream of humidity sensor data objects
+     */
+    public java.util.stream.Stream<SensorDataAggregatedDTO> exportHumidityData(Instant startTime, Instant endTime) {
+        return exportAggregatedHumidity(startTime, endTime).stream();
+    }
+
+    /**
      * Helper method to execute a query and convert results.
      *
      * @param query the Flux query to execute
