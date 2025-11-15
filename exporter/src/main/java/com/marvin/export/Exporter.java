@@ -17,10 +17,8 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -41,7 +39,7 @@ public class Exporter {
 
     private static final Function<SpecialCostEntryEntity, SpecialCostEntryDTO>
             SPECIAL_COST_ENTRY_MAPPER = e -> new SpecialCostEntryDTO(
-                    e.getDescription(), e.getValue(), e.getAdditionalInfo());
+            e.getDescription(), e.getValue(), e.getAdditionalInfo());
 
     private static final Function<Map.Entry<LocalDate, List<SpecialCostEntryDTO>>, SpecialCostDTO>
             SPECIAL_COST_MAPPER = e -> new SpecialCostDTO(e.getKey(), e.getValue());
@@ -62,7 +60,6 @@ public class Exporter {
 
     private final ExportConfig exportConfig;
     private final ExportFileWriter exportFileWriter;
-    private final InfluxExporter influxExporter;
     private final DailyCostRepository dailyCostRepository;
     private final MonthlyCostRepository monthlyCostRepository;
     private final SpecialCostEntryRepository specialCostEntryRepository;
@@ -71,14 +68,12 @@ public class Exporter {
     public Exporter(
             ExportConfig exportConfig,
             ExportFileWriter exportFileWriter,
-            InfluxExporter influxExporter,
             DailyCostRepository dailyCostRepository,
             MonthlyCostRepository monthlyCostRepository,
             SpecialCostEntryRepository specialCostEntryRepository,
             SalaryRepository salaryRepository) {
         this.exportConfig = exportConfig;
         this.exportFileWriter = exportFileWriter;
-        this.influxExporter = influxExporter;
         this.dailyCostRepository = dailyCostRepository;
         this.monthlyCostRepository = monthlyCostRepository;
         this.specialCostEntryRepository = specialCostEntryRepository;
@@ -89,59 +84,31 @@ public class Exporter {
         final String timestamp = LocalDateTime.now().format(FILE_DATE_TIME_FORMATTER);
         final String costExportFolder = exportConfig.getCostExportFolder();
 
-        final Path dailyCostsPath = createFilePath(costExportFolder, DAILY_COSTS_FILENAME_PREFIX, timestamp);
+        final Path dailyCostsPath = createFilePath(costExportFolder, DAILY_COSTS_FILENAME_PREFIX,
+                timestamp);
         exportCost(dailyCostsPath, () -> dailyCostRepository.findAll()
                 .stream()
                 .map(DAILY_COST_MAPPER));
 
-        final Path monthlyCostsPath = createFilePath(costExportFolder, MONTHLY_COSTS_FILENAME_PREFIX, timestamp);
+        final Path monthlyCostsPath = createFilePath(costExportFolder,
+                MONTHLY_COSTS_FILENAME_PREFIX, timestamp);
         exportCost(monthlyCostsPath, () -> monthlyCostRepository.findAll()
                 .stream()
                 .map(MONTHLY_COST_MAPPER));
 
-        final Path specialCostsPath = createFilePath(costExportFolder, SPECIAL_COSTS_FILENAME_PREFIX, timestamp);
+        final Path specialCostsPath = createFilePath(costExportFolder,
+                SPECIAL_COSTS_FILENAME_PREFIX, timestamp);
         exportCost(specialCostsPath, this::createSpecialCostsStream);
 
-        final Path salariesPath = createFilePath(costExportFolder, SALARIES_FILENAME_PREFIX, timestamp);
+        final Path salariesPath = createFilePath(costExportFolder, SALARIES_FILENAME_PREFIX,
+                timestamp);
         exportCost(salariesPath, () -> salaryRepository.findAll()
                 .stream()
                 .map(SALARY_MAPPER));
 
-        return List.of(dailyCostsPath, monthlyCostsPath, specialCostsPath, salariesPath)
-                .stream()
+        return Stream.of(dailyCostsPath, monthlyCostsPath, specialCostsPath, salariesPath)
                 .map(Path::getFileName)
                 .toList();
-    }
-
-    /**
-     * Exports data from InfluxDB user buckets.
-     *
-     * @return List of generated InfluxDB export file paths
-     */
-    public List<Path> exportInfluxDB() {
-        return influxExporter.exportAllBuckets();
-    }
-
-    /**
-     * Exports data from selected InfluxDB buckets only.
-     *
-     * @param buckets The buckets to export
-     * @return List of generated InfluxDB export file paths
-     */
-    public List<Path> exportInfluxDB(Set<InfluxExporter.InfluxBucket> buckets) {
-        return influxExporter.exportSelectedBuckets(buckets);
-    }
-
-    /**
-     * Exports all data (costs and InfluxDB) in a single operation.
-     *
-     * @return Combined list of all generated export file paths
-     */
-    public List<Path> exportAll() {
-        final List<Path> allExports = new ArrayList<>();
-        allExports.addAll(exportCosts());
-        allExports.addAll(exportInfluxDB());
-        return allExports;
     }
 
     private Path createFilePath(String folder, String prefix, String timestamp) {

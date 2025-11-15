@@ -4,20 +4,21 @@ import com.influxdb.client.InfluxDBClient;
 import com.influxdb.query.FluxRecord;
 import com.influxdb.query.FluxTable;
 import com.marvin.export.ExportConfig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Generic base class for exporting data from InfluxDB user buckets.
- * Follows the template method pattern to provide a consistent export workflow
- * while allowing bucket-specific implementations.
+ * Generic base class for exporting data from InfluxDB user buckets. Follows the template method
+ * pattern to provide a consistent export workflow while allowing bucket-specific implementations.
  *
  * @param <T> The type of DTO that will be produced from the InfluxDB data
  */
@@ -32,11 +33,11 @@ public abstract class AbstractInfluxExport<T> {
     protected ExportConfig exportConfig;
 
     /**
-     * Template method that defines the standard export workflow.
-     * This method orchestrates the entire export process.
+     * Template method that defines the standard export workflow. This method orchestrates the
+     * entire export process.
      *
      * @param startTime The start time for the export range (null for default)
-     * @param endTime The end time for the export range (null for default)
+     * @param endTime   The end time for the export range (null for default)
      * @return List of exported DTOs
      */
     public List<T> exportData(Instant startTime, Instant endTime) {
@@ -66,7 +67,8 @@ public abstract class AbstractInfluxExport<T> {
                     .map(Optional::get)
                     .collect(Collectors.toList());
 
-            LOGGER.info("Successfully exported {} records from bucket: {}", result.size(), getBucketName());
+            LOGGER.info("Successfully exported {} records from bucket: {}", result.size(),
+                    getBucketName());
             return result;
 
         } catch (Exception e) {
@@ -79,13 +81,16 @@ public abstract class AbstractInfluxExport<T> {
      * Validates that the required configuration is present and valid.
      */
     protected void validateConfiguration() {
-        if (exportConfig.getInfluxdbUrl() == null || exportConfig.getInfluxdbUrl().trim().isEmpty()) {
+        if (exportConfig.getInfluxdbUrl() == null || exportConfig.getInfluxdbUrl().trim()
+                .isEmpty()) {
             throw new InfluxExportException("InfluxDB URL is not configured");
         }
-        if (exportConfig.getInfluxdbToken() == null || exportConfig.getInfluxdbToken().trim().isEmpty()) {
+        if (exportConfig.getInfluxdbToken() == null || exportConfig.getInfluxdbToken().trim()
+                .isEmpty()) {
             throw new InfluxExportException("InfluxDB token is not configured");
         }
-        if (exportConfig.getInfluxdbOrg() == null || exportConfig.getInfluxdbOrg().trim().isEmpty()) {
+        if (exportConfig.getInfluxdbOrg() == null || exportConfig.getInfluxdbOrg().trim()
+                .isEmpty()) {
             throw new InfluxExportException("InfluxDB organization is not configured");
         }
         if (!exportConfig.isInfluxdbExportEnabled()) {
@@ -109,12 +114,12 @@ public abstract class AbstractInfluxExport<T> {
     }
 
     /**
-     * Gets the default start time for exports (24 hours ago).
+     * Gets the default start time for exports (5 years ago).
      *
      * @return Default start time
      */
     protected Instant getDefaultStartTime() {
-        return Instant.now().minus(24, ChronoUnit.HOURS);
+        return ZonedDateTime.now(ZoneId.of("Europe/Berlin")).minusYears(5).toInstant();
     }
 
     /**
@@ -139,7 +144,7 @@ public abstract class AbstractInfluxExport<T> {
      * Builds a Flux query for exporting data from the bucket.
      *
      * @param startTime The start time for the export range
-     * @param endTime The end time for the export range
+     * @param endTime   The end time for the export range
      * @return A Flux query string
      */
     protected abstract String buildQuery(Instant startTime, Instant endTime);
@@ -156,6 +161,7 @@ public abstract class AbstractInfluxExport<T> {
      * Custom exception for InfluxDB export errors.
      */
     public static class InfluxExportException extends RuntimeException {
+
         public InfluxExportException(String message) {
             super(message);
         }

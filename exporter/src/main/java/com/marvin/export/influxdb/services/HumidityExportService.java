@@ -25,7 +25,23 @@ public class HumidityExportService extends AbstractInfluxExport<SensorDataDTO> {
 
     @Override
     protected String buildQuery(Instant startTime, Instant endTime) {
-        return buildHumiditySensorQuery(startTime, endTime);
+      return InfluxQueryBuilder.from(BUCKET_NAME)
+          .timeRange(startTime, endTime)
+          .measurement("%")
+          .field("value")
+          .map("""
+                    fn: (r) => ({
+                          r with friendly_name:
+                            if r.entity_id == "lumi_lumi_weather_luftfeuchtigkeit" then "Badezimmer"
+                            else if r.entity_id == "lumi_lumi_weather_luftfeuchtigkeit_2" then "Flur"
+                            else if r.entity_id == "lumi_lumi_weather_luftfeuchtigkeit_3" then "Küche"
+                            else if r.entity_id == "lumi_lumi_weather_luftfeuchtigkeit_4" then "Schlafzimmer"
+                            else if r.entity_id == "lumi_lumi_weather_luftfeuchtigkeit_5" then "Wohnzimmer"
+                            else "Nicht bekannt"
+                        })""")
+          .keepOriginalColumns(false)
+          .sort("desc")
+          .build();
     }
 
     @Override
@@ -45,78 +61,5 @@ public class HumidityExportService extends AbstractInfluxExport<SensorDataDTO> {
             LOGGER.error("Failed to convert humidity sensor data record: {}", record, e);
         }
         return Optional.empty();
-    }
-
-    /**
-     * Builds a query for humidity sensor data only.
-     *
-     * @param startTime the start time for the query
-     * @param endTime the end time for the query
-     * @return the Flux query string for humidity sensors
-     */
-    public String buildHumiditySensorQuery(Instant startTime, Instant endTime) {
-        return InfluxQueryBuilder.from(BUCKET_NAME)
-                .timeRange(startTime, endTime)
-                .measurement("%")
-                .field("value")
-                .map("""
-                    fn: (r) => ({
-                          r with friendly_name:
-                            if r.entity_id == "lumi_lumi_weather_luftfeuchtigkeit" then "Badezimmer"
-                            else if r.entity_id == "lumi_lumi_weather_luftfeuchtigkeit_2" then "Flur"
-                            else if r.entity_id == "lumi_lumi_weather_luftfeuchtigkeit_3" then "Küche"
-                            else if r.entity_id == "lumi_lumi_weather_luftfeuchtigkeit_4" then "Schlafzimmer"
-                            else if r.entity_id == "lumi_lumi_weather_luftfeuchtigkeit_5" then "Wohnzimmer"
-                            else "Nicht bekannt"
-                        })""")
-                .keepOriginalColumns(false)
-                .sort("desc")
-                .build();
-    }
-
-    /**
-     * Exports humidity sensor data specifically.
-     *
-     * @param startTime the optional start time for export
-     * @param endTime the optional end time for export
-     * @return list of humidity sensor data objects
-     */
-    public java.util.List<SensorDataDTO> exportHumiditySensors(Instant startTime, Instant endTime) {
-        final Instant actualStartTime = startTime != null ? startTime : getDefaultStartTime();
-        final Instant actualEndTime = endTime != null ? endTime : getDefaultEndTime();
-
-        final String query = buildHumiditySensorQuery(actualStartTime, actualEndTime);
-        return executeQueryAndConvert(query);
-    }
-
-    /**
-     * Main export method that returns humidity data for streaming.
-     *
-     * @param startTime the optional start time for export
-     * @param endTime the optional end time for export
-     * @return stream of humidity sensor data objects
-     */
-    public java.util.stream.Stream<SensorDataDTO> exportHumidityData(Instant startTime, Instant endTime) {
-        return exportHumiditySensors(startTime, endTime).stream();
-    }
-
-    /**
-     * Helper method to execute a query and convert results.
-     *
-     * @param query the Flux query to execute
-     * @return list of converted humidity sensor data DTOs
-     */
-    private java.util.List<SensorDataDTO> executeQueryAndConvert(String query) {
-        try {
-            return executeQuery(query).stream()
-                    .flatMap(table -> table.getRecords().stream())
-                    .map(this::convertRecord)
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .toList();
-        } catch (Exception e) {
-            LOGGER.error("Failed to execute humidity sensor data query: {}", query, e);
-            throw new RuntimeException("Failed to execute humidity sensor data query", e);
-        }
     }
 }
