@@ -1,19 +1,13 @@
 package com.marvin.export;
 
-import com.marvin.export.influxdb.services.SystemMetricsExportService;
-import com.marvin.export.influxdb.services.SensorDataExportService;
-import com.marvin.export.influxdb.services.TemperatureExportService;
 import com.marvin.export.influxdb.services.HumidityExportService;
 import com.marvin.export.influxdb.services.SensorDataAggregatedExportService;
-import com.marvin.export.influxdb.services.CostsExportService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
-
+import com.marvin.export.influxdb.services.SystemMetricsExportService;
+import com.marvin.export.influxdb.services.TemperatureExportService;
 import java.nio.file.Path;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -21,6 +15,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
+import lombok.Getter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 /**
  * Main orchestrator for exporting data from InfluxDB user buckets.
@@ -36,41 +34,33 @@ public class InfluxExporter {
             DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
 
     private static final String SYSTEM_METRICS_FILENAME_PREFIX = "system_metrics_";
-    private static final String SENSOR_DATA_FILENAME_PREFIX = "sensor_data_";
     private static final String TEMPERATURE_FILENAME_PREFIX = "temperature_";
     private static final String HUMIDITY_FILENAME_PREFIX = "humidity_";
     private static final String SENSOR_DATA_AGGREGATED_FILENAME_PREFIX = "sensor_data_30m_";
     private static final String TEMPERATURE_AGGREGATED_FILENAME_PREFIX = "temperature_30m_";
     private static final String HUMIDITY_AGGREGATED_FILENAME_PREFIX = "humidity_30m_";
-    private static final String COSTS_FILENAME_PREFIX = "costs_";
     private static final String FILE_EXTENSION = ".jsonl";
 
     private final ExportConfig exportConfig;
     private final ExportFileWriter exportFileWriter;
     private final SystemMetricsExportService systemMetricsExportService;
-    private final SensorDataExportService sensorDataExportService;
     private final TemperatureExportService temperatureExportService;
     private final HumidityExportService humidityExportService;
     private final SensorDataAggregatedExportService sensorDataAggregatedExportService;
-    private final CostsExportService costsExportService;
 
     public InfluxExporter(
             ExportConfig exportConfig,
             ExportFileWriter exportFileWriter,
             SystemMetricsExportService systemMetricsExportService,
-            SensorDataExportService sensorDataExportService,
             TemperatureExportService temperatureExportService,
             HumidityExportService humidityExportService,
-            SensorDataAggregatedExportService sensorDataAggregatedExportService,
-            CostsExportService costsExportService) {
+            SensorDataAggregatedExportService sensorDataAggregatedExportService) {
         this.exportConfig = exportConfig;
         this.exportFileWriter = exportFileWriter;
         this.systemMetricsExportService = systemMetricsExportService;
-        this.sensorDataExportService = sensorDataExportService;
         this.temperatureExportService = temperatureExportService;
         this.humidityExportService = humidityExportService;
         this.sensorDataAggregatedExportService = sensorDataAggregatedExportService;
-        this.costsExportService = costsExportService;
     }
 
     /**
@@ -99,7 +89,7 @@ public class InfluxExporter {
         LOGGER.info("Starting export of selected InfluxDB buckets: {}", buckets);
 
         final String timestamp = LocalDateTime.now().format(FILE_DATE_TIME_FORMATTER);
-        final String influxExportFolder = exportConfig.getCostExportFolder(); // Reuse same folder
+        final String influxExportFolder = exportConfig.getCostExportFolder();
 
         final List<Path> exportedFiles = new ArrayList<>();
 
@@ -110,11 +100,6 @@ public class InfluxExporter {
                             createFilePath(influxExportFolder, SYSTEM_METRICS_FILENAME_PREFIX, timestamp),
                             () -> systemMetricsExportService.exportData(null, null).stream(),
                             "system metrics"
-                    );
-                    case SENSOR_DATA -> exportBucket(
-                            createFilePath(influxExportFolder, SENSOR_DATA_FILENAME_PREFIX, timestamp),
-                            () -> sensorDataExportService.exportData(null, null).stream(),
-                            "sensor data"
                     );
                     case TEMPERATURE -> exportBucket(
                             createFilePath(influxExportFolder, TEMPERATURE_FILENAME_PREFIX, timestamp),
@@ -142,16 +127,9 @@ public class InfluxExporter {
                             () -> sensorDataAggregatedExportService.exportHumidityData(null, null),
                             "aggregated humidity data"
                     );
-                    case COSTS -> exportBucket(
-                            createFilePath(influxExportFolder, COSTS_FILENAME_PREFIX, timestamp),
-                            () -> costsExportService.exportData(null, null).stream(),
-                            "costs"
-                    );
                 };
 
-                if (filePath != null) {
-                    exportedFiles.add(filePath);
-                }
+              exportedFiles.add(filePath);
             } catch (Exception e) {
                 LOGGER.error("Failed to export bucket: {}", bucket, e);
                 // Continue with other buckets instead of failing completely
@@ -180,13 +158,11 @@ public class InfluxExporter {
 
         final String filenamePrefix = switch (bucket) {
             case SYSTEM_METRICS -> SYSTEM_METRICS_FILENAME_PREFIX;
-            case SENSOR_DATA -> SENSOR_DATA_FILENAME_PREFIX;
             case TEMPERATURE -> TEMPERATURE_FILENAME_PREFIX;
             case HUMIDITY -> HUMIDITY_FILENAME_PREFIX;
             case SENSOR_DATA_AGGREGATED -> SENSOR_DATA_AGGREGATED_FILENAME_PREFIX;
             case TEMPERATURE_AGGREGATED -> TEMPERATURE_AGGREGATED_FILENAME_PREFIX;
             case HUMIDITY_AGGREGATED -> HUMIDITY_AGGREGATED_FILENAME_PREFIX;
-            case COSTS -> COSTS_FILENAME_PREFIX;
         };
 
         return switch (bucket) {
@@ -194,11 +170,6 @@ public class InfluxExporter {
                     createFilePath(influxExportFolder, filenamePrefix, timestamp),
                     () -> systemMetricsExportService.exportData(startTime, endTime).stream(),
                     "system metrics"
-            );
-            case SENSOR_DATA -> exportBucket(
-                    createFilePath(influxExportFolder, filenamePrefix, timestamp),
-                    () -> sensorDataExportService.exportData(startTime, endTime).stream(),
-                    "sensor data"
             );
             case TEMPERATURE -> exportBucket(
                     createFilePath(influxExportFolder, filenamePrefix, timestamp),
@@ -225,11 +196,6 @@ public class InfluxExporter {
                     () -> sensorDataAggregatedExportService.exportHumidityData(startTime, endTime),
                     "aggregated humidity data"
             );
-            case COSTS -> exportBucket(
-                    createFilePath(influxExportFolder, filenamePrefix, timestamp),
-                    () -> costsExportService.exportData(startTime, endTime).stream(),
-                    "costs"
-            );
         };
     }
 
@@ -254,15 +220,14 @@ public class InfluxExporter {
     /**
      * Enumeration of available InfluxDB user buckets for export.
      */
+    @Getter
     public enum InfluxBucket {
         SYSTEM_METRICS("system_metrics", "System performance metrics (CPU, memory, disk, network)"),
-        SENSOR_DATA("sensor_data", "Real-time IoT sensor data"),
         TEMPERATURE("sensor_data", "Temperature sensor data"),
         HUMIDITY("sensor_data", "Humidity sensor data"),
         SENSOR_DATA_AGGREGATED("sensor_data_30m", "30-minute aggregated sensor data"),
         TEMPERATURE_AGGREGATED("sensor_data_30m", "30-minute aggregated temperature data"),
-        HUMIDITY_AGGREGATED("sensor_data_30m", "30-minute aggregated humidity data"),
-        COSTS("costs", "Cost-related metrics");
+        HUMIDITY_AGGREGATED("sensor_data_30m", "30-minute aggregated humidity data");
 
         private final String bucketName;
         private final String description;
@@ -270,14 +235,6 @@ public class InfluxExporter {
         InfluxBucket(String bucketName, String description) {
             this.bucketName = bucketName;
             this.description = description;
-        }
-
-        public String getBucketName() {
-            return bucketName;
-        }
-
-        public String getDescription() {
-            return description;
         }
     }
 }

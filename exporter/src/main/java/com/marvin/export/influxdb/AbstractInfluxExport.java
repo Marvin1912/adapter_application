@@ -153,13 +153,6 @@ public abstract class AbstractInfluxExport<T> {
     protected abstract Optional<T> convertRecord(FluxRecord record);
 
     /**
-     * Returns a description of the data type being exported for logging purposes.
-     *
-     * @return Description of the export data type
-     */
-    protected abstract String getDataTypeDescription();
-
-    /**
      * Custom exception for InfluxDB export errors.
      */
     public static class InfluxExportException extends RuntimeException {

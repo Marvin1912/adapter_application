@@ -5,13 +5,9 @@ import com.marvin.export.influxdb.AbstractInfluxExport;
 import com.marvin.export.influxdb.InfluxQueryBuilder;
 import com.marvin.export.influxdb.dto.SensorDataDTO;
 import com.marvin.export.influxdb.handlers.DataTypeHandler;
-import com.marvin.export.influxdb.mappings.MeasurementMappings;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import org.springframework.stereotype.Service;
-
 import java.time.Instant;
 import java.util.Optional;
+import org.springframework.stereotype.Service;
 
 /**
  * Export service for humidity sensor data from the sensor_data bucket.
@@ -49,11 +45,6 @@ public class HumidityExportService extends AbstractInfluxExport<SensorDataDTO> {
             LOGGER.error("Failed to convert humidity sensor data record: {}", record, e);
         }
         return Optional.empty();
-    }
-
-    @Override
-    protected String getDataTypeDescription() {
-        return "Humidity sensor data from IoT devices";
     }
 
     /**

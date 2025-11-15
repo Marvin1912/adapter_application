@@ -17,13 +17,8 @@ public class InfluxQueryBuilder {
     private String endTime;
     private final List<String> measurementFilters = new ArrayList<>();
     private final List<String> fieldFilters = new ArrayList<>();
-    private final List<String> tagFilters = new ArrayList<>();
-    private final List<String> rangeFilters = new ArrayList<>();
-    private final List<String> aggregateFunctions = new ArrayList<>();
     private final List<String> mapFunctions = new ArrayList<>();
     private String sortDirection;
-    private Integer limit;
-    private Integer offset;
     private boolean keepOriginalColumns = true;
 
     private InfluxQueryBuilder(String bucket) {
@@ -44,19 +39,6 @@ public class InfluxQueryBuilder {
     }
 
     /**
-     * Sets the time range for the query.
-     *
-     * @param start The start time (in ISO-8601 format or Flux duration)
-     * @param end The end time (in ISO-8601 format or Flux duration)
-     * @return This builder for method chaining
-     */
-    public InfluxQueryBuilder timeRange(String start, String end) {
-        this.startTime = start;
-        this.endTime = end;
-        return this;
-    }
-
-    /**
      * Sets the time range for the query using Instant objects.
      *
      * @param start The start time
@@ -66,18 +48,6 @@ public class InfluxQueryBuilder {
     public InfluxQueryBuilder timeRange(Instant start, Instant end) {
         this.startTime = start.truncatedTo(ChronoUnit.MILLIS).toString();
         this.endTime = end.truncatedTo(ChronoUnit.MILLIS).toString();
-        return this;
-    }
-
-    /**
-     * Sets a relative time range from the specified start time to now.
-     *
-     * @param startDuration The start duration (e.g., "-24h", "-7d")
-     * @return This builder for method chaining
-     */
-    public InfluxQueryBuilder relativeTimeRange(String startDuration) {
-        this.startTime = startDuration;
-        this.endTime = "now()";
         return this;
     }
 
@@ -103,7 +73,7 @@ public class InfluxQueryBuilder {
         for (String measurement : measurements) {
             joiner.add(String.format("r._measurement == \"%s\"", measurement));
         }
-        this.measurementFilters.add("(" + joiner.toString() + ")");
+        this.measurementFilters.add("(" + joiner + ")");
         return this;
     }
 
@@ -115,100 +85,6 @@ public class InfluxQueryBuilder {
      */
     public InfluxQueryBuilder field(String field) {
         this.fieldFilters.add(String.format("r._field == \"%s\"", field));
-        return this;
-    }
-
-    /**
-     * Filters by one of multiple field names.
-     *
-     * @param fields The field names to filter by
-     * @return This builder for method chaining
-     */
-    public InfluxQueryBuilder fields(String... fields) {
-        final StringJoiner joiner = new StringJoiner(" or ");
-        for (String field : fields) {
-            joiner.add(String.format("r._field == \"%s\"", field));
-        }
-        this.fieldFilters.add("(" + joiner.toString() + ")");
-        return this;
-    }
-
-    /**
-     * Filters by tag value.
-     *
-     * @param tagName The tag name
-     * @param tagValue The tag value
-     * @return This builder for method chaining
-     */
-    public InfluxQueryBuilder tag(String tagName, String tagValue) {
-        this.tagFilters.add(String.format("r.%s == \"%s\"", tagName, tagValue));
-        return this;
-    }
-
-    /**
-     * Filters by tag value using a regex pattern.
-     *
-     * @param tagName The tag name
-     * @param regexPattern The regex pattern to match
-     * @return This builder for method chaining
-     */
-    public InfluxQueryBuilder tagRegex(String tagName, String regexPattern) {
-        this.tagFilters.add(String.format("r.%s =~ /%s/", tagName, regexPattern));
-        return this;
-    }
-
-    /**
-     * Filters by field value range.
-     *
-     * @param field The field name
-     * @param minValue The minimum value (inclusive)
-     * @param maxValue The maximum value (inclusive)
-     * @return This builder for method chaining
-     */
-    public InfluxQueryBuilder valueRange(String field, Number minValue, Number maxValue) {
-        this.rangeFilters.add(String.format("r.%s >= %f and r.%s <= %f", field, minValue, field, maxValue));
-        return this;
-    }
-
-    /**
-     * Filters by field value greater than or equal to specified value.
-     *
-     * @param field The field name
-     * @param minValue The minimum value (inclusive)
-     * @return This builder for method chaining
-     */
-    public InfluxQueryBuilder minValue(String field, Number minValue) {
-        this.rangeFilters.add(String.format("r.%s >= %f", field, minValue));
-        return this;
-    }
-
-    /**
-     * Adds an aggregate function to the query.
-     *
-     * @param function The aggregate function (e.g., "mean", "sum", "count")
-     * @param column The column to aggregate
-     * @return This builder for method chaining
-     */
-    public InfluxQueryBuilder aggregate(String function, String column) {
-        final String aggregate = String.format(
-                "|> aggregateWindow(every: inf, fn: %s, column: \"%s\")",
-                function, column
-        );
-        this.aggregateFunctions.add(aggregate);
-        return this;
-    }
-
-    /**
-     * Adds time-based aggregation with a specified window.
-     *
-     * @param window The window size (e.g., "1h", "30m", "1d")
-     * @param function The aggregate function (e.g., "mean", "sum", "count")
-     * @return This builder for method chaining
-     */
-    public InfluxQueryBuilder timeWindow(String window, String function) {
-        final String windowAggregate = String.format(
-            "|> aggregateWindow(every: %s, fn: %s, createEmpty: false)", window, function);
-        this.aggregateFunctions.add(windowAggregate);
         return this;
     }
 
@@ -234,28 +110,6 @@ public class InfluxQueryBuilder {
             throw new IllegalArgumentException("Sort direction must be 'asc' or 'desc'");
         }
         this.sortDirection = direction.toLowerCase();
-        return this;
-    }
-
-    /**
-     * Sets the maximum number of results to return.
-     *
-     * @param limitValue The maximum number of results
-     * @return This builder for method chaining
-     */
-    public InfluxQueryBuilder limit(int limitValue) {
-        this.limit = limitValue;
-        return this;
-    }
-
-    /**
-     * Sets the number of results to skip.
-     *
-     * @param offsetValue The number of results to skip
-     * @return This builder for method chaining
-     */
-    public InfluxQueryBuilder offset(int offsetValue) {
-        this.offset = offsetValue;
         return this;
     }
 
@@ -293,18 +147,11 @@ public class InfluxQueryBuilder {
         final List<String> allFilters = new ArrayList<>();
         allFilters.addAll(measurementFilters);
         allFilters.addAll(fieldFilters);
-        allFilters.addAll(tagFilters);
-        allFilters.addAll(rangeFilters);
 
         if (!allFilters.isEmpty()) {
             query.append("\n  |> filter(fn: (r) => ");
             query.append(String.join(" and ", allFilters));
             query.append(")");
-        }
-
-        // Add aggregate functions
-        for (String aggregate : aggregateFunctions) {
-            query.append("\n  ").append(aggregate);
         }
 
         // Add map functions
@@ -317,55 +164,11 @@ public class InfluxQueryBuilder {
             query.append(String.format("\n  |> sort(columns: [\"_time\"], desc: %s)", "desc".equals(sortDirection)));
         }
 
-        // Add limit and offset
-        if (limit != null) {
-            query.append(String.format("\n  |> limit(n: %d", limit));
-            if (offset != null) {
-                query.append(String.format(", offset: %d", offset));
-            }
-            query.append(")");
-        } else if (offset != null) {
-            query.append(String.format("\n  |> limit(n: 1000, offset: %d)", offset));
-        }
-
         // Keep original columns if requested
         if (keepOriginalColumns) {
             query.append("\n  |> keep(columns: [\"_measurement\", \"_field\", \"_value\", \"_time\"])");
         }
 
         return query.toString();
-    }
-
-    /**
-     * Creates a simple query for all data in a bucket within the last 24 hours.
-     *
-     * @param bucket The bucket name
-     * @return A simple Flux query
-     */
-    public static String simpleQuery(String bucket) {
-        return from(bucket).build();
-    }
-
-    /**
-     * Creates a query for a specific measurement within the last 24 hours.
-     *
-     * @param bucket The bucket name
-     * @param measurement The measurement name
-     * @return A Flux query for the specific measurement
-     */
-    public static String measurementQuery(String bucket, String measurement) {
-        return from(bucket).measurement(measurement).build();
-    }
-
-    /**
-     * Creates a time-range query for all data in a bucket.
-     *
-     * @param bucket The bucket name
-     * @param startTime The start time
-     * @param endTime The end time
-     * @return A Flux query with the specified time range
-     */
-    public static String timeRangeQuery(String bucket, Instant startTime, Instant endTime) {
-        return from(bucket).timeRange(startTime, endTime).build();
     }
 }

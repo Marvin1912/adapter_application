@@ -5,11 +5,11 @@ import com.marvin.export.influxdb.AbstractInfluxExport;
 import com.marvin.export.influxdb.InfluxQueryBuilder;
 import com.marvin.export.influxdb.dto.SensorDataDTO;
 import com.marvin.export.influxdb.handlers.DataTypeHandler;
-import com.marvin.export.influxdb.mappings.MeasurementMappings;
-import org.springframework.stereotype.Service;
-
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
+import org.springframework.stereotype.Service;
 
 /**
  * Export service for temperature sensor data from the sensor_data bucket.
@@ -49,11 +49,6 @@ public class TemperatureExportService extends AbstractInfluxExport<SensorDataDTO
         return Optional.empty();
     }
 
-    @Override
-    protected String getDataTypeDescription() {
-        return "Temperature sensor data from IoT devices";
-    }
-
     /**
      * Builds a query for temperature sensor data only.
      *
@@ -62,13 +57,23 @@ public class TemperatureExportService extends AbstractInfluxExport<SensorDataDTO
      * @return the Flux query string for temperature sensors
      */
     public String buildTemperatureSensorQuery(Instant startTime, Instant endTime) {
-        return InfluxQueryBuilder.from(BUCKET_NAME)
-                .timeRange(startTime, endTime)
-                .measurements("sensor", "climate")
-                .fields("temperature", "value")
-                .tagRegex("device_class", "(temperature|thermal)")
-                .sort("desc")
-                .build();
+      return InfluxQueryBuilder.from(BUCKET_NAME)
+          .timeRange(startTime, endTime)
+          .measurement("%")
+          .field("value")
+          .map("""
+                    fn: (r) => ({
+                          r with friendly_name:
+                            if r.entity_id == "lumi_lumi_weather_temperatur" then "Badezimmer"
+                            else if r.entity_id == "lumi_lumi_weather_temperatur_2" then "Flur"
+                            else if r.entity_id == "lumi_lumi_weather_temperatur_3" then "Küche"
+                            else if r.entity_id == "lumi_lumi_weather_temperatur_4" then "Schlafzimmer"
+                            else if r.entity_id == "lumi_lumi_weather_temperatur_5" then "Wohnzimmer"
+                            else "Nicht bekannt"
+                        })""")
+          .keepOriginalColumns(false)
+          .sort("desc")
+          .build();
     }
 
     /**
@@ -78,7 +83,7 @@ public class TemperatureExportService extends AbstractInfluxExport<SensorDataDTO
      * @param endTime the optional end time for export
      * @return list of temperature sensor data objects
      */
-    public java.util.List<SensorDataDTO> exportTemperatureSensors(
+    public List<SensorDataDTO> exportTemperatureSensors(
             Instant startTime, Instant endTime) {
         final Instant actualStartTime = startTime != null ? startTime : getDefaultStartTime();
         final Instant actualEndTime = endTime != null ? endTime : getDefaultEndTime();
@@ -94,7 +99,7 @@ public class TemperatureExportService extends AbstractInfluxExport<SensorDataDTO
      * @param endTime the optional end time for export
      * @return stream of temperature sensor data objects
      */
-    public java.util.stream.Stream<SensorDataDTO> exportTemperatureData(Instant startTime, Instant endTime) {
+    public Stream<SensorDataDTO> exportTemperatureData(Instant startTime, Instant endTime) {
         return exportTemperatureSensors(startTime, endTime).stream();
     }
 
@@ -104,7 +109,7 @@ public class TemperatureExportService extends AbstractInfluxExport<SensorDataDTO
      * @param query the Flux query to execute
      * @return list of converted temperature sensor data DTOs
      */
-    private java.util.List<SensorDataDTO> executeQueryAndConvert(String query) {
+    private List<SensorDataDTO> executeQueryAndConvert(String query) {
         try {
             return executeQuery(query).stream()
                     .flatMap(table -> table.getRecords().stream())
