@@ -25,7 +25,7 @@ public class TemperatureExportService extends AbstractInfluxExport<SensorDataDTO
 
     @Override
     protected String buildQuery(Instant startTime, Instant endTime) {
-      return InfluxQueryBuilder.from(BUCKET_NAME)
+      return InfluxQueryBuilder.from(getBucketName())
           .timeRange(startTime, endTime)
           .measurement("°C")
           .field("value")

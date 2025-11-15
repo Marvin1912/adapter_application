@@ -1,7 +1,6 @@
 package com.marvin.export.influxdb.handlers;
 
 import com.influxdb.query.FluxRecord;
-import com.marvin.export.influxdb.dto.SensorDataAggregatedDTO;
 import com.marvin.export.influxdb.dto.SensorDataDTO;
 import com.marvin.export.influxdb.dto.SystemMetricsDTO;
 import com.marvin.export.influxdb.mappings.MeasurementMappings;
@@ -12,222 +11,130 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Handles the conversion of FluxRecord objects to appropriate DTOs based on data type. This class
- * processes the different data types from each bucket and performs proper type conversion.
+ * Handles the conversion of FluxRecord objects to appropriate DTOs based on data type. This class processes the different data types from each bucket and
+ * performs proper type conversion.
  */
 public class DataTypeHandler {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(DataTypeHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DataTypeHandler.class);
 
-  /**
-   * Converts a FluxRecord to the appropriate DTO based on the bucket name.
-   *
-   * @param record     The FluxRecord to convert
-   * @param bucketName The name of the bucket the record came from
-   * @return the appropriate DTO if conversion was successful, null otherwise
-   */
-  public static Object convertRecord(FluxRecord record, String bucketName) {
-    try {
-      return switch (bucketName.toLowerCase()) {
-        case "system_metrics" -> convertToSystemMetricsDTO(record);
-        case "sensor_data" -> convertToSensorDataDTO(record);
-        case "sensor_data_30m" -> convertToSensorDataAggregatedDTO(record);
-        default -> {
-          LOGGER.warn("Unknown bucket name: {}", bucketName);
-          yield null;
+    /**
+     * Converts a FluxRecord to the appropriate DTO based on the bucket name.
+     *
+     * @param record     The FluxRecord to convert
+     * @param bucketName The name of the bucket the record came from
+     * @return the appropriate DTO if conversion was successful, null otherwise
+     */
+    public static Object convertRecord(FluxRecord record, String bucketName) {
+        try {
+            return switch (bucketName.toLowerCase()) {
+                case "system_metrics" -> convertToSystemMetricsDTO(record);
+                case "sensor_data", "sensor_data_30m" -> convertToSensorDataDTO(record);
+                default -> {
+                    LOGGER.warn("Unknown bucket name: {}", bucketName);
+                    yield null;
+                }
+            };
+        } catch (Exception e) {
+            LOGGER.error("Failed to convert record from bucket: {}", bucketName, e);
+            return null;
         }
-      };
-    } catch (Exception e) {
-      LOGGER.error("Failed to convert record from bucket: {}", bucketName, e);
-      return null;
     }
-  }
 
-  /**
-   * Converts a FluxRecord to SystemMetricsDTO.
-   *
-   * @param record the FluxRecord to convert
-   * @return SystemMetricsDTO the converted DTO
-   */
-  private static SystemMetricsDTO convertToSystemMetricsDTO(FluxRecord record) {
-    final String measurement = record.getMeasurement();
-    final Instant timestamp = record.getTime();
+    /**
+     * Converts a FluxRecord to SystemMetricsDTO.
+     *
+     * @param record the FluxRecord to convert
+     * @return SystemMetricsDTO the converted DTO
+     */
+    private static SystemMetricsDTO convertToSystemMetricsDTO(FluxRecord record) {
+        final String measurement = record.getMeasurement();
+        final Instant timestamp = record.getTime();
 
-    final Map<String, Object> fields = new HashMap<>();
-    final Map<String, String> tags = new HashMap<>();
+        final Map<String, Object> fields = new HashMap<>();
+        final Map<String, String> tags = new HashMap<>();
 
-    // Extract fields and tags from the record
-    record.getValues().forEach((key, value) -> {
-      if (value != null) {
-        if (key.equals("_field")) {
-          fields.put(value.toString(), MeasurementMappings.DataTypeConverter
-              .convertToExpectedType(value.toString(), record.getValue(), "system_metrics"));
-        } else if (!key.startsWith("_") && !key.equals("table")) {
-          tags.put(key, value.toString());
+        // Extract fields and tags from the record
+        record.getValues().forEach((key, value) -> {
+            if (value != null) {
+                if (key.equals("_field")) {
+                    fields.put(value.toString(), MeasurementMappings.DataTypeConverter
+                            .convertToExpectedType(value.toString(), record.getValue(), "system_metrics"));
+                } else if (!key.startsWith("_") && !key.equals("table")) {
+                    tags.put(key, value.toString());
+                }
+            }
+        });
+
+        // Add the field/value pair for this record
+        if (record.getField() != null && record.getValue() != null) {
+            fields.put(record.getField(), MeasurementMappings.DataTypeConverter
+                    .convertToExpectedType(record.getField(), record.getValue(), "system_metrics"));
         }
-      }
-    });
 
-    // Add the field/value pair for this record
-    if (record.getField() != null && record.getValue() != null) {
-      fields.put(record.getField(), MeasurementMappings.DataTypeConverter
-          .convertToExpectedType(record.getField(), record.getValue(), "system_metrics"));
+        return new SystemMetricsDTO(measurement, null, timestamp, fields, tags);
     }
 
-    return new SystemMetricsDTO(measurement, null, timestamp, fields, tags);
-  }
+    /**
+     * Converts a FluxRecord to SensorDataDTO.
+     *
+     * @param record the FluxRecord to convert
+     * @return SensorDataDTO the converted DTO
+     */
+    private static SensorDataDTO convertToSensorDataDTO(FluxRecord record) {
+        final String measurement = record.getMeasurement();
+        final Instant timestamp = record.getTime();
 
-  /**
-   * Converts a FluxRecord to SensorDataDTO.
-   *
-   * @param record the FluxRecord to convert
-   * @return SensorDataDTO the converted DTO
-   */
-  private static SensorDataDTO convertToSensorDataDTO(FluxRecord record) {
-    final String measurement = record.getMeasurement();
-    final Instant timestamp = record.getTime();
+        final Map<String, Object> fields = new HashMap<>();
+        final Map<String, String> tags = new HashMap<>();
 
-    final Map<String, Object> fields = new HashMap<>();
-    final Map<String, String> tags = new HashMap<>();
+        // Extract fields and tags from the record
+        record.getValues().forEach((key, value) -> {
+            if (value != null) {
+                if (key.equals("_field")) {
+                    fields.put(value.toString(), MeasurementMappings.DataTypeConverter
+                            .convertToExpectedType(value.toString(), record.getValue(), "sensor_data"));
+                } else if (!key.startsWith("_") && !key.equals("table")) {
+                    tags.put(key, value.toString());
+                }
+            }
+        });
 
-    // Extract fields and tags from the record
-    record.getValues().forEach((key, value) -> {
-      if (value != null) {
-        if (key.equals("_field")) {
-          fields.put(value.toString(), MeasurementMappings.DataTypeConverter
-              .convertToExpectedType(value.toString(), record.getValue(), "sensor_data"));
-        } else if (!key.startsWith("_") && !key.equals("table")) {
-          tags.put(key, value.toString());
+        // Add the field/value pair for this record
+        if (record.getField() != null && record.getValue() != null) {
+            fields.put(record.getField(), MeasurementMappings.DataTypeConverter
+                    .convertToExpectedType(record.getField(), record.getValue(), "sensor_data"));
         }
-      }
-    });
 
-    // Add the field/value pair for this record
-    if (record.getField() != null && record.getValue() != null) {
-      fields.put(record.getField(), MeasurementMappings.DataTypeConverter
-          .convertToExpectedType(record.getField(), record.getValue(), "sensor_data"));
+        // Extract common sensor attributes from tags
+        final String entityId = tags.get("entity_id");
+        final String friendlyName = tags.get("friendly_name");
+
+        return new SensorDataDTO(measurement, entityId, friendlyName, timestamp, fields, tags);
     }
 
-    // Extract common sensor attributes from tags
-    final String entityId = tags.get("entity_id");
-    final String friendlyName = tags.get("friendly_name");
-
-    return new SensorDataDTO(measurement, entityId, friendlyName, timestamp, fields, tags);
-  }
-
-  /**
-   * Converts a FluxRecord to SensorDataAggregatedDTO.
-   *
-   * @param record the FluxRecord to convert
-   * @return SensorDataAggregatedDTO the converted DTO
-   */
-  private static SensorDataAggregatedDTO convertToSensorDataAggregatedDTO(FluxRecord record) {
-    final String measurement = record.getMeasurement();
-    final Instant timestamp = record.getTime();
-
-    final Map<String, Object> fields = new HashMap<>();
-    final Map<String, String> tags = new HashMap<>();
-
-    // Extract fields and tags from the record
-    record.getValues().forEach((key, value) -> {
-      if (value != null) {
-        if (key.equals("_field")) {
-          fields.put(value.toString(), MeasurementMappings.DataTypeConverter
-              .convertToExpectedType(value.toString(), record.getValue(), "sensor_data_30m"));
-        } else if (!key.startsWith("_") && !key.equals("table")) {
-          tags.put(key, value.toString());
+    public static boolean validateDTO(Object dto, String bucketName) {
+        try {
+            return switch (bucketName.toLowerCase()) {
+                case "system_metrics" -> validateSystemMetricsDTO((SystemMetricsDTO) dto);
+                case "sensor_data", "sensor_data_30m" -> validateSensorDataDTO((SensorDataDTO) dto);
+                default -> false;
+            };
+        } catch (Exception e) {
+            LOGGER.debug("DTO validation failed for bucket: {}", bucketName, e);
+            return false;
         }
-      }
-    });
-
-    // Add the field/value pair for this record
-    if (record.getField() != null && record.getValue() != null) {
-      fields.put(record.getField(), MeasurementMappings.DataTypeConverter
-          .convertToExpectedType(record.getField(), record.getValue(), "sensor_data_30m"));
     }
 
-    // Extract common sensor attributes from tags
-    final String entityId = tags.get("entity_id");
-    final String friendlyName = tags.get("friendly_name");
-    final String deviceClass = tags.get("device_class");
-    final String unitOfMeasurement = tags.get("unit_of_measurement");
-
-    // For aggregated data, we'll use the record timestamp as window start
-    // and estimate window end based on aggregation window tag
-    final Instant windowStart = timestamp;
-    Instant windowEnd = timestamp;
-    final String windowTag = tags.get("window");
-    if (windowTag != null) {
-      windowEnd = estimateWindowEnd(timestamp, windowTag);
+    private static boolean validateSystemMetricsDTO(SystemMetricsDTO dto) {
+        return dto.measurement() != null &&
+                dto.timestamp() != null &&
+                !dto.fields().isEmpty();
     }
 
-    return new SensorDataAggregatedDTO(measurement, entityId, friendlyName, deviceClass,
-        unitOfMeasurement, windowStart, windowEnd,
-        fields, tags);
-  }
-
-  /**
-   * Estimates the window end time based on the aggregation window tag.
-   *
-   * @param windowStart the starting time of the window
-   * @param windowTag   the window tag indicating duration (e.g., "30m", "1h", "1d")
-   * @return the estimated window end time
-   */
-  private static Instant estimateWindowEnd(Instant windowStart, String windowTag) {
-    try {
-      int rawTime = Integer.parseInt(windowTag.substring(0, windowTag.length() - 1));
-      if (windowTag.endsWith("m")) {
-        return windowStart.plusSeconds(rawTime * 60L);
-      } else if (windowTag.endsWith("h")) {
-        return windowStart.plusSeconds(rawTime * 3600L);
-      } else if (windowTag.endsWith("d")) {
-        return windowStart.plusSeconds(rawTime * 86400L);
-      }
-    } catch (NumberFormatException e) {
-      LOGGER.debug("Could not parse window tag: {}", windowTag);
+    private static boolean validateSensorDataDTO(SensorDataDTO dto) {
+        return dto.measurement() != null &&
+                dto.timestamp() != null &&
+                !dto.fields().isEmpty();
     }
-
-    // Default to 30 minutes if parsing fails
-    return windowStart.plusSeconds(1800L);
-  }
-
-  /**
-   * Validates that a DTO contains required fields for its type.
-   *
-   * @param dto        the data transfer object to validate
-   * @param bucketName the bucket name to determine validation rules
-   * @return true if the DTO is valid for its type, false otherwise
-   */
-  public static boolean validateDTO(Object dto, String bucketName) {
-    try {
-      return switch (bucketName.toLowerCase()) {
-        case "system_metrics" -> validateSystemMetricsDTO((SystemMetricsDTO) dto);
-        case "sensor_data" -> validateSensorDataDTO((SensorDataDTO) dto);
-        case "sensor_data_30m" -> validateSensorDataAggregatedDTO((SensorDataAggregatedDTO) dto);
-        default -> false;
-      };
-    } catch (Exception e) {
-      LOGGER.debug("DTO validation failed for bucket: {}", bucketName, e);
-      return false;
-    }
-  }
-
-  private static boolean validateSystemMetricsDTO(SystemMetricsDTO dto) {
-    return dto.measurement() != null &&
-        dto.timestamp() != null &&
-        !dto.fields().isEmpty();
-  }
-
-  private static boolean validateSensorDataDTO(SensorDataDTO dto) {
-    return dto.measurement() != null &&
-        dto.timestamp() != null &&
-        !dto.fields().isEmpty();
-  }
-
-  private static boolean validateSensorDataAggregatedDTO(SensorDataAggregatedDTO dto) {
-    return dto.measurement() != null &&
-        dto.windowStart() != null &&
-        dto.windowEnd() != null &&
-        !dto.fields().isEmpty();
-  }
 }
