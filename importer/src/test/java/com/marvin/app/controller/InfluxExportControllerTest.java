@@ -8,7 +8,10 @@ import static org.mockito.Mockito.mock;
 
 import com.marvin.app.controller.dto.InfluxBucketResponse;
 import com.marvin.export.InfluxExporter;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -43,48 +46,22 @@ class InfluxExportControllerTest {
 
         List<InfluxBucketResponse.InfluxBucketDTO> buckets = response.getBody().getBuckets();
         assertNotNull(buckets);
-        assertEquals(5, buckets.size());
+        assertFalse(buckets.isEmpty());
 
-        // Verify each bucket has correct information
-        InfluxBucketResponse.InfluxBucketDTO systemMetrics = buckets.stream()
-                .filter(bucket -> "SYSTEM_METRICS".equals(bucket.getName()))
-                .findFirst()
-                .orElse(null);
-        assertNotNull(systemMetrics);
-        assertEquals("system_metrics", systemMetrics.getBucketName());
-        assertEquals("System performance metrics (CPU, memory, disk, network)", systemMetrics.getDescription());
+        // Verify that response contains same number of buckets as enum
+        int expectedBucketCount = InfluxExporter.InfluxBucket.values().length;
+        assertEquals(expectedBucketCount, buckets.size());
 
-        InfluxBucketResponse.InfluxBucketDTO temperature = buckets.stream()
-                .filter(bucket -> "TEMPERATURE".equals(bucket.getName()))
-                .findFirst()
-                .orElse(null);
-        assertNotNull(temperature);
-        assertEquals("sensor_data", temperature.getBucketName());
-        assertEquals("Temperature sensor data", temperature.getDescription());
+        // Verify all bucket names are unique and correspond to enum values
+        Set<String> responseBucketNames = buckets.stream()
+                .map(InfluxBucketResponse.InfluxBucketDTO::getName)
+                .collect(Collectors.toSet());
 
-        InfluxBucketResponse.InfluxBucketDTO humidity = buckets.stream()
-                .filter(bucket -> "HUMIDITY".equals(bucket.getName()))
-                .findFirst()
-                .orElse(null);
-        assertNotNull(humidity);
-        assertEquals("sensor_data", humidity.getBucketName());
-        assertEquals("Humidity sensor data", humidity.getDescription());
+        Set<String> expectedBucketNames = Arrays.stream(InfluxExporter.InfluxBucket.values())
+                .map(Enum::name)
+                .collect(Collectors.toSet());
 
-        InfluxBucketResponse.InfluxBucketDTO temperatureAggregated = buckets.stream()
-                .filter(bucket -> "TEMPERATURE_AGGREGATED".equals(bucket.getName()))
-                .findFirst()
-                .orElse(null);
-        assertNotNull(temperatureAggregated);
-        assertEquals("sensor_data_30m", temperatureAggregated.getBucketName());
-        assertEquals("30-minute per hour aggregated temperature data", temperatureAggregated.getDescription());
-
-        InfluxBucketResponse.InfluxBucketDTO humidityAggregated = buckets.stream()
-                .filter(bucket -> "HUMIDITY_AGGREGATED".equals(bucket.getName()))
-                .findFirst()
-                .orElse(null);
-        assertNotNull(humidityAggregated);
-        assertEquals("sensor_data_30m", humidityAggregated.getBucketName());
-        assertEquals("30-minute per hour aggregated humidity data", humidityAggregated.getDescription());
+        assertEquals(expectedBucketNames, responseBucketNames);
     }
 
     @Test
@@ -118,6 +95,29 @@ class InfluxExportControllerTest {
             assertFalse(bucket.getName().isEmpty());
             assertFalse(bucket.getBucketName().isEmpty());
             assertFalse(bucket.getDescription().isEmpty());
+        }
+    }
+
+    @Test
+    @DisplayName("Should verify bucket data matches enum values")
+    void getAvailableBuckets_VerifyDataIntegrity() {
+        // Act
+        ResponseEntity<InfluxBucketResponse> response = influxExportController.getAvailableBuckets();
+
+        // Assert
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        List<InfluxBucketResponse.InfluxBucketDTO> buckets = response.getBody().getBuckets();
+
+        // Verify each bucket DTO has matching enum data
+        for (InfluxExporter.InfluxBucket enumBucket : InfluxExporter.InfluxBucket.values()) {
+            boolean bucketFound = buckets.stream()
+                    .anyMatch(dto ->
+                        enumBucket.name().equals(dto.getName()) &&
+                        enumBucket.getBucketName().equals(dto.getBucketName()) &&
+                        enumBucket.getDescription().equals(dto.getDescription())
+                    );
+
+            assertTrue(bucketFound, "Bucket " + enumBucket.name() + " should be present with correct data");
         }
     }
 }

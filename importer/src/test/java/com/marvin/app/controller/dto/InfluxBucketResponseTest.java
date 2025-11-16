@@ -1,6 +1,7 @@
 package com.marvin.app.controller.dto;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -19,8 +20,8 @@ class InfluxBucketResponseTest {
     @BeforeEach
     void setUp() {
         testBuckets = List.of(
-                new InfluxBucketResponse.InfluxBucketDTO("SYSTEM_METRICS", "system_metrics", "System metrics"),
-                new InfluxBucketResponse.InfluxBucketDTO("TEMPERATURE", "sensor_data", "Temperature data")
+                new InfluxBucketResponse.InfluxBucketDTO("TEST_BUCKET_1", "test_bucket_1", "Test description 1"),
+                new InfluxBucketResponse.InfluxBucketDTO("TEST_BUCKET_2", "test_bucket_2", "Test description 2")
         );
     }
 
@@ -33,15 +34,20 @@ class InfluxBucketResponseTest {
         // Assert
         assertNotNull(response);
         assertNotNull(response.getBuckets());
-        assertEquals(2, response.getBuckets().size());
+        assertEquals(testBuckets.size(), response.getBuckets().size());
         assertEquals("Available InfluxDB buckets retrieved successfully", response.getMessage());
         assertTrue(response.getTimestamp() > 0);
+        assertTrue(response.isSuccess());
 
-        // Verify bucket data
-        InfluxBucketResponse.InfluxBucketDTO firstBucket = response.getBuckets().get(0);
-        assertEquals("SYSTEM_METRICS", firstBucket.getName());
-        assertEquals("system_metrics", firstBucket.getBucketName());
-        assertEquals("System metrics", firstBucket.getDescription());
+        // Verify bucket data is preserved correctly
+        for (int i = 0; i < testBuckets.size(); i++) {
+            InfluxBucketResponse.InfluxBucketDTO expected = testBuckets.get(i);
+            InfluxBucketResponse.InfluxBucketDTO actual = response.getBuckets().get(i);
+
+            assertEquals(expected.getName(), actual.getName());
+            assertEquals(expected.getBucketName(), actual.getBucketName());
+            assertEquals(expected.getDescription(), actual.getDescription());
+        }
     }
 
     @Test
@@ -55,6 +61,7 @@ class InfluxBucketResponseTest {
         assertNull(response.getBuckets());
         assertEquals("Test error message", response.getMessage());
         assertTrue(response.getTimestamp() > 0);
+        assertFalse(response.isSuccess());
     }
 
     @Test
@@ -69,6 +76,7 @@ class InfluxBucketResponseTest {
         assertEquals(0, response.getBuckets().size());
         assertEquals("Available InfluxDB buckets retrieved successfully", response.getMessage());
         assertTrue(response.getTimestamp() > 0);
+        assertTrue(response.isSuccess());
     }
 
     @Test
@@ -93,40 +101,34 @@ class InfluxBucketResponseTest {
     }
 
     @Test
-    @DisplayName("Should create multiple valid InfluxBucketDTO instances")
+    @DisplayName("Should create multiple InfluxBucketDTO instances with different data")
     void influxBucketDTO_MultipleInstances() {
         // Arrange & Act
-        InfluxBucketResponse.InfluxBucketDTO systemMetrics = new InfluxBucketResponse.InfluxBucketDTO(
-                "SYSTEM_METRICS", "system_metrics", "System performance metrics");
-        InfluxBucketResponse.InfluxBucketDTO temperature = new InfluxBucketResponse.InfluxBucketDTO(
-                "TEMPERATURE", "sensor_data", "Temperature sensor data");
-        InfluxBucketResponse.InfluxBucketDTO humidity = new InfluxBucketResponse.InfluxBucketDTO(
-                "HUMIDITY", "sensor_data", "Humidity sensor data");
-        InfluxBucketResponse.InfluxBucketDTO temperatureAggregated = new InfluxBucketResponse.InfluxBucketDTO(
-                "TEMPERATURE_AGGREGATED", "sensor_data_30m", "30-minute per hour aggregated temperature data");
-        InfluxBucketResponse.InfluxBucketDTO humidityAggregated = new InfluxBucketResponse.InfluxBucketDTO(
-                "HUMIDITY_AGGREGATED", "sensor_data_30m", "30-minute per hour aggregated humidity data");
+        InfluxBucketResponse.InfluxBucketDTO bucket1 = new InfluxBucketResponse.InfluxBucketDTO(
+                "BUCKET_ONE", "bucket_one", "First bucket description");
+        InfluxBucketResponse.InfluxBucketDTO bucket2 = new InfluxBucketResponse.InfluxBucketDTO(
+                "BUCKET_TWO", "bucket_two", "Second bucket description");
+        InfluxBucketResponse.InfluxBucketDTO bucket3 = new InfluxBucketResponse.InfluxBucketDTO(
+                "BUCKET_THREE", "bucket_three", "Third bucket description");
 
-        // Assert
-        assertEquals("SYSTEM_METRICS", systemMetrics.getName());
-        assertEquals("system_metrics", systemMetrics.getBucketName());
-        assertEquals("System performance metrics", systemMetrics.getDescription());
+        // Assert - Verify each bucket maintains its own data
+        assertEquals("BUCKET_ONE", bucket1.getName());
+        assertEquals("bucket_one", bucket1.getBucketName());
+        assertEquals("First bucket description", bucket1.getDescription());
 
-        assertEquals("TEMPERATURE", temperature.getName());
-        assertEquals("sensor_data", temperature.getBucketName());
-        assertEquals("Temperature sensor data", temperature.getDescription());
+        assertEquals("BUCKET_TWO", bucket2.getName());
+        assertEquals("bucket_two", bucket2.getBucketName());
+        assertEquals("Second bucket description", bucket2.getDescription());
 
-        assertEquals("HUMIDITY", humidity.getName());
-        assertEquals("sensor_data", humidity.getBucketName());
-        assertEquals("Humidity sensor data", humidity.getDescription());
+        assertEquals("BUCKET_THREE", bucket3.getName());
+        assertEquals("bucket_three", bucket3.getBucketName());
+        assertEquals("Third bucket description", bucket3.getDescription());
 
-        assertEquals("TEMPERATURE_AGGREGATED", temperatureAggregated.getName());
-        assertEquals("sensor_data_30m", temperatureAggregated.getBucketName());
-        assertEquals("30-minute per hour aggregated temperature data", temperatureAggregated.getDescription());
-
-        assertEquals("HUMIDITY_AGGREGATED", humidityAggregated.getName());
-        assertEquals("sensor_data_30m", humidityAggregated.getBucketName());
-        assertEquals("30-minute per hour aggregated humidity data", humidityAggregated.getDescription());
+        // Verify buckets are independent
+        bucket1.setName("MODIFIED_BUCKET");
+        assertEquals("MODIFIED_BUCKET", bucket1.getName());
+        assertEquals("BUCKET_TWO", bucket2.getName()); // Should remain unchanged
+        assertEquals("BUCKET_THREE", bucket3.getName()); // Should remain unchanged
     }
 
     @Test
