@@ -147,7 +147,7 @@ public class InfluxExportController {
             );
 
             // Upload the exported files using the uploader module
-            uploader.zipAndUploadCostFiles(exportedFiles);
+            uploader.zipAndUploadCostFiles("influxdb", exportedFiles);
 
             return ResponseEntity.ok(InfluxExportResponse.success("InfluxDB buckets exported and uploaded successfully", exportedFiles));
         } catch (IllegalArgumentException e) {

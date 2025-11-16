@@ -8,6 +8,7 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import org.slf4j.Logger;
@@ -21,7 +22,7 @@ public class Uploader {
     private static final Logger LOGGER = LoggerFactory.getLogger(Uploader.class);
 
     private static final DateTimeFormatter FILE_DTF = DateTimeFormatter.ofPattern(
-            "yyyyMMdd_hhmmss");
+            "yyyyMMdd_HHmmssSSS");
 
     private final String costExportFolder;
     private final String parentFolderName;
@@ -37,20 +38,21 @@ public class Uploader {
         this.googleDrive = googleDrive;
     }
 
-    public void zipAndUploadCostFiles(List<Path> filesToZipAndUpload) {
-        LOGGER.info("Going to zip and upload files!");
+    public void zipAndUploadCostFiles(String fileNamePrefix, List<Path> filesToZipAndUpload) {
+        LOGGER.info("Going to zip and upload files with prefix: {}!", fileNamePrefix);
 
         final Path dirPath = Paths.get(costExportFolder);
-        final Path zipFilePath = generateZipFilePath(dirPath);
+        final Path zipFilePath = generateZipFilePath(dirPath, fileNamePrefix);
 
         createZipFile(filesToZipAndUpload, dirPath, zipFilePath);
         uploadToGoogleDrive(zipFilePath);
         cleanupFiles(filesToZipAndUpload, dirPath, zipFilePath);
     }
 
-    private Path generateZipFilePath(Path dirPath) {
+    private Path generateZipFilePath(Path dirPath, String fileNamePrefix) {
         final String timestamp = LocalDateTime.now().format(FILE_DTF);
-        return dirPath.resolve("files_" + timestamp + ".zip");
+        final String uniqueId = UUID.randomUUID().toString().substring(0, 8);
+        return dirPath.resolve(fileNamePrefix + "_" + timestamp + "_" + uniqueId + ".zip");
     }
 
     private void createZipFile(List<Path> filesToZipAndUpload, Path dirPath, Path zipFilePath) {
