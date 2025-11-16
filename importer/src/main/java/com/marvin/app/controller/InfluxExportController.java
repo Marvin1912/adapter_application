@@ -4,6 +4,7 @@ import com.marvin.app.controller.dto.InfluxBucketResponse;
 import com.marvin.app.controller.dto.InfluxExportRequest;
 import com.marvin.app.controller.dto.InfluxExportResponse;
 import com.marvin.export.InfluxExporter;
+import com.marvin.export.InfluxExporter.InfluxBucket;
 import com.marvin.upload.Uploader;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -16,8 +17,6 @@ import java.nio.file.Path;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -134,20 +133,18 @@ public class InfluxExportController {
             final List<Path> exportedFiles;
 
             // Export specific buckets
-            final Set<InfluxExporter.InfluxBucket> bucketEnums = request.getBuckets().stream()
-                    .map(InfluxExporter.InfluxBucket::valueOf)
-                    .collect(Collectors.toSet());
+            final InfluxExporter.InfluxBucket bucketEnum = InfluxBucket.valueOf(request.getBucket());
 
             final String startTime = request.getStartTime();
             final String endTime = request.getEndTime();
-            exportedFiles = influxExporter.exportSelectedBuckets(
-                    bucketEnums,
+            exportedFiles = influxExporter.exportSelectedBucket(
+                    bucketEnum,
                     startTime != null ? ZonedDateTime.parse(startTime).toInstant() : null,
                     endTime != null ? ZonedDateTime.parse(endTime).toInstant() : null
             );
 
             // Upload the exported files using the uploader module
-            uploader.zipAndUploadCostFiles("influxdb", exportedFiles);
+            uploader.zipAndUploadCostFiles(bucketEnum.name(), exportedFiles);
 
             return ResponseEntity.ok(InfluxExportResponse.success("InfluxDB buckets exported and uploaded successfully", exportedFiles));
         } catch (IllegalArgumentException e) {

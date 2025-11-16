@@ -3,7 +3,6 @@ package com.marvin.app.controller.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,24 +20,24 @@ import lombok.Setter;
 public class InfluxExportRequest {
 
     /**
-     * List of bucket names to export. If null or empty, all enabled buckets will be exported.
+     * Bucket name to export.
      */
     @Schema(
-        description = "List of bucket names to export. If null or empty, all enabled buckets will be exported.",
-        allowableValues = {"SYSTEM_METRICS", "SENSOR_DATA", "SENSOR_DATA_AGGREGATED", "COSTS"},
-        example = "[\"SENSOR_DATA\", \"SYSTEM_METRICS\"]"
+            description = "Bucket name to export.",
+            allowableValues = {"SYSTEM_METRICS", "SENSOR_DATA", "SENSOR_DATA_AGGREGATED", "COSTS"},
+            example = "SENSOR_DATA"
     )
-    private List<String> buckets;
+    private String bucket;
 
     /**
      * Optional start time for filtering data. If not provided, defaults to 24 hours ago for time-range exports.
      */
     @Schema(
-        description = "Optional start time for filtering data. If not provided, defaults to 5 years ago (implemented in AbstractInfluxExport).",
-        example = "2019-01-15T10:30:00",
-        pattern = "yyyy-MM-dd'T'HH:mm:ss",
-        type = "string",
-        format = "date-time"
+            description = "Optional start time for filtering data. If not provided, defaults to 5 years ago (implemented in AbstractInfluxExport).",
+            example = "2019-01-15T10:30:00",
+            pattern = "yyyy-MM-dd'T'HH:mm:ss",
+            type = "string",
+            format = "date-time"
     )
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "UTC")
     private String startTime;
@@ -47,11 +46,11 @@ public class InfluxExportRequest {
      * Optional end time for filtering data. If not provided, defaults to current time for time-range exports.
      */
     @Schema(
-        description = "Optional end time for filtering data. If not provided, defaults to current time (implemented in AbstractInfluxExport).",
-        example = "2024-01-15T18:45:00",
-        pattern = "yyyy-MM-dd'T'HH:mm:ss",
-        type = "string",
-        format = "date-time"
+            description = "Optional end time for filtering data. If not provided, defaults to current time (implemented in AbstractInfluxExport).",
+            example = "2024-01-15T18:45:00",
+            pattern = "yyyy-MM-dd'T'HH:mm:ss",
+            type = "string",
+            format = "date-time"
     )
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "UTC")
     private String endTime;

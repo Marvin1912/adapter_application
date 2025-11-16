@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 import lombok.Getter;
@@ -66,38 +65,36 @@ public class InfluxExporter {
     /**
      * Exports data from specific buckets only.
      *
-     * @param buckets The buckets to export
+     * @param bucket   The bucket to export
      * @param startTime The start time to export
-     * @param endTime The end time to export
+     * @param endTime   The end time to export
      * @return List of generated file paths
      */
-    public List<Path> exportSelectedBuckets(Set<InfluxBucket> buckets, Instant startTime, Instant endTime) {
-        LOGGER.info("Starting export of selected InfluxDB buckets: {}", buckets);
+    public List<Path> exportSelectedBucket(InfluxBucket bucket, Instant startTime, Instant endTime) {
+        LOGGER.info("Starting export of selected InfluxDB bucket: {}", bucket);
 
         final String timestamp = LocalDateTime.now().format(FILE_DATE_TIME_FORMATTER);
         final String influxExportFolder = exportConfig.getCostExportFolder();
 
         final List<Path> exportedFiles = new ArrayList<>();
 
-        for (InfluxBucket bucket : buckets) {
-            try {
-                final Path filePath = switch (bucket) {
-                    case SYSTEM_METRICS -> exportBucket(createFilePath(influxExportFolder, SYSTEM_METRICS_FILENAME_PREFIX, timestamp),
-                            () -> systemMetricsExportService.exportData(startTime, endTime).stream(), "system metrics");
-                    case TEMPERATURE -> exportBucket(createFilePath(influxExportFolder, TEMPERATURE_FILENAME_PREFIX, timestamp),
-                            () -> temperatureExportService.exportData(startTime, endTime).stream(), "temperature data");
-                    case HUMIDITY -> exportBucket(createFilePath(influxExportFolder, HUMIDITY_FILENAME_PREFIX, timestamp),
-                            () -> humidityExportService.exportData(startTime, endTime).stream(), "humidity data");
-                    case TEMPERATURE_AGGREGATED -> exportBucket(createFilePath(influxExportFolder, TEMPERATURE_AGGREGATED_FILENAME_PREFIX, timestamp),
-                            () -> temperatureAggregatedExportService.exportData(startTime, endTime).stream(), "aggregated temperature data");
-                    case HUMIDITY_AGGREGATED -> exportBucket(createFilePath(influxExportFolder, HUMIDITY_AGGREGATED_FILENAME_PREFIX, timestamp),
-                            () -> humidityAggregatedExportService.exportData(startTime, endTime).stream(), "aggregated humidity data");
-                };
+        try {
+            final Path filePath = switch (bucket) {
+                case SYSTEM_METRICS -> exportBucket(createFilePath(influxExportFolder, SYSTEM_METRICS_FILENAME_PREFIX, timestamp),
+                        () -> systemMetricsExportService.exportData(startTime, endTime).stream(), "system metrics");
+                case TEMPERATURE -> exportBucket(createFilePath(influxExportFolder, TEMPERATURE_FILENAME_PREFIX, timestamp),
+                        () -> temperatureExportService.exportData(startTime, endTime).stream(), "temperature data");
+                case HUMIDITY -> exportBucket(createFilePath(influxExportFolder, HUMIDITY_FILENAME_PREFIX, timestamp),
+                        () -> humidityExportService.exportData(startTime, endTime).stream(), "humidity data");
+                case TEMPERATURE_AGGREGATED -> exportBucket(createFilePath(influxExportFolder, TEMPERATURE_AGGREGATED_FILENAME_PREFIX, timestamp),
+                        () -> temperatureAggregatedExportService.exportData(startTime, endTime).stream(), "aggregated temperature data");
+                case HUMIDITY_AGGREGATED -> exportBucket(createFilePath(influxExportFolder, HUMIDITY_AGGREGATED_FILENAME_PREFIX, timestamp),
+                        () -> humidityAggregatedExportService.exportData(startTime, endTime).stream(), "aggregated humidity data");
+            };
 
-                exportedFiles.add(filePath);
-            } catch (Exception e) {
-                LOGGER.error("Failed to export bucket: {}", bucket, e);
-            }
+            exportedFiles.add(filePath);
+        } catch (Exception e) {
+            LOGGER.error("Failed to export bucket: {}", bucket, e);
         }
 
         LOGGER.info("Successfully exported {} InfluxDB bucket files", exportedFiles.size());
