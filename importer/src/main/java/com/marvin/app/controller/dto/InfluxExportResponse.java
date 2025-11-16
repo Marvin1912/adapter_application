@@ -1,7 +1,7 @@
 package com.marvin.app.controller.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-
+import java.nio.file.Path;
 import java.time.Instant;
 import java.util.List;
 
@@ -52,7 +52,7 @@ public class InfluxExportResponse {
      * @param exportedFiles List of exported file paths
      * @return Successful response
      */
-    public static InfluxExportResponse success(String message, java.util.List<java.nio.file.Path> exportedFiles) {
+    public static InfluxExportResponse success(String message, List<Path> exportedFiles) {
         final List<String> fileNames = exportedFiles.stream()
             .map(path -> path.getFileName().toString())
             .toList();

@@ -22,8 +22,8 @@ public class IbanMaintenance implements BookEntryDataMaintenance {
   }
 
   private static BookingEntryDTO checkDebitIban(BookingEntryDTO bookingEntry) {
-    return bookingEntry.debitIban() == null ?
-        new BookingEntryDTO(
+    return bookingEntry.debitIban() == null
+        ? new BookingEntryDTO(
             bookingEntry.creditDebitCode(),
             bookingEntry.entryInfo(),
             bookingEntry.amount(),

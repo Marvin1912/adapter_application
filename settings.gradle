@@ -12,4 +12,3 @@ include 'uploader'
 include 'plants'
 include 'image-server'
 include 'vocabulary'
-

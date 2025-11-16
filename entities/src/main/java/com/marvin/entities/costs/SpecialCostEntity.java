@@ -61,9 +61,9 @@ public class SpecialCostEntity extends BasicEntity {
 
   @Override
   public String toString() {
-    return "SpecialCostEntity{" +
-        "id=" + id +
-        ", costDate=" + costDate +
-        '}';
+    return "SpecialCostEntity{"
+        + "id=" + id
+        + ", costDate=" + costDate
+        + '}';
   }
 }

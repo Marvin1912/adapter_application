@@ -47,7 +47,7 @@ public class ImageController {
 
   @PostMapping
   public Mono<ResponseEntity<Object>> createImage(
-      @RequestPart(value = "image") Mono<FilePart> image,
+      @RequestPart("image") Mono<FilePart> image,
       @RequestParam(name = "content-type") String contentType
   ) {
     return getFileAsByteArray(image)

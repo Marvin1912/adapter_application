@@ -57,9 +57,9 @@ public class BasicEntity {
 
   @Override
   public String toString() {
-    return "BasicEntity{" +
-        "creationDate=" + creationDate +
-        ", lastModified=" + lastModified +
-        '}';
+    return "BasicEntity{"
+        + "creationDate=" + creationDate
+        + ", lastModified=" + lastModified
+        + '}';
   }
 }

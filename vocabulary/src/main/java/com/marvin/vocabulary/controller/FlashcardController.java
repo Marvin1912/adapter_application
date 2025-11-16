@@ -415,7 +415,7 @@ public class FlashcardController {
    */
   @PutMapping("/flashcards/file")
   public Mono<ResponseEntity<Void>> updateFlashcards(
-      @RequestPart(value = "file") Mono<FilePart> fileMono) {
+      @RequestPart("file") Mono<FilePart> fileMono) {
     return fileMono
         .flatMap(FlashcardController::convertFilePartToBytes)
         .switchIfEmpty(Mono.just(new byte[0]))

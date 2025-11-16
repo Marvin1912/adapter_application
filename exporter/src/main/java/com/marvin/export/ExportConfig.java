@@ -63,11 +63,11 @@ public class ExportConfig {
             return false;
         }
         final ExportConfig that = (ExportConfig) obj;
-        return Objects.equals(costExportFolder, that.costExportFolder) &&
-                Objects.equals(influxdbUrl, that.influxdbUrl) &&
-                Objects.equals(influxdbToken, that.influxdbToken) &&
-                Objects.equals(influxdbOrg, that.influxdbOrg) &&
-                Objects.equals(influxdbExportEnabled, that.influxdbExportEnabled);
+        return Objects.equals(costExportFolder, that.costExportFolder)
+                && Objects.equals(influxdbUrl, that.influxdbUrl)
+                && Objects.equals(influxdbToken, that.influxdbToken)
+                && Objects.equals(influxdbOrg, that.influxdbOrg)
+                && Objects.equals(influxdbExportEnabled, that.influxdbExportEnabled);
     }
 
     @Override
@@ -77,12 +77,12 @@ public class ExportConfig {
 
     @Override
     public String toString() {
-        return "ExportConfig{" +
-                "costExportFolder='" + costExportFolder + '\'' +
-                ", influxdbUrl='" + influxdbUrl + '\'' +
-                ", influxdbToken='" + (influxdbToken != null ? "***" : "null") + '\'' +
-                ", influxdbOrg='" + influxdbOrg + '\'' +
-                ", influxdbExportEnabled=" + influxdbExportEnabled +
-                '}';
+        return "ExportConfig{"
+                + "costExportFolder='" + costExportFolder + '\''
+                + ", influxdbUrl='" + influxdbUrl + '\''
+                + ", influxdbToken='" + (influxdbToken != null ? "***" : "null") + '\''
+                + ", influxdbOrg='" + influxdbOrg + '\''
+                + ", influxdbExportEnabled=" + influxdbExportEnabled
+                + '}';
     }
 }

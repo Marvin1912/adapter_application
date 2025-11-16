@@ -29,8 +29,8 @@ class DictionaryClientTest {
 
     StepVerifier.create(result)
         .expectErrorMatches(throwable ->
-            throwable instanceof InvalidWordException &&
-                throwable.getMessage().contains(
+            throwable instanceof InvalidWordException
+                && throwable.getMessage().contains(
                     "The word 'null' is invalid or contains unsupported characters")
         )
         .verify();
@@ -44,8 +44,8 @@ class DictionaryClientTest {
 
     StepVerifier.create(result)
         .expectErrorMatches(throwable ->
-            throwable instanceof InvalidWordException &&
-                throwable.getMessage().contains(
+            throwable instanceof InvalidWordException
+                && throwable.getMessage().contains(
                     "The word '' is invalid or contains unsupported characters")
         )
         .verify();
@@ -59,8 +59,8 @@ class DictionaryClientTest {
 
     StepVerifier.create(result)
         .expectErrorMatches(throwable ->
-            throwable instanceof InvalidWordException &&
-                throwable.getMessage().contains(
+            throwable instanceof InvalidWordException
+                && throwable.getMessage().contains(
                     "The word '   ' is invalid or contains unsupported characters")
         )
         .verify();
@@ -74,8 +74,8 @@ class DictionaryClientTest {
 
     StepVerifier.create(result)
         .expectErrorMatches(throwable ->
-            throwable instanceof InvalidWordException &&
-                throwable.getMessage().contains(
+            throwable instanceof InvalidWordException
+                && throwable.getMessage().contains(
                     "The word 'hello123' is invalid or contains unsupported characters")
         )
         .verify();
@@ -89,8 +89,8 @@ class DictionaryClientTest {
 
     StepVerifier.create(result)
         .expectErrorMatches(throwable ->
-            throwable instanceof InvalidWordException &&
-                throwable.getMessage().contains(
+            throwable instanceof InvalidWordException
+                && throwable.getMessage().contains(
                     "The word 'hello!@#' is invalid or contains unsupported characters")
         )
         .verify();
@@ -108,7 +108,7 @@ class DictionaryClientTest {
           final InvalidWordException exception = (InvalidWordException) throwable;
           assert exception.getWord().equals(invalidWord);
           assert exception.getStatusCode() == 400;
-          assert exception.getErrorType().equals("INVALID_WORD");
+          assert "INVALID_WORD".equals(exception.getErrorType());
         })
         .verify();
   }

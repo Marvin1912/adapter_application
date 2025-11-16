@@ -52,4 +52,7 @@ public class NullSafeUtil {
         .map(function4)
         .orElse(defaultValue);
   }
+
+  private NullSafeUtil() {
+  }
 }

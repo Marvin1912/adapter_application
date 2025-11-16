@@ -5,7 +5,7 @@ import org.flywaydb.core.Flyway;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-@Configuration(value = "FlywayConfigMain")
+@Configuration("FlywayConfigMain")
 public class FlywayConfig {
 
   @Bean(initMethod = "migrate")

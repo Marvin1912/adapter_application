@@ -6,6 +6,8 @@ import com.marvin.export.InfluxExporter;
 import java.nio.file.Path;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,9 +39,9 @@ public class InfluxExportController {
             final List<Path> exportedFiles;
 
             // Export specific buckets
-            final java.util.Set<InfluxExporter.InfluxBucket> bucketEnums = request.getBuckets().stream()
+            final Set<InfluxExporter.InfluxBucket> bucketEnums = request.getBuckets().stream()
                     .map(InfluxExporter.InfluxBucket::valueOf)
-                    .collect(java.util.stream.Collectors.toSet());
+                    .collect(Collectors.toSet());
 
             final String startTime = request.getStartTime();
             final String endTime = request.getEndTime();

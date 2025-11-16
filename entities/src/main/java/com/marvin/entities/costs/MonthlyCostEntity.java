@@ -76,10 +76,10 @@ public class MonthlyCostEntity extends BasicEntity {
 
   @Override
   public String toString() {
-    return "MonthlyCostEntity{" +
-        "id=" + id +
-        ", costDate=" + costDate +
-        ", value=" + value +
-        '}';
+    return "MonthlyCostEntity{"
+        + "id=" + id
+        + ", costDate=" + costDate
+        + ", value=" + value
+        + '}';
   }
 }

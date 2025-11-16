@@ -21,11 +21,11 @@ class WiktionaryIntegrationTest {
           }
 
           final DictionaryEntry entry = entries.get(0);
-          return entry.word().equals(testWord) &&
-              !entry.meanings().isEmpty() &&
-              entry.meanings().get(0).partOfSpeech() != null &&
-              !entry.meanings().get(0).definitions().isEmpty() &&
-              entry.meanings().get(0).definitions().get(0).definition() != null;
+          return entry.word().equals(testWord)
+              && !entry.meanings().isEmpty()
+              && entry.meanings().get(0).partOfSpeech() != null
+              && !entry.meanings().get(0).definitions().isEmpty()
+              && entry.meanings().get(0).definitions().get(0).definition() != null;
         })
         .verifyComplete();
   }

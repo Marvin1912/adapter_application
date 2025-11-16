@@ -45,12 +45,12 @@ public class MeasurementMappings {
 
     private static Object convertSensorDataValue(String field, Object value) {
       // Percentage values
-      if (field.equals("humidity") || field.contains("percent")) {
+      if ("humidity".equals(field) || field.contains("percent")) {
         return Double.parseDouble(value.toString());
       }
       // Energy values
-      if (field.equals("current") || field.equals("voltage") ||
-          field.equals("power") || field.equals("energy")) {
+      if ("current".equals(field) || "voltage".equals(field)
+          || "power".equals(field) || "energy".equals(field)) {
         return Double.parseDouble(value.toString());
       }
       return value;
@@ -58,9 +58,9 @@ public class MeasurementMappings {
 
     private static Object convertAggregatedValue(String field, Object value) {
       // Statistical values
-      if (field.contains("mean") || field.contains("average") ||
-          field.contains("min") || field.contains("max") ||
-          field.contains("stddev") || field.contains("variance")) {
+      if (field.contains("mean") || field.contains("average")
+          || field.contains("min") || field.contains("max")
+          || field.contains("stddev") || field.contains("variance")) {
         return Double.parseDouble(value.toString());
       }
       // Count values
@@ -68,6 +68,9 @@ public class MeasurementMappings {
         return Double.parseDouble(value.toString());
       }
       return value;
+    }
+
+    private DataTypeConverter() {
     }
   }
 }

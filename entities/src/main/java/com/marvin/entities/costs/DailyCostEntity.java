@@ -90,11 +90,11 @@ public class DailyCostEntity extends BasicEntity {
 
   @Override
   public String toString() {
-    return "DailyCostEntity{" +
-        "id=" + id +
-        ", costDate=" + costDate +
-        ", value=" + value +
-        ", description='" + description + '\'' +
-        '}';
+    return "DailyCostEntity{"
+        + "id=" + id
+        + ", costDate=" + costDate
+        + ", value=" + value
+        + ", description='" + description + '\''
+        + '}';
   }
 }

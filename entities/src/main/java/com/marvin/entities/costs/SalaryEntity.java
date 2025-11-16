@@ -82,10 +82,10 @@ public class SalaryEntity extends BasicEntity {
 
   @Override
   public String toString() {
-    return "SalaryEntity{" +
-        "id=" + id +
-        ", salaryDate=" + salaryDate +
-        ", value=" + value +
-        '}';
+    return "SalaryEntity{"
+        + "id=" + id
+        + ", salaryDate=" + salaryDate
+        + ", value=" + value
+        + '}';
   }
 }

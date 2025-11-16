@@ -10,6 +10,7 @@ import com.marvin.vocabulary.dto.Flashcard;
 import com.marvin.vocabulary.model.FlashcardEntity;
 import com.marvin.vocabulary.service.FlashcardService;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,6 +21,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DefaultDataBufferFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -341,13 +343,13 @@ class FlashcardControllerTest {
     }
 
     @Override
-    public org.springframework.http.HttpHeaders headers() {
-      return org.springframework.http.HttpHeaders.EMPTY;
+    public HttpHeaders headers() {
+      return HttpHeaders.EMPTY;
     }
 
     @Override
-    public reactor.core.publisher.Mono<Void> transferTo(final java.nio.file.Path dest) {
-      return reactor.core.publisher.Mono.empty();
+    public Mono<Void> transferTo(final Path dest) {
+      return Mono.empty();
     }
   }
 }

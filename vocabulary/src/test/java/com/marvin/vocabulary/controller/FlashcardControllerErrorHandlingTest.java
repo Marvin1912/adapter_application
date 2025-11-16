@@ -51,7 +51,7 @@ class FlashcardControllerErrorHandlingTest {
         .expectStatus().isNotFound()
         .expectBody(Map.class)
         .value(response -> {
-          assert response.get("type").equals("WORD_NOT_FOUND");
+          assert "WORD_NOT_FOUND".equals(response.get("type"));
           assert response.get("message").toString()
               .contains("The word '" + word + "' was not found");
           assert response.get("word").equals(word);
@@ -71,7 +71,7 @@ class FlashcardControllerErrorHandlingTest {
         .expectStatus().isBadRequest()
         .expectBody(Map.class)
         .value(response -> {
-          assert response.get("type").equals("INVALID_WORD");
+          assert "INVALID_WORD".equals(response.get("type"));
           assert response.get("message").toString()
               .contains("The word '" + word + "' is invalid");
           assert response.get("word").equals(word);
@@ -91,7 +91,7 @@ class FlashcardControllerErrorHandlingTest {
         .expectStatus().isEqualTo(429)
         .expectBody(Map.class)
         .value(response -> {
-          assert response.get("type").equals("RATE_LIMIT_EXCEEDED");
+          assert "RATE_LIMIT_EXCEEDED".equals(response.get("type"));
           assert response.get("message").toString().contains("API rate limit exceeded");
         });
   }
@@ -109,7 +109,7 @@ class FlashcardControllerErrorHandlingTest {
         .expectStatus().isEqualTo(503)
         .expectBody(Map.class)
         .value(response -> {
-          assert response.get("type").equals("SERVICE_UNAVAILABLE");
+          assert "SERVICE_UNAVAILABLE".equals(response.get("type"));
           assert response.get("message").toString()
               .contains("Dictionary API service is currently unavailable");
         });
@@ -132,9 +132,9 @@ class FlashcardControllerErrorHandlingTest {
         .expectStatus().isEqualTo(402)
         .expectBody(Map.class)
         .value(response -> {
-          assert response.get("type").equals("PAYMENT_REQUIRED");
+          assert "PAYMENT_REQUIRED".equals(response.get("type"));
           assert response.get("message").toString().contains("Some API error occurred");
-          assert response.get("statusCode").equals("402");
+          assert "402".equals(response.get("statusCode"));
         });
   }
 
@@ -151,8 +151,8 @@ class FlashcardControllerErrorHandlingTest {
         .expectStatus().is5xxServerError()
         .expectBody(Map.class)
         .value(response -> {
-          assert response.get("type").equals("RuntimeException");
-          assert response.get("message").equals("Unexpected error");
+          assert "RuntimeException".equals(response.get("type"));
+          assert "Unexpected error".equals(response.get("message"));
         });
   }
 
@@ -170,7 +170,7 @@ class FlashcardControllerErrorHandlingTest {
         .expectStatus().isEqualTo(429)
         .expectBody(Map.class)
         .value(response -> {
-          assert response.get("type").equals("RATE_LIMIT_EXCEEDED");
+          assert "RATE_LIMIT_EXCEEDED".equals(response.get("type"));
           assert response.get("message").equals(customMessage);
         });
   }
@@ -191,7 +191,7 @@ class FlashcardControllerErrorHandlingTest {
         .expectStatus().isEqualTo(503)
         .expectBody(Map.class)
         .value(response -> {
-          assert response.get("type").equals("SERVICE_UNAVAILABLE");
+          assert "SERVICE_UNAVAILABLE".equals(response.get("type"));
           assert response.get("message").equals(customMessage);
         });
   }
@@ -205,23 +205,23 @@ class FlashcardControllerErrorHandlingTest {
     final WordNotFoundException wordNotFound = new WordNotFoundException(word);
     assert wordNotFound.getWord().equals(word);
     assert wordNotFound.getStatusCode() == 404;
-    assert wordNotFound.getErrorType().equals("WORD_NOT_FOUND");
+    assert "WORD_NOT_FOUND".equals(wordNotFound.getErrorType());
 
     // Test InvalidWordException properties
     final InvalidWordException invalidWord = new InvalidWordException(word);
     assert invalidWord.getWord().equals(word);
     assert invalidWord.getStatusCode() == 400;
-    assert invalidWord.getErrorType().equals("INVALID_WORD");
+    assert "INVALID_WORD".equals(invalidWord.getErrorType());
 
     // Test RateLimitExceededException properties
     final RateLimitExceededException rateLimit = new RateLimitExceededException();
     assert rateLimit.getStatusCode() == 429;
-    assert rateLimit.getErrorType().equals("RATE_LIMIT_EXCEEDED");
+    assert "RATE_LIMIT_EXCEEDED".equals(rateLimit.getErrorType());
 
     // Test DictionaryServiceUnavailableException properties
     final DictionaryServiceUnavailableException serviceUnavailable =
         new DictionaryServiceUnavailableException();
     assert serviceUnavailable.getStatusCode() == 503;
-    assert serviceUnavailable.getErrorType().equals("SERVICE_UNAVAILABLE");
+    assert "SERVICE_UNAVAILABLE".equals(serviceUnavailable.getErrorType());
   }
 }

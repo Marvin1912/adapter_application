@@ -20,6 +20,7 @@ import com.marvin.plants.service.PlantService;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -625,7 +626,7 @@ class PlantControllerTest {
 
     // Then
     StepVerifier.create(result)
-        .expectNextMatches(bytes -> java.util.Arrays.equals(expectedBytes, bytes))
+        .expectNextMatches(bytes -> Arrays.equals(expectedBytes, bytes))
         .verifyComplete();
   }
 

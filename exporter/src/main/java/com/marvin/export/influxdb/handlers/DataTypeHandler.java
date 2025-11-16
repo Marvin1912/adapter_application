@@ -57,10 +57,10 @@ public class DataTypeHandler {
         // Extract fields and tags from the record
         record.getValues().forEach((key, value) -> {
             if (value != null) {
-                if (key.equals("_field")) {
+                if ("_field".equals(key)) {
                     fields.put(value.toString(), MeasurementMappings.DataTypeConverter
                             .convertToExpectedType(value.toString(), record.getValue(), "system_metrics"));
-                } else if (!key.startsWith("_") && !key.equals("table")) {
+                } else if (!key.startsWith("_") && !"table".equals(key)) {
                     tags.put(key, value.toString());
                 }
             }
@@ -91,10 +91,10 @@ public class DataTypeHandler {
         // Extract fields and tags from the record
         record.getValues().forEach((key, value) -> {
             if (value != null) {
-                if (key.equals("_field")) {
+                if ("_field".equals(key)) {
                     fields.put(value.toString(), MeasurementMappings.DataTypeConverter
                             .convertToExpectedType(value.toString(), record.getValue(), "sensor_data"));
-                } else if (!key.startsWith("_") && !key.equals("table")) {
+                } else if (!key.startsWith("_") && !"table".equals(key)) {
                     tags.put(key, value.toString());
                 }
             }
@@ -127,14 +127,17 @@ public class DataTypeHandler {
     }
 
     private static boolean validateSystemMetricsDTO(SystemMetricsDTO dto) {
-        return dto.measurement() != null &&
-                dto.timestamp() != null &&
-                !dto.fields().isEmpty();
+        return dto.measurement() != null
+                && dto.timestamp() != null
+                && !dto.fields().isEmpty();
     }
 
     private static boolean validateSensorDataDTO(SensorDataDTO dto) {
-        return dto.measurement() != null &&
-                dto.timestamp() != null &&
-                !dto.fields().isEmpty();
+        return dto.measurement() != null
+                && dto.timestamp() != null
+                && !dto.fields().isEmpty();
     }
+
+  private DataTypeHandler() {
+  }
 }

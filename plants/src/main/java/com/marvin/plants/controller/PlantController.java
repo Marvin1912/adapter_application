@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
+import reactor.util.function.Tuple2;
 
 /**
  * REST Controller for managing plants. Provides endpoints for CRUD operations and plant care
@@ -114,7 +115,7 @@ public class PlantController {
    * @return Mono containing ResponseEntity with location of created plant
    */
   private Mono<ResponseEntity<Object>> processImageAndCreatePlant(
-      reactor.util.function.Tuple2<PlantDTO, byte[]> plantAndImage, String contentType) {
+      Tuple2<PlantDTO, byte[]> plantAndImage, String contentType) {
 
     final PlantDTO plantDTO = plantAndImage.getT1();
     final byte[] imageBytes = plantAndImage.getT2();
