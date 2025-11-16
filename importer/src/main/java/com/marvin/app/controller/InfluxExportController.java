@@ -4,6 +4,13 @@ import com.marvin.app.controller.dto.InfluxBucketResponse;
 import com.marvin.app.controller.dto.InfluxExportRequest;
 import com.marvin.app.controller.dto.InfluxExportResponse;
 import com.marvin.export.InfluxExporter;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.nio.file.Path;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
@@ -21,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
  * REST controller for triggering InfluxDB data exports. Provides endpoints to retrieve available buckets and export data from user buckets with optional filtering.
  */
 @RestController
+@Tag(name = "InfluxDB Export", description = "API for exporting InfluxDB bucket data")
 public class InfluxExportController {
 
     private final InfluxExporter influxExporter;
@@ -34,6 +42,28 @@ public class InfluxExportController {
      *
      * @return List of available buckets with their details
      */
+    @Operation(
+        summary = "Get available InfluxDB buckets",
+        description = "Retrieves a list of all available InfluxDB buckets that can be exported. Each bucket includes its name, bucket identifier, and description."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Successfully retrieved available buckets",
+            content = @Content(
+                mediaType = MediaType.APPLICATION_JSON_VALUE,
+                schema = @Schema(implementation = InfluxBucketResponse.class)
+            )
+        ),
+        @ApiResponse(
+            responseCode = "500",
+            description = "Internal server error occurred while retrieving buckets",
+            content = @Content(
+                mediaType = MediaType.APPLICATION_JSON_VALUE,
+                schema = @Schema(implementation = InfluxBucketResponse.class)
+            )
+        )
+    })
     @GetMapping(path = "/export/influxdb/buckets", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<InfluxBucketResponse> getAvailableBuckets() {
         try {
@@ -57,8 +87,45 @@ public class InfluxExportController {
      * @param request Export configuration with bucket selection and optional time range
      * @return Export response with generated file information
      */
+    @Operation(
+        summary = "Export InfluxDB buckets",
+        description = "Exports data from selected InfluxDB buckets with optional time range filtering. The export is performed asynchronously and returns information about the generated files. " +
+                   "Time range filters use ISO-8601 format: yyyy-MM-dd'T'HH:mm:ss (e.g., 2024-01-15T10:30:00). If startTime is not provided, defaults to 5 years ago; if endTime is not provided, defaults to current time (implemented in AbstractInfluxExport)."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Successfully initiated bucket export",
+            content = @Content(
+                mediaType = MediaType.APPLICATION_JSON_VALUE,
+                schema = @Schema(implementation = InfluxExportResponse.class)
+            )
+        ),
+        @ApiResponse(
+            responseCode = "400",
+            description = "Invalid request parameters or bucket names",
+            content = @Content(
+                mediaType = MediaType.APPLICATION_JSON_VALUE,
+                schema = @Schema(implementation = InfluxExportResponse.class)
+            )
+        ),
+        @ApiResponse(
+            responseCode = "500",
+            description = "Internal server error occurred during export",
+            content = @Content(
+                mediaType = MediaType.APPLICATION_JSON_VALUE,
+                schema = @Schema(implementation = InfluxExportResponse.class)
+            )
+        )
+    })
     @PostMapping(path = "/export/influxdb", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<InfluxExportResponse> exportInfluxBuckets(@RequestBody InfluxExportRequest request) {
+    public ResponseEntity<InfluxExportResponse> exportInfluxBuckets(
+            @Parameter(
+                description = "Export request configuration including bucket selection and optional time range",
+                required = true,
+                schema = @Schema(implementation = InfluxExportRequest.class)
+            )
+            @RequestBody InfluxExportRequest request) {
 
         try {
             final List<Path> exportedFiles;
