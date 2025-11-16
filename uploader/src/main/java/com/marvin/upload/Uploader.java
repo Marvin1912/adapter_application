@@ -8,6 +8,7 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import org.slf4j.Logger;
@@ -21,7 +22,7 @@ public class Uploader {
     private static final Logger LOGGER = LoggerFactory.getLogger(Uploader.class);
 
     private static final DateTimeFormatter FILE_DTF = DateTimeFormatter.ofPattern(
-            "yyyyMMdd_hhmmss");
+            "yyyyMMdd_HHmmssSSS");
 
     private final String costExportFolder;
     private final String parentFolderName;
@@ -50,7 +51,8 @@ public class Uploader {
 
     private Path generateZipFilePath(Path dirPath) {
         final String timestamp = LocalDateTime.now().format(FILE_DTF);
-        return dirPath.resolve("files_" + timestamp + ".zip");
+        final String uniqueId = UUID.randomUUID().toString().substring(0, 8);
+        return dirPath.resolve("files_" + timestamp + "_" + uniqueId + ".zip");
     }
 
     private void createZipFile(List<Path> filesToZipAndUpload, Path dirPath, Path zipFilePath) {
