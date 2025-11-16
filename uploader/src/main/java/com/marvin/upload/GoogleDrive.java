@@ -24,77 +24,82 @@ import org.springframework.stereotype.Component;
 @Component
 public class GoogleDrive {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(GoogleDrive.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GoogleDrive.class);
 
-  private static final String APPLICATION_NAME = "Applications";
+    private static final String APPLICATION_NAME = "Applications";
+    private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
+    private static final List<String> SCOPES = Collections.singletonList(DriveScopes.DRIVE);
 
-  private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
-  private static final List<String> SCOPES = Collections.singletonList(DriveScopes.DRIVE);
+    private final String credentialsPath;
 
-  private final String credentialsPath;
-
-  public GoogleDrive(@Value("${uploader.credentials.path}") String credentialsPath) {
-    this.credentialsPath = credentialsPath;
-  }
-
-  public String getFileId(String fileName) throws GoogleDriveException {
-
-    LOGGER.info("Trying to get file ID for {}!", fileName);
-
-    try {
-      final NetHttpTransport netHttpTransport = GoogleNetHttpTransport.newTrustedTransport();
-      final Drive service = new Drive.Builder(netHttpTransport, JSON_FACTORY,
-          getCredentialsPath())
-          .setApplicationName(APPLICATION_NAME)
-          .build();
-
-      final FileList result = service.files().list()
-          .setQ("mimeType = 'application/vnd.google-apps.folder' and name = 'backup'")
-          .setFields("files(id)")
-          .execute();
-
-      if (result == null || result.isEmpty()) {
-        throw new GoogleDriveException("No file with name " + fileName + " found!");
-      }
-
-      return result.getFiles().get(0).getId();
-    } catch (Exception e) {
-      throw new GoogleDriveException(e);
+    public GoogleDrive(@Value("${uploader.credentials.path}") String credentialsPath) {
+        this.credentialsPath = credentialsPath;
     }
-  }
 
-  public void uploadFile(Path path, String parent) throws GoogleDriveException {
+    public String getFileId(String folderName) throws GoogleDriveException {
+        LOGGER.info("Trying to get file ID for {}!", folderName);
 
-    LOGGER.info("Trying to upload file to {}/{} !", parent, path.getFileName());
+        try {
+            final Drive service = createDriveService();
+            final FileList result = searchFolderByName(service, folderName);
 
-    try {
-      final NetHttpTransport netHttpTransport = GoogleNetHttpTransport.newTrustedTransport();
-      final Drive service = new Drive.Builder(netHttpTransport, JSON_FACTORY,
-          getCredentialsPath())
-          .setApplicationName(APPLICATION_NAME)
-          .build();
+            if (result == null || result.getFiles().isEmpty()) {
+                throw new GoogleDriveException("No folder with name " + folderName + " found!");
+            }
 
-      final File fileMetadata = new File();
-      fileMetadata.setName(path.getFileName().toString());
-      fileMetadata.setParents(List.of(parent));
-
-      final var filePath = new java.io.File(path.toAbsolutePath().toString());
-      final FileContent mediaContent = new FileContent("application/zip", filePath);
-
-      final File file = service.files()
-          .create(fileMetadata, mediaContent)
-          .setFields("id")
-          .execute();
-      LOGGER.info("Uploaded file {}. File ID: {}.", path.getFileName(), file.getId());
-    } catch (Exception e) {
-      throw new GoogleDriveException(e);
+            return result.getFiles().get(0).getId();
+        } catch (Exception e) {
+            throw new GoogleDriveException(e);
+        }
     }
-  }
 
-  private Credential getCredentialsPath() throws IOException {
-    return GoogleCredential
-        .fromStream(new FileInputStream(credentialsPath))
-        .createScoped(SCOPES);
-  }
+    public void uploadFile(Path path, String parent) throws GoogleDriveException {
+        LOGGER.info("Trying to upload file to {}/{} !", parent, path.getFileName());
 
+        try {
+            final Drive service = createDriveService();
+            final File uploadedFile = performFileUpload(service, path, parent);
+            LOGGER.info("Uploaded file {}. File ID: {}.", path.getFileName(), uploadedFile.getId());
+        } catch (Exception e) {
+            throw new GoogleDriveException(e);
+        }
+    }
+
+    private Drive createDriveService() throws Exception {
+        final NetHttpTransport netHttpTransport = GoogleNetHttpTransport.newTrustedTransport();
+        return new Drive.Builder(netHttpTransport, JSON_FACTORY, getCredentials())
+                .setApplicationName(APPLICATION_NAME)
+                .build();
+    }
+
+    private FileList searchFolderByName(Drive service, String folderName) throws Exception {
+        return service.files().list()
+                .setQ("mimeType = 'application/vnd.google-apps.folder' and name = '" + folderName + "'")
+                .setFields("files(id)")
+                .execute();
+    }
+
+    private File performFileUpload(Drive service, Path path, String parent) throws Exception {
+        final File fileMetadata = createFileMetadata(path, parent);
+        final java.io.File filePath = path.toAbsolutePath().toFile();
+        final FileContent mediaContent = new FileContent("application/zip", filePath);
+
+        return service.files()
+                .create(fileMetadata, mediaContent)
+                .setFields("id")
+                .execute();
+    }
+
+    private File createFileMetadata(Path path, String parent) {
+        final File fileMetadata = new File();
+        fileMetadata.setName(path.getFileName().toString());
+        fileMetadata.setParents(List.of(parent));
+        return fileMetadata;
+    }
+
+    private Credential getCredentials() throws IOException {
+        return GoogleCredential
+                .fromStream(new FileInputStream(credentialsPath))
+                .createScoped(SCOPES);
+    }
 }
