@@ -34,7 +34,7 @@ public class InfluxExportRequest {
      * Optional start time for filtering data. If not provided, defaults to 24 hours ago for time-range exports.
      */
     @Schema(
-        description = "Optional start time for filtering data. If not provided, defaults to 24 hours ago for time-range exports.",
+        description = "Optional start time for filtering data. If not provided along with endTime, defaults to last 24 hours (implemented at query level).",
         example = "2024-01-15T10:30:00",
         pattern = "yyyy-MM-dd'T'HH:mm:ss",
         type = "string",
@@ -47,7 +47,7 @@ public class InfluxExportRequest {
      * Optional end time for filtering data. If not provided, defaults to current time for time-range exports.
      */
     @Schema(
-        description = "Optional end time for filtering data. If not provided, defaults to current time for time-range exports.",
+        description = "Optional end time for filtering data. If not provided along with startTime, defaults to current time (implemented at query level).",
         example = "2024-01-15T18:45:00",
         pattern = "yyyy-MM-dd'T'HH:mm:ss",
         type = "string",
