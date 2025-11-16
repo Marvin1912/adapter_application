@@ -2,14 +2,16 @@ plugins {
 	id 'java'
 	id 'java-library'
 	id 'checkstyle'
-	id 'org.springframework.boot' version '3.5.6' apply false
-	id 'io.spring.dependency-management' version '1.1.7' apply false
 	id 'com.bmuschko.docker-remote-api' version '9.3.2'
-	id("io.freefair.lombok") version "8.13.1" apply false
+    id 'org.openrewrite.rewrite' version '7.20.0'
+    id 'org.springframework.boot' version '3.5.6' apply false
+    id 'io.spring.dependency-management' version '1.1.7' apply false
+    id 'io.freefair.lombok' version "8.13.1" apply false
 }
 
 import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
 import com.bmuschko.gradle.docker.tasks.image.DockerPushImage
+import org.springframework.boot.gradle.plugin.SpringBootPlugin
 
 ext {
 	registry = project.registry_local
@@ -17,6 +19,10 @@ ext {
 
 repositories {
 	mavenCentral()
+}
+
+dependencies {
+    rewrite("org.openrewrite.recipe:rewrite-static-analysis:2.21.0")
 }
 
 checkstyle {
@@ -32,7 +38,7 @@ subprojects {
 
 	dependencyManagement {
 		imports {
-			mavenBom org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES
+			mavenBom SpringBootPlugin.BOM_COORDINATES
 		}
 	}
 
@@ -64,7 +70,7 @@ subprojects {
 		}
 	} else {
 		// Disable bootJar task for non-Spring Boot modules if it exists
-		tasks.matching { it.name == 'bootJar' }.all {
+		tasks.matching { it.name == 'bootJar' }.configureEach {
 			it.enabled = false
 		}
 	}
@@ -122,4 +128,8 @@ tasks.register('checkstyleAll') {
 	dependsOn subprojects.collect { "${it.path}:checkstyleMain" }
 	description = 'Run Checkstyle on all subprojects'
 	group = 'Verification'
+}
+
+rewrite {
+    activeRecipe("org.openrewrite.staticanalysis.CodeCleanup")
 }
