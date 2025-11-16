@@ -8,6 +8,7 @@ import static org.mockito.Mockito.mock;
 
 import com.marvin.app.controller.dto.InfluxBucketResponse;
 import com.marvin.export.InfluxExporter;
+import com.marvin.upload.Uploader;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -30,7 +31,7 @@ class InfluxExportControllerTest {
 
     @BeforeEach
     void setUp() {
-        influxExportController = new InfluxExportController(mock(InfluxExporter.class));
+        influxExportController = new InfluxExportController(mock(InfluxExporter.class), mock(Uploader.class));
     }
 
     @Test
