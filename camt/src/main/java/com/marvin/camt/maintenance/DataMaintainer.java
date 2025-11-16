@@ -8,15 +8,15 @@ import reactor.core.publisher.Flux;
 @Component
 public class DataMaintainer {
 
-  private final List<BookEntryDataMaintenance> maintainers;
+    private final List<BookEntryDataMaintenance> maintainers;
 
-  public DataMaintainer(List<BookEntryDataMaintenance> maintainers) {
-    this.maintainers = maintainers;
-  }
+    public DataMaintainer(List<BookEntryDataMaintenance> maintainers) {
+        this.maintainers = maintainers;
+    }
 
-  public Flux<BookingEntryDTO> maintainData(BookingEntryDTO bookingEntries) {
-    return Flux.fromIterable(maintainers)
-        .reduce(bookingEntries, (l, r) -> r.applyToBookEntry(l))
-        .flux();
-  }
+    public Flux<BookingEntryDTO> maintainData(BookingEntryDTO bookingEntries) {
+        return Flux.fromIterable(maintainers)
+                .reduce(bookingEntries, (l, r) -> r.applyToBookEntry(l))
+                .flux();
+    }
 }

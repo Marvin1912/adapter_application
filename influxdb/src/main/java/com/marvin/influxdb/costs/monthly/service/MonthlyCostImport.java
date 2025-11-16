@@ -11,8 +11,7 @@ import org.springframework.stereotype.Component;
  * Service class for importing monthly cost data into InfluxDB.
  *
  * <p>This component extends the AbstractCostImport to provide specific functionality
- * for importing monthly cost measurements. It handles the mapping from MonthlyCostDTO
- * to MonthlyCostMeasurement for storage in InfluxDB.</p>
+ * for importing monthly cost measurements. It handles the mapping from MonthlyCostDTO to MonthlyCostMeasurement for storage in InfluxDB.</p>
  *
  * @author Marvin Application
  * @version 1.0
@@ -34,8 +33,7 @@ public class MonthlyCostImport extends AbstractCostImport<MonthlyCostDTO, Monthl
      * Maps a MonthlyCostDTO to a MonthlyCostMeasurement.
      *
      * <p>This method transforms the monthly cost DTO into a measurement object
-     * that can be written to InfluxDB, setting the appropriate cost type tag
-     * and converting the date to an instant.</p>
+     * that can be written to InfluxDB, setting the appropriate cost type tag and converting the date to an instant.</p>
      *
      * @param monthlyCost the monthly cost DTO to map
      * @return the corresponding monthly cost measurement

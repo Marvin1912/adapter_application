@@ -6,8 +6,7 @@ import java.time.Instant;
 import java.util.List;
 
 /**
- * Response DTO for InfluxDB export operations.
- * Provides export status, messages, and generated file information.
+ * Response DTO for InfluxDB export operations. Provides export status, messages, and generated file information.
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class InfluxExportResponse {
@@ -48,14 +47,14 @@ public class InfluxExportResponse {
     /**
      * Creates a successful export response.
      *
-     * @param message Success message
+     * @param message       Success message
      * @param exportedFiles List of exported file paths
      * @return Successful response
      */
     public static InfluxExportResponse success(String message, List<Path> exportedFiles) {
         final List<String> fileNames = exportedFiles.stream()
-            .map(path -> path.getFileName().toString())
-            .toList();
+                .map(path -> path.getFileName().toString())
+                .toList();
         return new InfluxExportResponse(true, message, fileNames, null);
     }
 

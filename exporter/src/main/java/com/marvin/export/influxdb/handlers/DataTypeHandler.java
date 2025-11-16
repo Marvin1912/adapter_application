@@ -18,6 +18,9 @@ public class DataTypeHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DataTypeHandler.class);
 
+    private DataTypeHandler() {
+    }
+
     /**
      * Converts a FluxRecord to the appropriate DTO based on the bucket name.
      *
@@ -137,7 +140,4 @@ public class DataTypeHandler {
                 && dto.timestamp() != null
                 && !dto.fields().isEmpty();
     }
-
-  private DataTypeHandler() {
-  }
 }

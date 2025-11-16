@@ -23,51 +23,51 @@ import org.hibernate.envers.Audited;
 @Audited
 public class Plant {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "plant_id_gen")
-  @SequenceGenerator(name = "plant_id_gen", sequenceName = "plants.plant_id_seq", allocationSize = 1)
-  @Column(name = "id", nullable = false)
-  private Integer id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "plant_id_gen")
+    @SequenceGenerator(name = "plant_id_gen", sequenceName = "plants.plant_id_seq", allocationSize = 1)
+    @Column(name = "id", nullable = false)
+    private Integer id;
 
-  @Column(name = "name", nullable = false)
-  private String name;
+    @Column(name = "name", nullable = false)
+    private String name;
 
-  @Column(name = "species", nullable = false)
-  private String species;
+    @Column(name = "species", nullable = false)
+    private String species;
 
-  @Column(name = "description", nullable = false)
-  private String description;
+    @Column(name = "description", nullable = false)
+    private String description;
 
-  @Column(name = "care_instructions")
-  private String careInstructions;
+    @Column(name = "care_instructions")
+    private String careInstructions;
 
-  @Column(name = "location", nullable = false)
-  @Enumerated(EnumType.STRING)
-  private PlantLocation location;
+    @Column(name = "location", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private PlantLocation location;
 
-  @Column(name = "watering_frequency", nullable = false)
-  private Integer wateringFrequency;
+    @Column(name = "watering_frequency", nullable = false)
+    private Integer wateringFrequency;
 
-  @Column(name = "last_watered_date")
-  private LocalDate lastWateredDate;
+    @Column(name = "last_watered_date")
+    private LocalDate lastWateredDate;
 
-  @Column(name = "next_watered_date")
-  private LocalDate nextWateredDate;
+    @Column(name = "next_watered_date")
+    private LocalDate nextWateredDate;
 
-  @Column(name = "image")
-  private String image;
+    @Column(name = "image")
+    private String image;
 
-  @Override
-  public boolean equals(Object o) {
-    if (o == null || getClass() != o.getClass()) {
-      return false;
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        final Plant plant = (Plant) o;
+        return Objects.equals(id, plant.id);
     }
-    final Plant plant = (Plant) o;
-    return Objects.equals(id, plant.id);
-  }
 
-  @Override
-  public int hashCode() {
-    return Objects.hashCode(id);
-  }
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
 }

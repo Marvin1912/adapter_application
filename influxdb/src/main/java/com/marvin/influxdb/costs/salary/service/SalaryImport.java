@@ -11,8 +11,7 @@ import org.springframework.stereotype.Component;
  * Service class for importing salary cost data into InfluxDB.
  *
  * <p>This component extends the AbstractCostImport to provide specific functionality
- * for importing salary cost measurements. It handles the mapping from SalaryDTO
- * to SalaryMeasurement for storage in InfluxDB.</p>
+ * for importing salary cost measurements. It handles the mapping from SalaryDTO to SalaryMeasurement for storage in InfluxDB.</p>
  *
  * @author Marvin Application
  * @version 1.0
@@ -34,8 +33,7 @@ public class SalaryImport extends AbstractCostImport<SalaryDTO, SalaryMeasuremen
      * Maps a SalaryDTO to a SalaryMeasurement.
      *
      * <p>This method transforms the salary DTO into a measurement object
-     * that can be written to InfluxDB, setting the appropriate cost type tag
-     * and converting the date to an instant.</p>
+     * that can be written to InfluxDB, setting the appropriate cost type tag and converting the date to an instant.</p>
      *
      * @param salary the salary DTO to map
      * @return the corresponding salary cost measurement

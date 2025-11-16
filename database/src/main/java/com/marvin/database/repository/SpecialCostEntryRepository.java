@@ -7,8 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface SpecialCostEntryRepository extends JpaRepository<SpecialCostEntryEntity, Integer> {
 
-  List<SpecialCostEntryEntity> findBySpecialCostCostDate(LocalDate costDate);
+    List<SpecialCostEntryEntity> findBySpecialCostCostDate(LocalDate costDate);
 
-  List<SpecialCostEntryEntity> findAllByOrderBySpecialCostCostDate();
+    List<SpecialCostEntryEntity> findAllByOrderBySpecialCostCostDate();
 
 }

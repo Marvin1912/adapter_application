@@ -8,11 +8,11 @@ import com.marvin.consul.config.ConsulKeyValueValueDeserializer;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record ConsulKeyValueDTO(String key, String value) {
 
-  public ConsulKeyValueDTO(
-      @JsonProperty("Key") String key,
-      @JsonProperty("Value") @JsonDeserialize(using = ConsulKeyValueValueDeserializer.class) String value
-  ) {
-    this.key = key;
-    this.value = value;
-  }
+    public ConsulKeyValueDTO(
+            @JsonProperty("Key") String key,
+            @JsonProperty("Value") @JsonDeserialize(using = ConsulKeyValueValueDeserializer.class) String value
+    ) {
+        this.key = key;
+        this.value = value;
+    }
 }

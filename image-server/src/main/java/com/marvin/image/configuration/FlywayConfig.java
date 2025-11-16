@@ -8,15 +8,15 @@ import org.springframework.context.annotation.Configuration;
 @Configuration("FlywayConfigImages")
 public class FlywayConfig {
 
-  @Bean(initMethod = "migrate")
-  public Flyway flywayImages(DataSource dataSource) {
-    return Flyway.configure()
-        .dataSource(dataSource)
-        .locations("classpath:db/migration/images")
-        .schemas("images")
-        .table("flyway_schema_history_images")
-        .baselineOnMigrate(true)
-        .load();
-  }
+    @Bean(initMethod = "migrate")
+    public Flyway flywayImages(DataSource dataSource) {
+        return Flyway.configure()
+                .dataSource(dataSource)
+                .locations("classpath:db/migration/images")
+                .schemas("images")
+                .table("flyway_schema_history_images")
+                .baselineOnMigrate(true)
+                .load();
+    }
 
 }

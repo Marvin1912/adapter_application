@@ -13,10 +13,9 @@ import org.slf4j.LoggerFactory;
  * Abstract base class for importing cost data into InfluxDB.
  *
  * <p>This class provides common functionality for importing different types of cost data
- * into InfluxDB measurements. It handles the conversion between DTOs and measurements,
- * and manages the writing of data to the InfluxDB database.</p>
+ * into InfluxDB measurements. It handles the conversion between DTOs and measurements, and manages the writing of data to the InfluxDB database.</p>
  *
- * @param <DTO> the type of data transfer object to be imported
+ * @param <DTO>  the type of data transfer object to be imported
  * @param <MEAS> the type of measurement to be written to InfluxDB
  * @author Marvin Application
  * @version 1.0

@@ -11,13 +11,13 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface FlashcardRepository extends JpaRepository<FlashcardEntity, Integer> {
 
-  @Query("SELECT f.ankiId FROM FlashcardEntity f")
-  Set<String> getAllAnkiIds();
+    @Query("SELECT f.ankiId FROM FlashcardEntity f")
+    Set<String> getAllAnkiIds();
 
-  Optional<FlashcardEntity> findByFrontAndBack(String front, String back);
+    Optional<FlashcardEntity> findByFrontAndBack(String front, String back);
 
-  List<FlashcardEntity> findByAnkiIdIsNull();
+    List<FlashcardEntity> findByAnkiIdIsNull();
 
-  List<FlashcardEntity> findByUpdated(boolean updated);
+    List<FlashcardEntity> findByUpdated(boolean updated);
 
 }

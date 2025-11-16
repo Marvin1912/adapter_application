@@ -9,30 +9,30 @@ import org.springframework.stereotype.Component;
 @Component("monthlyCostBlockedIbans")
 public class MonthlyCostBlockedIbansConsul implements Ibans {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(
-      MonthlyCostBlockedIbansConsul.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+            MonthlyCostBlockedIbansConsul.class);
 
-  private final Set<String> blockedIbans;
-  private final MonthlyCostConsulRepository monthlyCostConsulRepository;
+    private final Set<String> blockedIbans;
+    private final MonthlyCostConsulRepository monthlyCostConsulRepository;
 
-  public MonthlyCostBlockedIbansConsul(MonthlyCostConsulRepository monthlyCostConsulRepository) {
-    this.monthlyCostConsulRepository = monthlyCostConsulRepository;
-    this.blockedIbans = initIbans();
-  }
+    public MonthlyCostBlockedIbansConsul(MonthlyCostConsulRepository monthlyCostConsulRepository) {
+        this.monthlyCostConsulRepository = monthlyCostConsulRepository;
+        this.blockedIbans = initIbans();
+    }
 
-  private Set<String> initIbans() {
+    private Set<String> initIbans() {
 
-    String property = monthlyCostConsulRepository.getProperty("iban/blocked");
+        String property = monthlyCostConsulRepository.getProperty("iban/blocked");
 
-    Set<String> blockedIbans = Set.of(property.split(","));
+        Set<String> blockedIbans = Set.of(property.split(","));
 
-    LOGGER.info("Initialized monthly cost blocked IBANs with: {}!", blockedIbans);
+        LOGGER.info("Initialized monthly cost blocked IBANs with: {}!", blockedIbans);
 
-    return blockedIbans;
-  }
+        return blockedIbans;
+    }
 
-  @Override
-  public Set<String> getIbans() {
-    return blockedIbans;
-  }
+    @Override
+    public Set<String> getIbans() {
+        return blockedIbans;
+    }
 }

@@ -132,4 +132,5 @@ tasks.register('checkstyleAll') {
 
 rewrite {
     activeRecipe("org.openrewrite.staticanalysis.CodeCleanup")
+    checkstyleConfigFile = file("$rootDir/config/checkstyle/checkstyle.xml")
 }

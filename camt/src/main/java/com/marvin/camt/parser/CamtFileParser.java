@@ -17,50 +17,50 @@ import reactor.core.scheduler.Schedulers;
 @Component
 public class CamtFileParser {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(CamtFileParser.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CamtFileParser.class);
 
-  private static Flux<ByteArrayOutputStream> readNextZipEntry(ZipInputStream zipInputStream) {
-    return Flux.generate(sink -> readNextZipEntry(zipInputStream, sink));
-  }
-
-  private static void readNextZipEntry(ZipInputStream zipInputStream,
-      SynchronousSink<ByteArrayOutputStream> sink) {
-    try {
-      ZipEntry entry = zipInputStream.getNextEntry();
-      if (entry != null) {
-
-        LOGGER.info("Reading file: " + entry);
-
-        if (!entry.isDirectory()) {
-          ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-          byte[] buffer = new byte[1024];
-          int len;
-          while ((len = zipInputStream.read(buffer)) > 0) {
-            outputStream.write(buffer, 0, len);
-          }
-          zipInputStream.closeEntry();
-          sink.next(outputStream);
-        }
-      } else {
-        sink.complete();
-      }
-    } catch (IOException e) {
-      LOGGER.error("Error processing ZipEntry!", e);
-      sink.error(e);
+    private static Flux<ByteArrayOutputStream> readNextZipEntry(ZipInputStream zipInputStream) {
+        return Flux.generate(sink -> readNextZipEntry(zipInputStream, sink));
     }
-  }
 
-  public Flux<ByteArrayOutputStream> unzipFile(InputStream file) {
-    return Flux.usingWhen(
-        Mono.fromCallable(() -> new ZipInputStream(file, StandardCharsets.UTF_8)),
-        CamtFileParser::readNextZipEntry,
-        zipInputStream -> Mono.fromRunnable(() -> {
-          try {
-            zipInputStream.close();
-          } catch (IOException e) {
-            LOGGER.error("Error closing ZipInputStream!", e);
-          }
-        }).subscribeOn(Schedulers.boundedElastic())
-    );
-  }
+    private static void readNextZipEntry(ZipInputStream zipInputStream,
+            SynchronousSink<ByteArrayOutputStream> sink) {
+        try {
+            ZipEntry entry = zipInputStream.getNextEntry();
+            if (entry != null) {
+
+                LOGGER.info("Reading file: " + entry);
+
+                if (!entry.isDirectory()) {
+                    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                    byte[] buffer = new byte[1024];
+                    int len;
+                    while ((len = zipInputStream.read(buffer)) > 0) {
+                        outputStream.write(buffer, 0, len);
+                    }
+                    zipInputStream.closeEntry();
+                    sink.next(outputStream);
+                }
+            } else {
+                sink.complete();
+            }
+        } catch (IOException e) {
+            LOGGER.error("Error processing ZipEntry!", e);
+            sink.error(e);
+        }
+    }
+
+    public Flux<ByteArrayOutputStream> unzipFile(InputStream file) {
+        return Flux.usingWhen(
+                Mono.fromCallable(() -> new ZipInputStream(file, StandardCharsets.UTF_8)),
+                CamtFileParser::readNextZipEntry,
+                zipInputStream -> Mono.fromRunnable(() -> {
+                    try {
+                        zipInputStream.close();
+                    } catch (IOException e) {
+                        LOGGER.error("Error closing ZipInputStream!", e);
+                    }
+                }).subscribeOn(Schedulers.boundedElastic())
+        );
+    }
 }

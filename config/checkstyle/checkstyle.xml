@@ -68,11 +68,11 @@
     <module name="SimplifyBooleanExpression"/>
     <module name="SimplifyBooleanReturn"/>
     <module name="StringLiteralEquality"/>
+    <module name="UnusedLocalVariable"/>
     <module name="IllegalType">
       <property name="illegalClassNames" value="java.util.Optional"/>
       <property name="tokens" value="PARAMETER_DEF"/>
     </module>
-
 
     <!-- Java 17+ Modern Features -->
     <module name="LambdaParameterName"/>

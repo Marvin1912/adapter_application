@@ -7,17 +7,16 @@ import java.util.List;
 import java.util.StringJoiner;
 
 /**
- * Utility class for building Flux queries for InfluxDB data exports.
- * Provides a fluent API for constructing queries with common patterns.
+ * Utility class for building Flux queries for InfluxDB data exports. Provides a fluent API for constructing queries with common patterns.
  */
 public class InfluxQueryBuilder {
 
     private final String bucket;
-    private String startTime;
-    private String endTime;
     private final List<String> measurementFilters = new ArrayList<>();
     private final List<String> fieldFilters = new ArrayList<>();
     private final List<String> mapFunctions = new ArrayList<>();
+    private String startTime;
+    private String endTime;
     private String sortDirection;
     private boolean keepOriginalColumns = true;
 
@@ -42,7 +41,7 @@ public class InfluxQueryBuilder {
      * Sets the time range for the query using Instant objects.
      *
      * @param start The start time
-     * @param end The end time
+     * @param end   The end time
      * @return This builder for method chaining
      */
     public InfluxQueryBuilder timeRange(Instant start, Instant end) {

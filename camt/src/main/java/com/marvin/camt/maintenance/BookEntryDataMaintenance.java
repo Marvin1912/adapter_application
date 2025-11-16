@@ -4,5 +4,5 @@ import com.marvin.camt.model.book_entry.BookingEntryDTO;
 
 public interface BookEntryDataMaintenance {
 
-  BookingEntryDTO applyToBookEntry(BookingEntryDTO bookingEntry);
+    BookingEntryDTO applyToBookEntry(BookingEntryDTO bookingEntry);
 }

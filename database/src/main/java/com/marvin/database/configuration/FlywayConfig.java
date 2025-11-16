@@ -8,13 +8,13 @@ import org.springframework.context.annotation.Configuration;
 @Configuration("FlywayConfigMain")
 public class FlywayConfig {
 
-  @Bean(initMethod = "migrate")
-  public Flyway flywayMain(DataSource dataSource) {
-    return Flyway.configure()
-        .dataSource(dataSource)
-        .locations("classpath:db/migration/costs")
-        .baselineOnMigrate(true)
-        .load();
-  }
+    @Bean(initMethod = "migrate")
+    public Flyway flywayMain(DataSource dataSource) {
+        return Flyway.configure()
+                .dataSource(dataSource)
+                .locations("classpath:db/migration/costs")
+                .baselineOnMigrate(true)
+                .load();
+    }
 
 }

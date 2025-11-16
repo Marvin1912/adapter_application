@@ -8,8 +8,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface SalaryRepository extends JpaRepository<SalaryEntity, Integer> {
 
-  Optional<SalaryEntity> findBySalaryDate(LocalDate salaryDate);
+    Optional<SalaryEntity> findBySalaryDate(LocalDate salaryDate);
 
-  List<SalaryEntity> findAllByOrderBySalaryDate();
+    List<SalaryEntity> findAllByOrderBySalaryDate();
 
 }

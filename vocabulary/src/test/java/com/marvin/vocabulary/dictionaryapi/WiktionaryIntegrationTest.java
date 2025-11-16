@@ -6,27 +6,27 @@ import reactor.test.StepVerifier;
 
 class WiktionaryIntegrationTest {
 
-  @Test
-  void getWordWithValidWordShouldReturnEntriesFromWiktionary() {
-    final HtmlCleaner htmlCleaner = new HtmlCleaner();
-    final WiktionaryResponseMapper responseMapper = new WiktionaryResponseMapper(htmlCleaner);
-    final DictionaryClient dictionaryClient = new DictionaryClient(responseMapper);
+    @Test
+    void getWordWithValidWordShouldReturnEntriesFromWiktionary() {
+        final HtmlCleaner htmlCleaner = new HtmlCleaner();
+        final WiktionaryResponseMapper responseMapper = new WiktionaryResponseMapper(htmlCleaner);
+        final DictionaryClient dictionaryClient = new DictionaryClient(responseMapper);
 
-    final String testWord = "hello";
+        final String testWord = "hello";
 
-    StepVerifier.create(dictionaryClient.getWord(testWord))
-        .expectNextMatches(entries -> {
-          if (entries.isEmpty()) {
-            return false;
-          }
+        StepVerifier.create(dictionaryClient.getWord(testWord))
+                .expectNextMatches(entries -> {
+                    if (entries.isEmpty()) {
+                        return false;
+                    }
 
-          final DictionaryEntry entry = entries.get(0);
-          return entry.word().equals(testWord)
-              && !entry.meanings().isEmpty()
-              && entry.meanings().get(0).partOfSpeech() != null
-              && !entry.meanings().get(0).definitions().isEmpty()
-              && entry.meanings().get(0).definitions().get(0).definition() != null;
-        })
-        .verifyComplete();
-  }
+                    final DictionaryEntry entry = entries.get(0);
+                    return entry.word().equals(testWord)
+                            && !entry.meanings().isEmpty()
+                            && entry.meanings().get(0).partOfSpeech() != null
+                            && !entry.meanings().get(0).definitions().isEmpty()
+                            && entry.meanings().get(0).definitions().get(0).definition() != null;
+                })
+                .verifyComplete();
+    }
 }

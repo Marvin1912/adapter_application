@@ -9,8 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * Request DTO for InfluxDB export operations. Supports bucket selection and optional time range
- * filtering.
+ * Request DTO for InfluxDB export operations. Supports bucket selection and optional time range filtering.
  */
 @Setter
 @Getter
@@ -19,24 +18,22 @@ import lombok.Setter;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class InfluxExportRequest {
 
-  /**
-   * List of bucket names to export. If null or empty, all enabled buckets will be exported. Valid
-   * values: SYSTEM_METRICS, SENSOR_DATA, SENSOR_DATA_AGGREGATED, COSTS
-   */
-  private List<String> buckets;
+    /**
+     * List of bucket names to export. If null or empty, all enabled buckets will be exported. Valid values: SYSTEM_METRICS, SENSOR_DATA,
+     * SENSOR_DATA_AGGREGATED, COSTS
+     */
+    private List<String> buckets;
 
-  /**
-   * Optional start time for filtering data (ISO-8601 format). If not provided, defaults to 24 hours
-   * ago for time-range exports.
-   */
-  @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Europe/Berlin'", timezone = "UTC")
-  private String startTime;
+    /**
+     * Optional start time for filtering data (ISO-8601 format). If not provided, defaults to 24 hours ago for time-range exports.
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Europe/Berlin'", timezone = "UTC")
+    private String startTime;
 
-  /**
-   * Optional end time for filtering data (ISO-8601 format). If not provided, defaults to current
-   * time for time-range exports.
-   */
-  @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Europe/Berlin'", timezone = "UTC")
-  private String endTime;
+    /**
+     * Optional end time for filtering data (ISO-8601 format). If not provided, defaults to current time for time-range exports.
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Europe/Berlin'", timezone = "UTC")
+    private String endTime;
 
 }

@@ -61,12 +61,14 @@ public class ExportFileWriter {
     }
 
     public static class FileWriteException extends RuntimeException {
+
         public FileWriteException(String message, Throwable cause) {
             super(message, cause);
         }
     }
 
     public static class JsonSerializationException extends RuntimeException {
+
         public JsonSerializationException(String message, Throwable cause) {
             super(message, cause);
         }

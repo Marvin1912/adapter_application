@@ -67,6 +67,8 @@ public class InfluxExporter {
      * Exports data from specific buckets only.
      *
      * @param buckets The buckets to export
+     * @param startTime The start time to export
+     * @param endTime The end time to export
      * @return List of generated file paths
      */
     public List<Path> exportSelectedBuckets(Set<InfluxBucket> buckets, Instant startTime, Instant endTime) {

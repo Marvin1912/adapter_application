@@ -6,9 +6,7 @@ import com.influxdb.query.FluxTable;
 import com.marvin.export.ExportConfig;
 import java.time.Instant;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -17,8 +15,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Generic base class for exporting data from InfluxDB user buckets. Follows the template method
- * pattern to provide a consistent export workflow while allowing bucket-specific implementations.
+ * Generic base class for exporting data from InfluxDB user buckets. Follows the template method pattern to provide a consistent export workflow while allowing
+ * bucket-specific implementations.
  *
  * @param <T> The type of DTO that will be produced from the InfluxDB data
  */
@@ -33,8 +31,7 @@ public abstract class AbstractInfluxExport<T> {
     protected ExportConfig exportConfig;
 
     /**
-     * Template method that defines the standard export workflow. This method orchestrates the
-     * entire export process.
+     * Template method that defines the standard export workflow. This method orchestrates the entire export process.
      *
      * @param startTime The start time for the export range (null for default)
      * @param endTime   The end time for the export range (null for default)

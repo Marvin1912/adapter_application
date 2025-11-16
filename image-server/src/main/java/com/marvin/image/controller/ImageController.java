@@ -21,49 +21,49 @@ import reactor.core.publisher.Mono;
 @RequestMapping(path = "/images")
 public class ImageController {
 
-  private final ImageService imageService;
+    private final ImageService imageService;
 
-  public ImageController(ImageService imageService) {
-    this.imageService = imageService;
-  }
+    public ImageController(ImageService imageService) {
+        this.imageService = imageService;
+    }
 
-  private static Mono<byte[]> getFileAsByteArray(Mono<FilePart> file) {
-    return file
-        .flatMap(filePart ->
-            DataBufferUtils.join(filePart.content())
-                .flatMap(dataBuffer -> {
-                  byte[] bytes = new byte[dataBuffer.readableByteCount()];
-                  dataBuffer.read(bytes);
-                  DataBufferUtils.release(dataBuffer);
-                  return Mono.just(bytes);
-                })
-        )
-        .switchIfEmpty(Mono.just(new byte[0]))
-        .onErrorResume(e -> {
-          log.error("", e);
-          return Mono.just(new byte[0]);
-        });
-  }
+    private static Mono<byte[]> getFileAsByteArray(Mono<FilePart> file) {
+        return file
+                .flatMap(filePart ->
+                        DataBufferUtils.join(filePart.content())
+                                .flatMap(dataBuffer -> {
+                                    final byte[] bytes = new byte[dataBuffer.readableByteCount()];
+                                    dataBuffer.read(bytes);
+                                    DataBufferUtils.release(dataBuffer);
+                                    return Mono.just(bytes);
+                                })
+                )
+                .switchIfEmpty(Mono.just(new byte[0]))
+                .onErrorResume(e -> {
+                    log.error("", e);
+                    return Mono.just(new byte[0]);
+                });
+    }
 
-  @PostMapping
-  public Mono<ResponseEntity<Object>> createImage(
-      @RequestPart("image") Mono<FilePart> image,
-      @RequestParam(name = "content-type") String contentType
-  ) {
-    return getFileAsByteArray(image)
-        .doOnError(throwable -> log.error("", throwable))
-        .flatMap(rawBytes ->
-            imageService.saveImage(rawBytes, contentType)
-                .map(uuid -> ResponseEntity.created(
-                    URI.create("/images/%s".formatted(uuid))).build())
-        );
-  }
+    @PostMapping
+    public Mono<ResponseEntity<Object>> createImage(
+            @RequestPart("image") Mono<FilePart> image,
+            @RequestParam(name = "content-type") String contentType
+    ) {
+        return getFileAsByteArray(image)
+                .doOnError(throwable -> log.error("", throwable))
+                .flatMap(rawBytes ->
+                        imageService.saveImage(rawBytes, contentType)
+                                .map(uuid -> ResponseEntity.created(
+                                        URI.create("/images/%s".formatted(uuid))).build())
+                );
+    }
 
-  @GetMapping(path = "/{uuid}")
-  public Mono<ResponseEntity<byte[]>> getImage(@PathVariable UUID uuid) {
-    return imageService.getImage(uuid)
-        .map(ResponseEntity::ok)
-        .defaultIfEmpty(ResponseEntity.notFound().build());
-  }
+    @GetMapping(path = "/{uuid}")
+    public Mono<ResponseEntity<byte[]>> getImage(@PathVariable UUID uuid) {
+        return imageService.getImage(uuid)
+                .map(ResponseEntity::ok)
+                .defaultIfEmpty(ResponseEntity.notFound().build());
+    }
 
 }

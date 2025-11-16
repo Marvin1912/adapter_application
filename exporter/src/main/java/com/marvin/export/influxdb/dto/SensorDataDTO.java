@@ -4,8 +4,8 @@ import java.time.Instant;
 import java.util.Map;
 
 /**
- * Data Transfer Object for IoT sensor data from the sensor_data bucket. Contains humidity sensors,
- * energy monitoring, and other IoT sensor readings from Home Assistant integration.
+ * Data Transfer Object for IoT sensor data from the sensor_data bucket. Contains humidity sensors, energy monitoring, and other IoT sensor readings from Home
+ * Assistant integration.
  *
  * @param measurement  the InfluxDB measurement name
  * @param entityId     the unique identifier for the sensor entity
@@ -15,19 +15,19 @@ import java.util.Map;
  * @param tags         map of tag names to their values
  */
 public record SensorDataDTO(
-    String measurement,
-    String entityId,
-    String friendlyName,
-    Instant timestamp,
-    Map<String, Object> fields,
-    Map<String, String> tags
+        String measurement,
+        String entityId,
+        String friendlyName,
+        Instant timestamp,
+        Map<String, Object> fields,
+        Map<String, String> tags
 ) {
 
-  public boolean isHumiditySensor() {
-    return "%".equals(measurement);
-  }
+    public boolean isHumiditySensor() {
+        return "%".equals(measurement);
+    }
 
-  public boolean isTemperatureSensor() {
-    return "°C".equals(measurement);
-  }
+    public boolean isTemperatureSensor() {
+        return "°C".equals(measurement);
+    }
 }

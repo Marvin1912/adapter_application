@@ -11,8 +11,7 @@ import org.springframework.stereotype.Component;
  * Service class for importing daily cost data into InfluxDB.
  *
  * <p>This component extends the AbstractCostImport to provide specific functionality
- * for importing daily cost measurements. It handles the mapping from DailyCostDTO
- * to DailyCostMeasurement for storage in InfluxDB.</p>
+ * for importing daily cost measurements. It handles the mapping from DailyCostDTO to DailyCostMeasurement for storage in InfluxDB.</p>
  *
  * @author Marvin Application
  * @version 1.0
@@ -34,8 +33,7 @@ public class DailyCostImport extends AbstractCostImport<DailyCostDTO, DailyCostM
      * Maps a DailyCostDTO to a DailyCostMeasurement.
      *
      * <p>This method transforms the daily cost DTO into a measurement object
-     * that can be written to InfluxDB, setting the appropriate cost type tag
-     * and converting the date to an instant.</p>
+     * that can be written to InfluxDB, setting the appropriate cost type tag and converting the date to an instant.</p>
      *
      * @param dailyCost the daily cost DTO to map
      * @return the corresponding daily cost measurement

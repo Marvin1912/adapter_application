@@ -10,8 +10,8 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 /**
- * Export service for system metrics data from the system_metrics bucket.
- * Handles CPU, memory, disk, network, and system performance metrics from host home-server.
+ * Export service for system metrics data from the system_metrics bucket. Handles CPU, memory, disk, network, and system performance metrics from host
+ * home-server.
  */
 @Service
 public class SystemMetricsExportService extends AbstractInfluxExport<SystemMetricsDTO> {
@@ -28,8 +28,8 @@ public class SystemMetricsExportService extends AbstractInfluxExport<SystemMetri
         return InfluxQueryBuilder.from(BUCKET_NAME)
                 .timeRange(startTime, endTime)
                 .measurements(
-                    // System metrics measurements we want to export
-                    "cpu", "mem", "system", "disk", "diskio", "net", "processes", "swap"
+                        // System metrics measurements we want to export
+                        "cpu", "mem", "system", "disk", "diskio", "net", "processes", "swap"
                 )
                 .keepOriginalColumns(true)
                 .sort("desc") // Most recent first

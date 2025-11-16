@@ -30,7 +30,7 @@ public class InfluxDbConfig {
      * and URL from the application configuration properties.</p>
      *
      * @param token the authentication token for InfluxDB
-     * @param url the URL of the InfluxDB server
+     * @param url   the URL of the InfluxDB server
      * @return a configured InfluxDB client instance
      */
     @Bean

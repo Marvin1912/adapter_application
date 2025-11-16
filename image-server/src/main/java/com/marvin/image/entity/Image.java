@@ -17,18 +17,18 @@ import lombok.Setter;
 @Table(name = "image", schema = "images")
 public class Image {
 
-  @Id
-  @GeneratedValue
-  private UUID id;
+    @Id
+    @GeneratedValue
+    private UUID id;
 
-  @Column(nullable = false, columnDefinition = "bytea")
-  private byte[] content;
+    @Column(nullable = false, columnDefinition = "bytea")
+    private byte[] content;
 
-  @Column(name = "content_type", nullable = false)
-  private String contentType;
+    @Column(name = "content_type", nullable = false)
+    private String contentType;
 
-  public Image(byte[] content, String contentType) {
-    this.content = content;
-    this.contentType = contentType;
-  }
+    public Image(byte[] content, String contentType) {
+        this.content = content;
+        this.contentType = contentType;
+    }
 }
