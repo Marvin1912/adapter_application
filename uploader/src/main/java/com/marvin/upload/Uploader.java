@@ -38,21 +38,21 @@ public class Uploader {
         this.googleDrive = googleDrive;
     }
 
-    public void zipAndUploadCostFiles(List<Path> filesToZipAndUpload) {
-        LOGGER.info("Going to zip and upload files!");
+    public void zipAndUploadCostFiles(String fileNamePrefix, List<Path> filesToZipAndUpload) {
+        LOGGER.info("Going to zip and upload files with prefix: {}!", fileNamePrefix);
 
         final Path dirPath = Paths.get(costExportFolder);
-        final Path zipFilePath = generateZipFilePath(dirPath);
+        final Path zipFilePath = generateZipFilePath(dirPath, fileNamePrefix);
 
         createZipFile(filesToZipAndUpload, dirPath, zipFilePath);
         uploadToGoogleDrive(zipFilePath);
         cleanupFiles(filesToZipAndUpload, dirPath, zipFilePath);
     }
 
-    private Path generateZipFilePath(Path dirPath) {
+    private Path generateZipFilePath(Path dirPath, String fileNamePrefix) {
         final String timestamp = LocalDateTime.now().format(FILE_DTF);
         final String uniqueId = UUID.randomUUID().toString().substring(0, 8);
-        return dirPath.resolve("files_" + timestamp + "_" + uniqueId + ".zip");
+        return dirPath.resolve(fileNamePrefix + "_" + timestamp + "_" + uniqueId + ".zip");
     }
 
     private void createZipFile(List<Path> filesToZipAndUpload, Path dirPath, Path zipFilePath) {

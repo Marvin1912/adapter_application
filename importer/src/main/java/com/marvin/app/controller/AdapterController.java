@@ -28,7 +28,7 @@ public class AdapterController {
 
     @PostMapping("/export/costs")
     public ResponseEntity<Void> triggerCostUpload() {
-        uploader.zipAndUploadCostFiles(exporter.exportCosts());
+        uploader.zipAndUploadCostFiles("costs", exporter.exportCosts());
         return ResponseEntity.ok().build();
     }
 
