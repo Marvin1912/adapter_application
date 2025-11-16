@@ -4,6 +4,7 @@ import com.marvin.app.controller.dto.InfluxBucketResponse;
 import com.marvin.app.controller.dto.InfluxExportRequest;
 import com.marvin.app.controller.dto.InfluxExportResponse;
 import com.marvin.export.InfluxExporter;
+import com.marvin.upload.Uploader;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -32,9 +33,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class InfluxExportController {
 
     private final InfluxExporter influxExporter;
+    private final Uploader uploader;
 
-    public InfluxExportController(InfluxExporter influxExporter) {
+    public InfluxExportController(InfluxExporter influxExporter, Uploader uploader) {
         this.influxExporter = influxExporter;
+        this.uploader = uploader;
     }
 
     /**
@@ -143,7 +146,10 @@ public class InfluxExportController {
                     endTime != null ? ZonedDateTime.parse(endTime).toInstant() : null
             );
 
-            return ResponseEntity.ok(InfluxExportResponse.success("InfluxDB buckets exported successfully", exportedFiles));
+            // Upload the exported files using the uploader module
+            uploader.zipAndUploadCostFiles(exportedFiles);
+
+            return ResponseEntity.ok(InfluxExportResponse.success("InfluxDB buckets exported and uploaded successfully", exportedFiles));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(InfluxExportResponse.error("Invalid bucket name: " + e.getMessage()));
         } catch (Exception e) {
