@@ -89,7 +89,8 @@ public class InfluxExportController {
      */
     @Operation(
         summary = "Export InfluxDB buckets",
-        description = "Exports data from selected InfluxDB buckets with optional time range filtering. The export is performed asynchronously and returns information about the generated files."
+        description = "Exports data from selected InfluxDB buckets with optional time range filtering. The export is performed asynchronously and returns information about the generated files. " +
+                   "Time range filters use ISO-8601 format: yyyy-MM-dd'T'HH:mm:ss (e.g., 2024-01-15T10:30:00). If no time range is provided, defaults to the last 24 hours."
     )
     @ApiResponses(value = {
         @ApiResponse(
