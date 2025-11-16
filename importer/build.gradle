@@ -12,8 +12,19 @@ dependencies {
     implementation project(':plants')
     implementation project(':image-server')
     implementation project(':vocabulary')
+
+    // Test dependencies
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.junit.platform:junit-platform-launcher'
+    testImplementation 'org.mockito:mockito-core'
+    testImplementation 'org.mockito:mockito-junit-jupiter'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
 bootJar {
     duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
 }

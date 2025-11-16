@@ -20,6 +20,11 @@ public class InfluxBucketResponse {
     private String message;
 
     /**
+     * Indicates whether the operation was successful.
+     */
+    private boolean success;
+
+    /**
      * Timestamp when the response was generated.
      */
     private long timestamp;
@@ -28,6 +33,7 @@ public class InfluxBucketResponse {
         this.buckets = buckets;
         this.message = message;
         this.timestamp = System.currentTimeMillis();
+        this.success = buckets != null;
     }
 
     /**
@@ -72,6 +78,14 @@ public class InfluxBucketResponse {
 
     public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public boolean isSuccess() {
+        return success;
+    }
+
+    public void setSuccess(boolean success) {
+        this.success = success;
     }
 
     /**
