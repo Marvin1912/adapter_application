@@ -5,35 +5,17 @@ import java.nio.file.Path;
 import java.time.Instant;
 import java.util.List;
 
-/**
- * Response DTO for InfluxDB export operations. Provides export status, messages, and generated file information.
- */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class InfluxExportResponse {
 
-    /**
-     * Indicates whether the export operation was successful.
-     */
     private boolean success;
 
-    /**
-     * Status message describing the export result.
-     */
     private String message;
 
-    /**
-     * List of generated export file paths (filenames only).
-     */
     private List<String> exportedFiles;
 
-    /**
-     * Timestamp when the export was completed.
-     */
     private Instant timestamp;
 
-    /**
-     * Error details (only present when success is false).
-     */
     private String error;
 
     private InfluxExportResponse(boolean success, String message, List<String> exportedFiles, String error) {
@@ -44,13 +26,6 @@ public class InfluxExportResponse {
         this.timestamp = Instant.now();
     }
 
-    /**
-     * Creates a successful export response.
-     *
-     * @param message       Success message
-     * @param exportedFiles List of exported file paths
-     * @return Successful response
-     */
     public static InfluxExportResponse success(String message, List<Path> exportedFiles) {
         final List<String> fileNames = exportedFiles.stream()
                 .map(path -> path.getFileName().toString())
@@ -58,12 +33,6 @@ public class InfluxExportResponse {
         return new InfluxExportResponse(true, message, fileNames, null);
     }
 
-    /**
-     * Creates an error export response.
-     *
-     * @param errorMessage Error message
-     * @return Error response
-     */
     public static InfluxExportResponse error(String errorMessage) {
         return new InfluxExportResponse(false, null, null, errorMessage);
     }

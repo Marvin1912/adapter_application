@@ -24,9 +24,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * REST controller for triggering InfluxDB data exports. Provides endpoints to retrieve available buckets and export data from user buckets with optional filtering.
- */
 @RestController
 @Tag(name = "InfluxDB Export", description = "API for exporting InfluxDB bucket data")
 public class InfluxExportController {
@@ -39,11 +36,6 @@ public class InfluxExportController {
         this.uploader = uploader;
     }
 
-    /**
-     * Get available InfluxDB buckets for export.
-     *
-     * @return List of available buckets with their details
-     */
     @Operation(
         summary = "Get available InfluxDB buckets",
         description = "Retrieves a list of all available InfluxDB buckets that can be exported. Each bucket includes its name, bucket identifier, and description."
@@ -83,12 +75,6 @@ public class InfluxExportController {
         }
     }
 
-    /**
-     * Export InfluxDB user buckets.
-     *
-     * @param request Export configuration with bucket selection and optional time range
-     * @return Export response with generated file information
-     */
     @Operation(
         summary = "Export InfluxDB buckets",
         description = "Exports data from selected InfluxDB buckets with optional time range filtering. The export is performed asynchronously and returns information about the generated files. " +
@@ -132,7 +118,6 @@ public class InfluxExportController {
         try {
             final List<Path> exportedFiles;
 
-            // Export specific buckets
             final InfluxExporter.InfluxBucket bucketEnum = InfluxBucket.valueOf(request.getBucket());
 
             final String startTime = request.getStartTime();
@@ -143,7 +128,6 @@ public class InfluxExportController {
                     endTime != null ? ZonedDateTime.parse(endTime).toInstant() : null
             );
 
-            // Upload the exported files using the uploader module
             uploader.zipAndUploadCostFiles(bucketEnum.name(), exportedFiles);
 
             return ResponseEntity.ok(InfluxExportResponse.success("InfluxDB buckets exported and uploaded successfully", exportedFiles));
