@@ -10,22 +10,6 @@ import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import java.time.Instant;
 import java.util.Map;
 
-/**
- * InfluxDB measurement record for sensor data.
- *
- * <p>This record represents sensor data that can be stored in InfluxDB.
- * It supports dynamic measurements, entities, fields, and tags as shown in the JSON example.</p>
- *
- * @param measurement   the name of the measurement (can be wildcard %)
- * @param entityId      the unique identifier of the sensor entity
- * @param friendlyName  the human-readable name of the sensor
- * @param timestamp     the timestamp when the sensor reading was taken
- * @param fields        the sensor values as a map (e.g., humidity value)
- * @param tags          the tags associated with the sensor reading
- * @author Marvin Application
- * @version 1.0
- * @since 1.0
- */
 @Measurement(name = "%")
 public record SensorData(
     @Column(name = "measurement", tag = true)
@@ -61,24 +45,16 @@ public record SensorData(
     boolean humiditySensor
 ) {
 
-    /**
-     * Gets the primary sensor value from the fields map.
-     * Assumes the first value in the fields map is the primary sensor reading.
-     *
-     * @return the primary sensor value, or null if no fields are present
-     */
     public Double getPrimaryValue() {
         if (fields == null || fields.isEmpty()) {
             return null;
         }
 
-        // Try to find a "value" field first
         Object value = fields.get("value");
         if (value instanceof Number) {
             return ((Number) value).doubleValue();
         }
 
-        // If no "value" field, return the first numeric value found
         return fields.values().stream()
                 .filter(Number.class::isInstance)
                 .map(Number.class::cast)
