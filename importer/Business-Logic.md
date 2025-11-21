@@ -32,27 +32,7 @@ The importer supports four cost data types based on filename prefixes:
 - Files are moved even if some individual lines fail to parse (best effort approach)
 - Failed file movements are logged but don't prevent processing of other files
 
-## Error Handling Strategy
-
-### Filename Validation
-- Files with invalid naming patterns are skipped with a warning log
-- No processing attempt is made for files that don't match the expected pattern
-
-### Line Processing Errors
-- Individual JSON lines that fail to parse are logged as errors
-- Processing continues with subsequent lines (best effort approach)
-- Invalid lines don't prevent the entire file from being processed
-
-### File Movement Errors
-- Failed file movements are logged as errors
-- Files remain in the input directory if archival fails
-- This allows for manual intervention and retry
-
-### Service Import Errors
-- Import services handle their own error conditions
-- The importer only logs errors from the file reading/parsing perspective
-
-## Architecture (Post-Refactoring)
+## Architecture
 
 ### Generic Components
 - **GenericFileReader**: Handles file discovery, reading, and archival operations
@@ -120,45 +100,3 @@ The CostImporter orchestrates the process by:
 3. DTOs are created from JSON lines
 4. Import services persist data to databases
 5. Files are moved to processed directory
-
-## Monitoring and Observability
-
-### Logging Levels
-- **INFO**: Successful file processing
-- **WARN**: Filename pattern mismatches, missing handlers
-- **ERROR**: File reading failures, JSON parsing errors, file movement failures
-
-### Key Metrics (for future enhancement)
-- Files processed per run
-- Records imported per file type
-- Parse failure rates
-- File movement success/failure rates
-
-## Extension Points
-
-### Adding New Cost Types
-To add support for new cost types:
-1. Create new DTO class in `common` module
-2. Implement new `ImportService` for the data type
-3. Create new `FileTypeHandler` implementation
-4. Register the handler in `CostImporter` constructor
-
-### Alternative File Formats
-The generic reader can be extended to support other formats by:
-1. Modifying `FileTypeHandler.readValue()` method
-2. Creating alternative line processing strategies
-3. Adding format detection logic
-
-## Performance Considerations
-
-### File Size
-- Processed line by line to handle large files efficiently
-- Memory usage scales with individual record size, not file size
-
-### Batch Processing
-- Each file is processed independently
-- Parallel processing of multiple files could be implemented in the future
-
-### Error Recovery
-- Failed file movements allow for manual retry
-- Invalid lines are logged but don't stop processing
