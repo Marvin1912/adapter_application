@@ -1,14 +1,13 @@
 package com.marvin.influxdb.core;
 
+import com.influxdb.annotations.Measurement;
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.client.WriteApiBlocking;
-import com.influxdb.annotations.Measurement;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
-
 import java.util.Collection;
 import java.util.List;
+import lombok.Getter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Generic POJO importer for writing data to InfluxDB.
@@ -35,12 +34,13 @@ import java.util.List;
  * @version 1.0
  * @since 1.0
  */
-@Component
+@Getter
 public class GenericPojoImporter<T> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GenericPojoImporter.class);
 
     private final InfluxDBClient influxDBClient;
+
     private final InfluxWriteConfig config;
 
     /**
@@ -159,12 +159,4 @@ public class GenericPojoImporter<T> {
         }
     }
 
-    /**
-     * Gets the current write configuration.
-     *
-     * @return the InfluxWriteConfig being used
-     */
-    public InfluxWriteConfig getConfig() {
-        return config;
-    }
 }
