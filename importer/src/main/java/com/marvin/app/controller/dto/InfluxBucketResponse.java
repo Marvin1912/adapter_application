@@ -3,30 +3,15 @@ package com.marvin.app.controller.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.List;
 
-/**
- * Response DTO for InfluxDB bucket information. Provides details about available buckets for export.
- */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class InfluxBucketResponse {
 
-    /**
-     * List of available InfluxDB buckets with their details.
-     */
     private List<InfluxBucketDTO> buckets;
 
-    /**
-     * Status message.
-     */
     private String message;
 
-    /**
-     * Indicates whether the operation was successful.
-     */
     private boolean success;
 
-    /**
-     * Timestamp when the response was generated.
-     */
     private long timestamp;
 
     private InfluxBucketResponse(List<InfluxBucketDTO> buckets, String message) {
@@ -36,22 +21,10 @@ public class InfluxBucketResponse {
         this.success = buckets != null;
     }
 
-    /**
-     * Creates a successful bucket response.
-     *
-     * @param buckets List of available buckets
-     * @return Successful response
-     */
     public static InfluxBucketResponse success(List<InfluxBucketDTO> buckets) {
         return new InfluxBucketResponse(buckets, "Available InfluxDB buckets retrieved successfully");
     }
 
-    /**
-     * Creates an error bucket response.
-     *
-     * @param errorMessage Error message
-     * @return Error response
-     */
     public static InfluxBucketResponse error(String errorMessage) {
         return new InfluxBucketResponse(null, errorMessage);
     }
@@ -88,23 +61,11 @@ public class InfluxBucketResponse {
         this.success = success;
     }
 
-    /**
-     * DTO representing an individual InfluxDB bucket.
-     */
     public static class InfluxBucketDTO {
-        /**
-         * The enum name of the bucket (e.g., SYSTEM_METRICS).
-         */
         private String name;
 
-        /**
-         * The actual bucket name in InfluxDB (e.g., system_metrics).
-         */
         private String bucketName;
 
-        /**
-         * Description of what data this bucket contains.
-         */
         private String description;
 
         public InfluxBucketDTO(String name, String bucketName, String description) {

@@ -8,9 +8,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * Request DTO for InfluxDB export operations. Supports bucket selection and optional time range filtering.
- */
 @Schema(description = "Request configuration for exporting InfluxDB bucket data with optional time range filtering")
 @Setter
 @Getter
@@ -19,9 +16,6 @@ import lombok.Setter;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class InfluxExportRequest {
 
-    /**
-     * Bucket name to export.
-     */
     @Schema(
             description = "Bucket name to export.",
             allowableValues = {"SYSTEM_METRICS", "SENSOR_DATA", "SENSOR_DATA_AGGREGATED", "COSTS"},
@@ -29,9 +23,6 @@ public class InfluxExportRequest {
     )
     private String bucket;
 
-    /**
-     * Optional start time for filtering data. If not provided, defaults to 24 hours ago for time-range exports.
-     */
     @Schema(
             description = "Optional start time for filtering data. If not provided, defaults to 5 years ago (implemented in AbstractInfluxExport).",
             example = "2019-01-15T10:30:00",
@@ -42,9 +33,6 @@ public class InfluxExportRequest {
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "UTC")
     private String startTime;
 
-    /**
-     * Optional end time for filtering data. If not provided, defaults to current time for time-range exports.
-     */
     @Schema(
             description = "Optional end time for filtering data. If not provided, defaults to current time (implemented in AbstractInfluxExport).",
             example = "2024-01-15T18:45:00",

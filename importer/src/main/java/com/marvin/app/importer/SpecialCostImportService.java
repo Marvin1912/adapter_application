@@ -77,7 +77,6 @@ public class SpecialCostImportService implements ImportService<SpecialCostDTO> {
         final List<SpecialCostEntryEntity> specialCostEntryEntities = specialCostEntryRepository.findBySpecialCostCostDate(
                 specialCost.costDate());
 
-        // This means no special costs exist, so new ones need to be created
         if (specialCostEntryEntities.isEmpty()) {
             createAndPersistNewEntries(specialCost);
             return;
