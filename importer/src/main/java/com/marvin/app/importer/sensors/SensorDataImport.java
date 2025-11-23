@@ -25,11 +25,11 @@ public class SensorDataImport {
     public void importSensorData(final SensorDataDTO sensorData) {
 
         final SensorData data = new SensorData(
-            sensorData.measurement(),
-            sensorData.entityId(),
-            sensorData.friendlyName(),
-            Instant.ofEpochMilli(sensorData.timestamp()),
-            (double) sensorData.field()
+            sensorData.getMeasurement(),
+            sensorData.getEntityId(),
+            sensorData.getFriendlyName(),
+            Instant.ofEpochMilli(sensorData.getTimestamp()),
+            (double) sensorData.getField()
         );
 
         genericPojoImporter.importPojo(data);
