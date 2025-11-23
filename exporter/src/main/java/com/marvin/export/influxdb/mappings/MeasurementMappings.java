@@ -19,8 +19,7 @@ public class MeasurementMappings {
             try {
                 return switch (bucketType.toLowerCase()) {
                     case "system_metrics" -> convertSystemMetricsValue(field, value);
-                    case "sensor_data" -> convertSensorDataValue(field, value);
-                    case "sensor_data_30m" -> convertAggregatedValue(field, value);
+                    case "sensor_data", "sensor_data_30m" -> convertSensorDataValue(field, value);
                     default -> value;
                 };
             } catch (Exception e) {
@@ -46,27 +45,7 @@ public class MeasurementMappings {
         }
 
         private static Object convertSensorDataValue(String field, Object value) {
-            // Percentage values
             if ("humidity".equals(field) || field.contains("percent")) {
-                return Double.parseDouble(value.toString());
-            }
-            // Energy values
-            if ("current".equals(field) || "voltage".equals(field)
-                    || "power".equals(field) || "energy".equals(field)) {
-                return Double.parseDouble(value.toString());
-            }
-            return value;
-        }
-
-        private static Object convertAggregatedValue(String field, Object value) {
-            // Statistical values
-            if (field.contains("mean") || field.contains("average")
-                    || field.contains("min") || field.contains("max")
-                    || field.contains("stddev") || field.contains("variance")) {
-                return Double.parseDouble(value.toString());
-            }
-            // Count values
-            if (field.contains("count") || field.contains("sum")) {
                 return Double.parseDouble(value.toString());
             }
             return value;

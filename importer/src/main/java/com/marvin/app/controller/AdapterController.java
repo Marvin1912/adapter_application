@@ -1,6 +1,6 @@
 package com.marvin.app.controller;
 
-import com.marvin.app.importer.CostImporter;
+import com.marvin.app.importer.costs.CostImporter;
 import com.marvin.export.Exporter;
 import com.marvin.upload.Uploader;
 import org.springframework.http.ResponseEntity;

@@ -1,5 +1,6 @@
-package com.marvin.app.importer;
+package com.marvin.app.importer.costs;
 
+import com.marvin.app.service.FileTypeHandler;
 import com.marvin.common.costs.MonthlyCostDTO;
 import org.springframework.stereotype.Component;
 
@@ -23,12 +24,7 @@ public class MonthlyCostHandler implements FileTypeHandler<MonthlyCostDTO> {
     }
 
     @Override
-    public ImportService<MonthlyCostDTO> getImportService() {
-        return monthlyCostImportService;
-    }
-
-    @Override
-    public void send(MonthlyCostDTO dto) {
+    public void handle(MonthlyCostDTO dto) {
         if (dto != null) {
             monthlyCostImportService.importData(dto);
         }

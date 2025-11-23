@@ -1,6 +1,6 @@
 package com.marvin.export.influxdb.dto;
 
-import java.time.Instant;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.Map;
 
 /**
@@ -11,15 +11,16 @@ import java.util.Map;
  * @param entityId     the unique identifier for the sensor entity
  * @param friendlyName the human-readable name of the sensor
  * @param timestamp    the exact timestamp when the sensor reading was recorded
- * @param fields       map of field names to their values
+ * @param field        field name to their value
  * @param tags         map of tag names to their values
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public record SensorDataDTO(
         String measurement,
         String entityId,
         String friendlyName,
-        Instant timestamp,
-        Map<String, Object> fields,
+        Long timestamp,
+        Object field,
         Map<String, String> tags
 ) {
 

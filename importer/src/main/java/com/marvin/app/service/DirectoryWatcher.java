@@ -1,4 +1,4 @@
-package com.marvin.app.service.watcher;
+package com.marvin.app.service;
 
 import com.marvin.app.model.event.NewFileEvent;
 import jakarta.annotation.PreDestroy;

@@ -1,4 +1,4 @@
-package com.marvin.app.importer;
+package com.marvin.app.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -8,8 +8,6 @@ public interface FileTypeHandler<T> {
 
     Class<T> getDtoClass();
 
-    ImportService<T> getImportService();
-
     default T readValue(String value, ObjectMapper objectMapper) {
         try {
             return objectMapper.readValue(value, getDtoClass());
@@ -18,5 +16,5 @@ public interface FileTypeHandler<T> {
         }
     }
 
-    void send(T dto);
+    void handle(T dto);
 }

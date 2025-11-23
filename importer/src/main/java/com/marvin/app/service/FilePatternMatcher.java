@@ -1,4 +1,4 @@
-package com.marvin.app.importer;
+package com.marvin.app.service;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 public class FilePatternMatcher {
 
     private static final Pattern FILE_NAME_PATTERN = Pattern.compile(
-            "([a-z_]+)_[0-9]{8}_[0-9]{6}\\.json");
+        "^([a-z_0-9]+)_[0-9]{8}_[0-9]{6}\\.jsonl?$");
 
     public static FileTypeMatchResult matchFileName(String fileName) {
         final Matcher matcher = FILE_NAME_PATTERN.matcher(fileName);

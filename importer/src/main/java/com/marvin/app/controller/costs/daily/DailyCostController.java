@@ -1,7 +1,7 @@
 package com.marvin.app.controller.costs.daily;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.marvin.app.importer.DailyCostImportService;
+import com.marvin.app.importer.costs.DailyCostImportService;
 import com.marvin.common.costs.DailyCostDTO;
 import com.marvin.database.repository.DailyCostRepository;
 import java.time.LocalDate;

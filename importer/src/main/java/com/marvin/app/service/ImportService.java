@@ -1,4 +1,4 @@
-package com.marvin.app.importer;
+package com.marvin.app.service;
 
 public interface ImportService<T> {
 

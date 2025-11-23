@@ -1,5 +1,6 @@
-package com.marvin.app.importer;
+package com.marvin.app.importer.costs;
 
+import com.marvin.app.service.FileTypeHandler;
 import com.marvin.common.costs.SalaryDTO;
 import org.springframework.stereotype.Component;
 
@@ -23,12 +24,7 @@ public class SalaryHandler implements FileTypeHandler<SalaryDTO> {
     }
 
     @Override
-    public ImportService<SalaryDTO> getImportService() {
-        return salaryImportService;
-    }
-
-    @Override
-    public void send(SalaryDTO dto) {
+    public void handle(SalaryDTO dto) {
         if (dto != null) {
             salaryImportService.importData(dto);
         }

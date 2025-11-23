@@ -1,9 +1,9 @@
 package com.marvin.app.service;
 
-import com.marvin.app.importer.DailyCostImportService;
-import com.marvin.app.importer.MonthlyCostImportService;
-import com.marvin.app.importer.SalaryImportService;
-import com.marvin.app.importer.SpecialCostImportService;
+import com.marvin.app.importer.costs.DailyCostImportService;
+import com.marvin.app.importer.costs.MonthlyCostImportService;
+import com.marvin.app.importer.costs.SalaryImportService;
+import com.marvin.app.importer.costs.SpecialCostImportService;
 import com.marvin.app.model.event.NewFileEvent;
 import com.marvin.camt.maintenance.DataMaintainer;
 import com.marvin.camt.model.book_entry.BookingEntryDTO;

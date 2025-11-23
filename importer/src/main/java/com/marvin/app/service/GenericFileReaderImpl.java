@@ -1,13 +1,13 @@
-package com.marvin.app.importer;
+package com.marvin.app.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.marvin.app.service.FilePatternMatcher.FileTypeMatchResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -15,34 +15,30 @@ public class GenericFileReaderImpl implements GenericFileReader {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GenericFileReaderImpl.class);
 
-    private final String in;
     private final ObjectMapper objectMapper;
     private final FileArchiveService fileArchiveService;
 
     public GenericFileReaderImpl(
-            @Value("${importer.in}") String in,
-            ObjectMapper objectMapper,
-            FileArchiveService fileArchiveService
+        ObjectMapper objectMapper,
+        FileArchiveService fileArchiveService
     ) {
-        this.in = in;
         this.objectMapper = objectMapper;
         this.fileArchiveService = fileArchiveService;
     }
 
     @Override
-    public void importFiles() {
+    public void importFiles(String in, List<FileTypeHandler<?>> handlers) {
         try (Stream<Path> pathStream = Files.walk(Path.of(in), 1)) {
             pathStream
-                    .filter(path -> !Files.isDirectory(path))
-                    .forEach(this::readDataFromFile);
+                .filter(path -> !Files.isDirectory(path))
+                .forEach(path -> processFile(path, handlers));
         } catch (Exception e) {
             LOGGER.error("Could read files!", e);
         }
     }
 
-    @Override
-    public void processFile(Path path, List<FileTypeHandler<?>> handlers) {
-        final FilePatternMatcher.FileTypeMatchResult matchResult =
+    private void processFile(Path path, List<FileTypeHandler<?>> handlers) {
+        final FileTypeMatchResult matchResult =
             FilePatternMatcher.matchFileName(path.getFileName().toString());
 
         if (!matchResult.matches()) {
@@ -67,22 +63,18 @@ public class GenericFileReaderImpl implements GenericFileReader {
         fileArchiveService.moveToDone(path);
     }
 
-    private void readDataFromFile(Path path) {
-        processFile(path, List.of());
-    }
-
     private FileTypeHandler<?> findHandler(String fileType, List<FileTypeHandler<?>> handlers) {
         return handlers.stream()
-                .filter(handler -> handler.canHandle(fileType))
-                .findFirst()
-                .orElse(null);
+            .filter(handler -> handler.canHandle(fileType))
+            .findFirst()
+            .orElse(null);
     }
 
     @SuppressWarnings("unchecked")
     private void processLine(String line, FileTypeHandler<?> handler) {
         try {
             Object dto = handler.readValue(line, objectMapper);
-            ((FileTypeHandler<Object>) handler).send(dto);
+            ((FileTypeHandler<Object>) handler).handle(dto);
         } catch (Exception e) {
             LOGGER.error("Could not process line: {}", line, e);
         }

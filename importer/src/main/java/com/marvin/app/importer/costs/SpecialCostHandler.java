@@ -1,5 +1,6 @@
-package com.marvin.app.importer;
+package com.marvin.app.importer.costs;
 
+import com.marvin.app.service.FileTypeHandler;
 import com.marvin.common.costs.SpecialCostDTO;
 import org.springframework.stereotype.Component;
 
@@ -23,12 +24,7 @@ public class SpecialCostHandler implements FileTypeHandler<SpecialCostDTO> {
     }
 
     @Override
-    public ImportService<SpecialCostDTO> getImportService() {
-        return specialCostImportService;
-    }
-
-    @Override
-    public void send(SpecialCostDTO dto) {
+    public void handle(SpecialCostDTO dto) {
         if (dto != null) {
             specialCostImportService.importData(dto);
         }

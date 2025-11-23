@@ -1,4 +1,4 @@
-package com.marvin.app.importer;
+package com.marvin.app.service;
 
 import java.io.IOException;
 import java.nio.file.Files;

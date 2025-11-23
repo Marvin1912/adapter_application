@@ -1,14 +1,13 @@
-package com.marvin.app.sensor.importer;
+package com.marvin.app.importer.sensors;
 
-import com.marvin.app.importer.ImportService;
-import com.marvin.app.sensor.dto.SensorData;
-import com.marvin.app.sensor.service.SensorDataImport;
+import com.marvin.app.service.ImportService;
+import com.marvin.export.influxdb.dto.SensorDataDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
-public class SensorDataImportService implements ImportService<SensorData> {
+public class SensorDataImportService implements ImportService<SensorDataDTO> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SensorDataImportService.class);
 
@@ -19,7 +18,7 @@ public class SensorDataImportService implements ImportService<SensorData> {
     }
 
     @Override
-    public void importData(final SensorData data) {
+    public void importData(final SensorDataDTO data) {
         if (data == null) {
             LOGGER.warn("Received null sensor data, skipping import");
             return;
