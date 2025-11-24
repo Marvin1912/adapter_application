@@ -5,48 +5,46 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Component
 public class FileLister {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FileLister.class);
 
-    private final String costExportFolder;
+    private final String parentFolderName;
+    private final GoogleDrive googleDrive;
 
-    public FileLister(@Value("${uploader.cost-export-folder}") String costExportFolder) {
-        this.costExportFolder = costExportFolder;
+    public FileLister(
+            @Value("${uploader.parent-folder-name}") String parentFolderName,
+            GoogleDrive googleDrive
+    ) {
+        this.parentFolderName = parentFolderName;
+        this.googleDrive = googleDrive;
     }
 
     public List<String> listFiles() {
-        LOGGER.info("Listing files in folder: {}", costExportFolder);
+        LOGGER.info("Listing files in Google Drive folder: {}", parentFolderName);
 
-        final File folder = new File(costExportFolder);
+        try {
+            final String folderId = googleDrive.getFileId(parentFolderName);
+            final List<DriveFileInfo> driveFiles = googleDrive.listFiles(folderId);
 
-        if (!folder.exists()) {
-            LOGGER.error("Folder does not exist: {}", costExportFolder);
-            throw new IllegalArgumentException("Folder does not exist: " + costExportFolder);
-        }
+            final List<String> fileNames = driveFiles.stream()
+                    .map(DriveFileInfo::getName)
+                    .collect(Collectors.toList());
 
-        if (!folder.isDirectory()) {
-            LOGGER.error("Path is not a directory: {}", costExportFolder);
-            throw new IllegalArgumentException("Path is not a directory: " + costExportFolder);
-        }
-
-        final List<String> fileNames = new ArrayList<>();
-        final File[] files = folder.listFiles();
-
-        if (files != null) {
-            for (File file : files) {
-                fileNames.add(file.getName());
+            for (DriveFileInfo file : driveFiles) {
                 LOGGER.debug("Found: {} ({})", file.getName(), file.isDirectory() ? "directory" : "file");
             }
-        }
 
-        LOGGER.info("Found {} items in folder: {}", fileNames.size(), costExportFolder);
-        return fileNames;
+            LOGGER.info("Found {} items in Google Drive folder: {}", fileNames.size(), parentFolderName);
+            return fileNames;
+
+        } catch (GoogleDriveException e) {
+            LOGGER.error("Failed to list files in Google Drive folder: {}", parentFolderName, e);
+            throw new RuntimeException("Failed to list files in Google Drive folder: " + parentFolderName, e);
+        }
     }
 }

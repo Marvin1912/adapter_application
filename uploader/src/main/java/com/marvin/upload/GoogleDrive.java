@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -63,6 +65,76 @@ public class GoogleDrive {
         } catch (Exception e) {
             throw new GoogleDriveException(e);
         }
+    }
+
+    public List<DriveFileInfo> listFiles(String folderId) throws GoogleDriveException {
+        LOGGER.info("Listing files in folder: {}", folderId);
+
+        try {
+            final Drive service = createDriveService();
+            final List<File> files = new ArrayList<>();
+            String pageToken = null;
+
+            do {
+                final FileList result = service.files().list()
+                        .setQ("'" + folderId + "' in parents and trashed=false")
+                        .setFields("nextPageToken, files(id, name, mimeType, size, modifiedTime, webViewLink)")
+                        .setPageToken(pageToken)
+                        .execute();
+
+                files.addAll(result.getFiles());
+                pageToken = result.getNextPageToken();
+            } while (pageToken != null);
+
+            LOGGER.info("Found {} files in folder: {}", files.size(), folderId);
+            return files.stream()
+                    .map(this::convertToDriveFileInfo)
+                    .collect(Collectors.toList());
+
+        } catch (Exception e) {
+            throw new GoogleDriveException("Failed to list files in folder: " + folderId, e);
+        }
+    }
+
+    public List<DriveFileInfo> listFiles(String folderId, String mimeType) throws GoogleDriveException {
+        LOGGER.info("Listing files in folder: {} with mimeType: {}", folderId, mimeType);
+
+        try {
+            final Drive service = createDriveService();
+            final List<File> files = new ArrayList<>();
+            String pageToken = null;
+
+            do {
+                final FileList result = service.files().list()
+                        .setQ("'" + folderId + "' in parents and trashed=false and mimeType='" + mimeType + "'")
+                        .setFields("nextPageToken, files(id, name, mimeType, size, modifiedTime, webViewLink)")
+                        .setPageToken(pageToken)
+                        .execute();
+
+                files.addAll(result.getFiles());
+                pageToken = result.getNextPageToken();
+            } while (pageToken != null);
+
+            LOGGER.info("Found {} files in folder: {} with mimeType: {}", files.size(), folderId, mimeType);
+            return files.stream()
+                    .map(this::convertToDriveFileInfo)
+                    .collect(Collectors.toList());
+
+        } catch (Exception e) {
+            throw new GoogleDriveException("Failed to list files in folder: " + folderId + " with mimeType: " + mimeType, e);
+        }
+    }
+
+    private DriveFileInfo convertToDriveFileInfo(File file) {
+        final Long size = file.getSize() != null ? file.getSize() : null;
+        return new DriveFileInfo(
+                file.getId(),
+                file.getName(),
+                file.getMimeType(),
+                size,
+                file.getModifiedTime(),
+                file.getWebViewLink()
+        );
     }
 
     private Drive createDriveService() throws Exception {
