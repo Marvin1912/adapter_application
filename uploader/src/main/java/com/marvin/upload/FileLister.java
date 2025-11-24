@@ -24,23 +24,19 @@ public class FileLister {
         this.googleDrive = googleDrive;
     }
 
-    public List<String> listFiles() {
+    public List<DriveFileInfo> listFiles() {
         LOGGER.info("Listing files in Google Drive folder: {}", parentFolderName);
 
         try {
             final String folderId = googleDrive.getFileId(parentFolderName);
             final List<DriveFileInfo> driveFiles = googleDrive.listFiles(folderId);
 
-            final List<String> fileNames = driveFiles.stream()
-                    .map(DriveFileInfo::getName)
-                    .collect(Collectors.toList());
-
             for (DriveFileInfo file : driveFiles) {
                 LOGGER.debug("Found: {} ({})", file.getName(), file.isDirectory() ? "directory" : "file");
             }
 
-            LOGGER.info("Found {} items in Google Drive folder: {}", fileNames.size(), parentFolderName);
-            return fileNames;
+            LOGGER.info("Found {} items in Google Drive folder: {}", driveFiles.size(), parentFolderName);
+            return driveFiles;
 
         } catch (GoogleDriveException e) {
             LOGGER.error("Failed to list files in Google Drive folder: {}", parentFolderName, e);

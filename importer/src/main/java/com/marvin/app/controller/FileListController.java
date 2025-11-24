@@ -4,6 +4,7 @@ import com.marvin.app.controller.dto.FileListResponse;
 import com.marvin.app.controller.dto.FileDeleteResponse;
 import com.marvin.upload.FileLister;
 import com.marvin.upload.FileDeleter;
+import com.marvin.upload.DriveFileInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -33,7 +34,7 @@ public class FileListController {
 
     @Operation(
         summary = "List files in Google Drive",
-        description = "Retrieves a list of all files and folders in the configured Google Drive parent folder. The listing includes both files and subdirectories with their names."
+        description = "Retrieves a list of all files and folders in the configured Google Drive parent folder. The listing includes file metadata such as ID, name, size, modification time, and web view link. File IDs can be used for deletion operations."
     )
     @ApiResponses(value = {
         @ApiResponse(
@@ -56,7 +57,7 @@ public class FileListController {
     @GetMapping(path = "/files/list", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<FileListResponse> listFiles() {
         try {
-            final List<String> files = fileLister.listFiles();
+            final List<DriveFileInfo> files = fileLister.listFiles();
             return ResponseEntity.ok(FileListResponse.success("Successfully listed files from Google Drive", files));
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(FileListResponse.error("Failed to list files from Google Drive: " + e.getMessage()));

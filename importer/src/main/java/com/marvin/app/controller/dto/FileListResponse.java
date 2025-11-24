@@ -1,6 +1,7 @@
 package com.marvin.app.controller.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.marvin.upload.DriveFileInfo;
 import java.time.Instant;
 import java.util.List;
 
@@ -11,13 +12,13 @@ public class FileListResponse {
 
     private String message;
 
-    private List<String> files;
+    private List<DriveFileInfo> files;
 
     private Instant timestamp;
 
     private String error;
 
-    private FileListResponse(boolean success, String message, List<String> files, String error) {
+    private FileListResponse(boolean success, String message, List<DriveFileInfo> files, String error) {
         this.success = success;
         this.message = message;
         this.files = files;
@@ -25,7 +26,7 @@ public class FileListResponse {
         this.timestamp = Instant.now();
     }
 
-    public static FileListResponse success(String message, List<String> files) {
+    public static FileListResponse success(String message, List<DriveFileInfo> files) {
         return new FileListResponse(true, message, files, null);
     }
 
@@ -49,11 +50,11 @@ public class FileListResponse {
         this.message = message;
     }
 
-    public List<String> getFiles() {
+    public List<DriveFileInfo> getFiles() {
         return files;
     }
 
-    public void setFiles(List<String> files) {
+    public void setFiles(List<DriveFileInfo> files) {
         this.files = files;
     }
 
