@@ -1,37 +1,35 @@
 package com.marvin.app.controller.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.marvin.upload.DriveFileInfo;
 import java.time.Instant;
-import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class FileListResponse {
+public class FileDeleteResponse {
 
     private boolean success;
 
     private String message;
 
-    private List<DriveFileInfo> files;
+    private String fileId;
 
     private Instant timestamp;
 
     private String error;
 
-    private FileListResponse(boolean success, String message, List<DriveFileInfo> files, String error) {
+    private FileDeleteResponse(boolean success, String message, String fileId, String error) {
         this.success = success;
         this.message = message;
-        this.files = files;
+        this.fileId = fileId;
         this.error = error;
         this.timestamp = Instant.now();
     }
 
-    public static FileListResponse success(String message, List<DriveFileInfo> files) {
-        return new FileListResponse(true, message, files, null);
+    public static FileDeleteResponse success(String message, String fileId) {
+        return new FileDeleteResponse(true, message, fileId, null);
     }
 
-    public static FileListResponse error(String errorMessage) {
-        return new FileListResponse(false, null, null, errorMessage);
+    public static FileDeleteResponse error(String errorMessage) {
+        return new FileDeleteResponse(false, null, null, errorMessage);
     }
 
     public boolean isSuccess() {
@@ -50,12 +48,12 @@ public class FileListResponse {
         this.message = message;
     }
 
-    public List<DriveFileInfo> getFiles() {
-        return files;
+    public String getFileId() {
+        return fileId;
     }
 
-    public void setFiles(List<DriveFileInfo> files) {
-        this.files = files;
+    public void setFileId(String fileId) {
+        this.fileId = fileId;
     }
 
     public Instant getTimestamp() {

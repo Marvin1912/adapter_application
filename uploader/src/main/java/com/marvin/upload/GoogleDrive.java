@@ -125,6 +125,18 @@ public class GoogleDrive {
         }
     }
 
+    public void deleteFile(String fileId) throws GoogleDriveException {
+        LOGGER.info("Trying to delete file with ID: {}", fileId);
+
+        try {
+            final Drive service = createDriveService();
+            service.files().delete(fileId).execute();
+            LOGGER.info("Successfully deleted file with ID: {}", fileId);
+        } catch (Exception e) {
+            throw new GoogleDriveException("Failed to delete file with ID: " + fileId, e);
+        }
+    }
+
     private DriveFileInfo convertToDriveFileInfo(File file) {
         final Long size = file.getSize() != null ? file.getSize() : null;
         return new DriveFileInfo(
