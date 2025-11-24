@@ -3,7 +3,7 @@ package com.marvin.app.controller;
 import com.marvin.app.controller.dto.FileListResponse;
 import com.marvin.app.controller.dto.FileDeleteResponse;
 import com.marvin.upload.FileLister;
-import com.marvin.upload.GoogleDrive;
+import com.marvin.upload.FileDeleter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -24,11 +24,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class FileListController {
 
     private final FileLister fileLister;
-    private final GoogleDrive googleDrive;
+    private final FileDeleter fileDeleter;
 
-    public FileListController(FileLister fileLister, GoogleDrive googleDrive) {
+    public FileListController(FileLister fileLister, FileDeleter fileDeleter) {
         this.fileLister = fileLister;
-        this.googleDrive = googleDrive;
+        this.fileDeleter = fileDeleter;
     }
 
     @Operation(
@@ -110,7 +110,7 @@ public class FileListController {
                 return ResponseEntity.badRequest().body(FileDeleteResponse.error("File ID cannot be null or empty"));
             }
 
-            googleDrive.deleteFile(fileId);
+            fileDeleter.deleteFile(fileId);
             return ResponseEntity.ok(FileDeleteResponse.success("File successfully deleted from Google Drive", fileId));
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(FileDeleteResponse.error("Failed to delete file from Google Drive: " + e.getMessage()));
