@@ -10,11 +10,10 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 /**
- * Export service for temperature sensor data from the sensor_data bucket. Handles temperature readings from various sensors including Home Assistant climate
- * devices.
+ * Export service for humidity sensor data from the sensor_data bucket. Handles humidity readings from various sensors including Xiaomi Aqara weather sensors.
  */
 @Service
-public class TemperatureExportService extends AbstractInfluxExport<SensorDataDTO> {
+public class PowerExportService extends AbstractInfluxExport<SensorDataDTO> {
 
     private static final String BUCKET_NAME = "sensor_data";
 
@@ -27,16 +26,15 @@ public class TemperatureExportService extends AbstractInfluxExport<SensorDataDTO
     protected String buildQuery(Instant startTime, Instant endTime) {
         return InfluxQueryBuilder.from(getBucketName())
                 .timeRange(startTime, endTime)
-                .measurement("°C")
+                .measurement("W")
                 .field("value")
                 .map("""
                         fn: (r) => ({
                               r with friendly_name:
-                                if r.entity_id == "lumi_lumi_weather_temperatur" then "Badezimmer"
-                                else if r.entity_id == "lumi_lumi_weather_temperatur_2" then "Flur"
-                                else if r.entity_id == "lumi_lumi_weather_temperatur_3" then "Küche"
-                                else if r.entity_id == "lumi_lumi_weather_temperatur_4" then "Schlafzimmer"
-                                else if r.entity_id == "lumi_lumi_weather_temperatur_5" then "Wohnzimmer"
+                                if r.entity_id == "tasmota_energy_power" then "Kühlschrank"
+                                else if r.entity_id == "tasmota_energy_power_2" then "Server"
+                                else if r.entity_id == "tasmota_energy_power_3" then "Workstation"
+                                else if r.entity_id == "tasmota_energy_power_4" then "Waschmaschine"
                                 else "Nicht bekannt"
                             })""")
                 .keepOriginalColumns(false)
@@ -49,14 +47,14 @@ public class TemperatureExportService extends AbstractInfluxExport<SensorDataDTO
         try {
             final Object converted = DataTypeHandler.convertRecord(record, BUCKET_NAME);
             if (converted instanceof SensorDataDTO dto) {
-                if (dto.isTemperatureSensor() && DataTypeHandler.validateDTO(dto, BUCKET_NAME)) {
+                if (dto.isPowerSensor() && DataTypeHandler.validateDTO(dto, BUCKET_NAME)) {
                     return Optional.of(dto);
                 } else {
-                    LOGGER.debug("Non-temperature sensor record filtered out: {}", record);
+                    LOGGER.debug("Non-power sensor record filtered out: {}", record);
                 }
             }
         } catch (Exception e) {
-            LOGGER.error("Failed to convert temperature sensor data record: {}", record, e);
+            LOGGER.error("Failed to convert humidity sensor data record: {}", record, e);
         }
         return Optional.empty();
     }

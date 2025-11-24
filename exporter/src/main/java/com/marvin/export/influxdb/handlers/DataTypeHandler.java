@@ -1,6 +1,7 @@
 package com.marvin.export.influxdb.handlers;
 
 import com.influxdb.query.FluxRecord;
+import com.marvin.export.influxdb.dto.AbstractInfluxData;
 import com.marvin.export.influxdb.dto.SensorDataDTO;
 import com.marvin.export.influxdb.dto.SystemMetricsDTO;
 import com.marvin.export.influxdb.mappings.MeasurementMappings;
@@ -9,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,8 +35,8 @@ public class DataTypeHandler {
     public static Object convertRecord(FluxRecord record, String bucketName) {
         try {
             return switch (bucketName.toLowerCase()) {
-                case "system_metrics" -> convertToSystemMetricsDTO(record, bucketName);
-                case "sensor_data", "sensor_data_30m" -> convertToSensorDataDTO(record, bucketName);
+                case "system_metrics" -> convertToDTO(record, bucketName, SystemMetricsDTO::new);
+                case "sensor_data", "sensor_data_30m" -> convertToDTO(record, bucketName, SensorDataDTO::new);
                 default -> {
                     LOGGER.warn("Unknown bucket name: {}", bucketName);
                     yield null;
@@ -46,7 +48,7 @@ public class DataTypeHandler {
         }
     }
 
-    private static SystemMetricsDTO convertToSystemMetricsDTO(FluxRecord record, String bucketName) {
+    private static <T extends AbstractInfluxData> AbstractInfluxData convertToDTO(FluxRecord record, String bucketName, Supplier<T> supplier) {
         final String measurement = record.getMeasurement();
         final Long timestamp = Optional.ofNullable(record.getTime()).map(Instant::toEpochMilli).orElseThrow();
 
@@ -67,41 +69,22 @@ public class DataTypeHandler {
             field.set(MeasurementMappings.DataTypeConverter.convertToExpectedType(record.getField(), record.getValue(), bucketName));
         }
 
-        return new SystemMetricsDTO(measurement, null, timestamp, field.get(), tags);
-    }
+        T t = supplier.get();
+        t.setMeasurement(measurement);
+        t.setEntityId(null);
+        t.setFriendlyName(null);
+        t.setTimestamp(timestamp);
+        t.setField(field.get());
+        t.setTags(tags);
 
-    private static SensorDataDTO convertToSensorDataDTO(FluxRecord record, String bucketName) {
-        final String measurement = record.getMeasurement();
-        final Long timestamp = Optional.ofNullable(record.getTime()).map(Instant::toEpochMilli).orElseThrow();
-
-        final AtomicReference<Object> field = new AtomicReference<>();
-        final Map<String, String> tags = new HashMap<>();
-
-        record.getValues().forEach((key, value) -> {
-            if (value != null) {
-                if ("_field".equals(key)) {
-                    field.set(MeasurementMappings.DataTypeConverter.convertToExpectedType(value.toString(), record.getValue(), bucketName));
-                } else if (!key.startsWith("_") && !"table".equals(key)) {
-                    tags.put(key, value.toString());
-                }
-            }
-        });
-
-        if (record.getField() != null && record.getValue() != null) {
-            field.set(MeasurementMappings.DataTypeConverter.convertToExpectedType(record.getField(), record.getValue(), bucketName));
-        }
-
-        final String entityId = tags.get("entity_id");
-        final String friendlyName = tags.get("friendly_name");
-
-        return new SensorDataDTO(measurement, entityId, friendlyName, timestamp, field.get(), tags);
+        return t;
     }
 
     public static boolean validateDTO(Object dto, String bucketName) {
         try {
             return switch (bucketName.toLowerCase()) {
-                case "system_metrics" -> validateSystemMetricsDTO((SystemMetricsDTO) dto);
-                case "sensor_data", "sensor_data_30m" -> validateSensorDataDTO((SensorDataDTO) dto);
+                case "system_metrics" -> validateDTO((SystemMetricsDTO) dto);
+                case "sensor_data", "sensor_data_30m" -> validateDTO((SensorDataDTO) dto);
                 default -> false;
             };
         } catch (Exception e) {
@@ -110,15 +93,9 @@ public class DataTypeHandler {
         }
     }
 
-    private static boolean validateSystemMetricsDTO(SystemMetricsDTO dto) {
-        return dto.measurement() != null
-            && dto.timestamp() != null
-            && dto.field() != null;
-    }
-
-    private static boolean validateSensorDataDTO(SensorDataDTO dto) {
-        return dto.measurement() != null
-            && dto.timestamp() != null
-            && dto.field() != null;
+    private static boolean validateDTO(AbstractInfluxData dto) {
+        return dto.getMeasurement() != null
+            && dto.getTimestamp() != null
+            && dto.getField() != null;
     }
 }

@@ -46,10 +46,8 @@ public class HumidityExportService extends AbstractInfluxExport<SensorDataDTO> {
     @Override
     protected Optional<SensorDataDTO> convertRecord(FluxRecord record) {
         try {
-            // Use the DataTypeHandler to convert the record
             final Object converted = DataTypeHandler.convertRecord(record, BUCKET_NAME);
             if (converted instanceof SensorDataDTO dto) {
-                // Filter to include only humidity records
                 if (dto.isHumiditySensor() && DataTypeHandler.validateDTO(dto, BUCKET_NAME)) {
                     return Optional.of(dto);
                 } else {
