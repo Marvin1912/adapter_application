@@ -2,6 +2,7 @@ package com.marvin.export;
 
 import com.marvin.export.influxdb.services.HumidityAggregatedExportService;
 import com.marvin.export.influxdb.services.HumidityExportService;
+import com.marvin.export.influxdb.services.PowerAggregatedExportService;
 import com.marvin.export.influxdb.services.PowerExportService;
 import com.marvin.export.influxdb.services.TemperatureAggregatedExportService;
 import com.marvin.export.influxdb.services.TemperatureExportService;
@@ -34,6 +35,7 @@ public class InfluxExporter {
     private static final String POWER_FILENAME_PREFIX = "power_";
     private static final String TEMPERATURE_AGGREGATED_FILENAME_PREFIX = "temperature_30m_";
     private static final String HUMIDITY_AGGREGATED_FILENAME_PREFIX = "humidity_30m_";
+    private static final String POWER_AGGREGATED_FILENAME_PREFIX = "power_30m_";
     private static final String FILE_EXTENSION = ".jsonl";
 
     private final ExportConfig exportConfig;
@@ -43,6 +45,7 @@ public class InfluxExporter {
     private final HumidityAggregatedExportService humidityAggregatedExportService;
     private final TemperatureAggregatedExportService temperatureAggregatedExportService;
     private final PowerExportService powerExportService;
+    private final PowerAggregatedExportService powerAggregatedExportService;
 
     public InfluxExporter(
         ExportConfig exportConfig,
@@ -51,7 +54,8 @@ public class InfluxExporter {
         HumidityExportService humidityExportService,
         HumidityAggregatedExportService humidityAggregatedExportService,
         TemperatureAggregatedExportService temperatureAggregatedExportService,
-        PowerExportService powerExportService
+        PowerExportService powerExportService,
+        PowerAggregatedExportService powerAggregatedExportService
     ) {
         this.exportConfig = exportConfig;
         this.exportFileWriter = exportFileWriter;
@@ -60,6 +64,7 @@ public class InfluxExporter {
         this.humidityAggregatedExportService = humidityAggregatedExportService;
         this.temperatureAggregatedExportService = temperatureAggregatedExportService;
         this.powerExportService = powerExportService;
+        this.powerAggregatedExportService = powerAggregatedExportService;
     }
 
     /**
@@ -86,6 +91,8 @@ public class InfluxExporter {
                     () -> humidityExportService.exportData(startTime, endTime).stream(), "humidity data");
                 case POWER -> exportBucket(createFilePath(influxExportFolder, POWER_FILENAME_PREFIX, timestamp),
                     () -> powerExportService.exportData(startTime, endTime).stream(), "power data");
+                case POWER_AGGREGATED -> exportBucket(createFilePath(influxExportFolder, POWER_AGGREGATED_FILENAME_PREFIX, timestamp),
+                    () -> powerAggregatedExportService.exportData(startTime, endTime).stream(), "aggregated power data");
                 case TEMPERATURE_AGGREGATED -> exportBucket(createFilePath(influxExportFolder, TEMPERATURE_AGGREGATED_FILENAME_PREFIX, timestamp),
                     () -> temperatureAggregatedExportService.exportData(startTime, endTime).stream(), "aggregated temperature data");
                 case HUMIDITY_AGGREGATED -> exportBucket(createFilePath(influxExportFolder, HUMIDITY_AGGREGATED_FILENAME_PREFIX, timestamp),
@@ -128,7 +135,8 @@ public class InfluxExporter {
         HUMIDITY("sensor_data", "Humidity sensor data"),
         POWER("sensor_data", "Power sensor data"),
         TEMPERATURE_AGGREGATED("sensor_data_30m", "30-minute per hour aggregated temperature data"),
-        HUMIDITY_AGGREGATED("sensor_data_30m", "30-minute per hour aggregated humidity data");
+        HUMIDITY_AGGREGATED("sensor_data_30m", "30-minute per hour aggregated humidity data"),
+        POWER_AGGREGATED("sensor_data_30m", "30-minute per hour aggregated power data");
 
         private final String bucketName;
         private final String description;
