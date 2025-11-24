@@ -9,4 +9,8 @@ public class GoogleDriveException extends Exception {
     public GoogleDriveException(Exception e) {
         super(e);
     }
+
+    public GoogleDriveException(String message, Exception e) {
+        super(message, e);
+    }
 }
