@@ -26,16 +26,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class InfluxExporter {
 
+    public static final String TEMPERATURE_FILENAME_PREFIX = "TEMPERATURE_";
+    public static final String HUMIDITY_FILENAME_PREFIX = "HUMIDITY_";
+    public static final String POWER_FILENAME_PREFIX = "POWER_";
+    public static final String TEMPERATURE_AGGREGATED_FILENAME_PREFIX = "TEMPERATURE_AGGREGATED_";
+    public static final String HUMIDITY_AGGREGATED_FILENAME_PREFIX = "HUMIDITY_AGGREGATED_";
+    public static final String POWER_AGGREGATED_FILENAME_PREFIX = "POWER_AGGREGATED_";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(InfluxExporter.class);
 
     private static final DateTimeFormatter FILE_DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
 
-    private static final String TEMPERATURE_FILENAME_PREFIX = "temperature_";
-    private static final String HUMIDITY_FILENAME_PREFIX = "humidity_";
-    private static final String POWER_FILENAME_PREFIX = "power_";
-    private static final String TEMPERATURE_AGGREGATED_FILENAME_PREFIX = "temperature_30m_";
-    private static final String HUMIDITY_AGGREGATED_FILENAME_PREFIX = "humidity_30m_";
-    private static final String POWER_AGGREGATED_FILENAME_PREFIX = "power_30m_";
     private static final String FILE_EXTENSION = ".jsonl";
 
     private final ExportConfig exportConfig;

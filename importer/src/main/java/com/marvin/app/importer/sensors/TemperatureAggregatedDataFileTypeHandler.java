@@ -1,6 +1,7 @@
 package com.marvin.app.importer.sensors;
 
 import com.marvin.app.service.FileTypeHandler;
+import com.marvin.export.InfluxExporter;
 import com.marvin.export.influxdb.dto.SensorDataDTO;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +16,7 @@ public class TemperatureAggregatedDataFileTypeHandler implements FileTypeHandler
 
     @Override
     public boolean canHandle(final String fileType) {
-        return "temperature_30m".equals(fileType);
+        return InfluxExporter.TEMPERATURE_AGGREGATED_FILENAME_PREFIX.equals(fileType);
     }
 
     @Override

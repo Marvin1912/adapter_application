@@ -24,11 +24,11 @@ public class SensorDataImportService implements ImportService<SensorDataDTO> {
             return;
         }
 
-        LOGGER.info("Importing sensor data for entity: {} ({})", data.getEntityId(), data.getFriendlyName());
+        LOGGER.debug("Importing sensor data for entity: {} ({})", data.getEntityId(), data.getFriendlyName());
 
         try {
             sensorDataImport.importSensorData(data);
-            LOGGER.info("Successfully imported sensor data for entity: {}", data.getEntityId());
+            LOGGER.debug("Successfully imported sensor data for entity: {}", data.getEntityId());
         } catch (Exception e) {
             LOGGER.error("Failed to import sensor data for entity: {}", data.getEntityId(), e);
             throw new RuntimeException("Failed to import sensor data", e);

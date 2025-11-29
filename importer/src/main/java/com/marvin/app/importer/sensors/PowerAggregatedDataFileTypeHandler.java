@@ -6,17 +6,17 @@ import com.marvin.export.influxdb.dto.SensorDataDTO;
 import org.springframework.stereotype.Component;
 
 @Component
-public class HumidityAggregatedDataFileTypeHandler implements FileTypeHandler<SensorDataDTO> {
+public class PowerAggregatedDataFileTypeHandler implements FileTypeHandler<SensorDataDTO> {
 
     private final SensorDataImportService sensorDataImportService;
 
-    public HumidityAggregatedDataFileTypeHandler(final SensorDataImportService sensorDataImportService) {
+    public PowerAggregatedDataFileTypeHandler(final SensorDataImportService sensorDataImportService) {
         this.sensorDataImportService = sensorDataImportService;
     }
 
     @Override
     public boolean canHandle(final String fileType) {
-        return InfluxExporter.HUMIDITY_AGGREGATED_FILENAME_PREFIX.equals(fileType);
+        return InfluxExporter.POWER_AGGREGATED_FILENAME_PREFIX.equals(fileType);
     }
 
     @Override
