@@ -16,7 +16,7 @@ public record GenericPojoImporter<T>(InfluxDBClient influxDBClient, InfluxWriteC
         final WriteApiBlocking writeApi = influxDBClient.getWriteApiBlocking();
         writeApi.writeMeasurement(config.bucket(), config.organization(), config.writePrecision(), pojo);
 
-        LOGGER.info("Successfully imported POJO of type {} to bucket {}",
+        LOGGER.debug("Successfully imported POJO of type {} to bucket {}",
             pojo.getClass().getSimpleName(), config.bucket());
     }
 
