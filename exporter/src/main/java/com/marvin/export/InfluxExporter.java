@@ -26,12 +26,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class InfluxExporter {
 
-    public static final String TEMPERATURE_FILENAME_PREFIX = "TEMPERATURE";
-    public static final String HUMIDITY_FILENAME_PREFIX = "HUMIDITY";
-    public static final String POWER_FILENAME_PREFIX = "POWER";
-    public static final String TEMPERATURE_AGGREGATED_FILENAME_PREFIX = "TEMPERATURE_AGGREGATED";
-    public static final String HUMIDITY_AGGREGATED_FILENAME_PREFIX = "HUMIDITY_AGGREGATED";
-    public static final String POWER_AGGREGATED_FILENAME_PREFIX = "POWER_AGGREGATED";
+    public static final String TEMPERATURE_FILENAME_PREFIX = "temperature";
+    public static final String HUMIDITY_FILENAME_PREFIX = "humidity";
+    public static final String POWER_FILENAME_PREFIX = "power";
+    public static final String TEMPERATURE_AGGREGATED_FILENAME_PREFIX = "temperature_aggregated";
+    public static final String HUMIDITY_AGGREGATED_FILENAME_PREFIX = "temperature_aggregated";
+    public static final String POWER_AGGREGATED_FILENAME_PREFIX = "temperature_aggregated";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(InfluxExporter.class);
 
