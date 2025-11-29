@@ -38,6 +38,9 @@ public class GenericFileReaderImpl implements GenericFileReader {
     }
 
     private void processFile(Path path, List<FileTypeHandler<?>> handlers) {
+
+        LOGGER.info("Processing file {}", path);
+
         final FileTypeMatchResult matchResult =
             FilePatternMatcher.matchFileName(path.getFileName().toString());
 
@@ -61,6 +64,8 @@ public class GenericFileReaderImpl implements GenericFileReader {
         }
 
         fileArchiveService.moveToDone(path);
+
+        LOGGER.info("File {} has been moved to done!", path);
     }
 
     private FileTypeHandler<?> findHandler(String fileType, List<FileTypeHandler<?>> handlers) {
