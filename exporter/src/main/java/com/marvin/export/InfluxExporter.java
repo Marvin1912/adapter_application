@@ -26,12 +26,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class InfluxExporter {
 
-    public static final String TEMPERATURE_FILENAME_PREFIX = "TEMPERATURE_";
-    public static final String HUMIDITY_FILENAME_PREFIX = "HUMIDITY_";
-    public static final String POWER_FILENAME_PREFIX = "POWER_";
-    public static final String TEMPERATURE_AGGREGATED_FILENAME_PREFIX = "TEMPERATURE_AGGREGATED_";
-    public static final String HUMIDITY_AGGREGATED_FILENAME_PREFIX = "HUMIDITY_AGGREGATED_";
-    public static final String POWER_AGGREGATED_FILENAME_PREFIX = "POWER_AGGREGATED_";
+    public static final String TEMPERATURE_FILENAME_PREFIX = "TEMPERATURE";
+    public static final String HUMIDITY_FILENAME_PREFIX = "HUMIDITY";
+    public static final String POWER_FILENAME_PREFIX = "POWER";
+    public static final String TEMPERATURE_AGGREGATED_FILENAME_PREFIX = "TEMPERATURE_AGGREGATED";
+    public static final String HUMIDITY_AGGREGATED_FILENAME_PREFIX = "HUMIDITY_AGGREGATED";
+    public static final String POWER_AGGREGATED_FILENAME_PREFIX = "POWER_AGGREGATED";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(InfluxExporter.class);
 
@@ -110,7 +110,7 @@ public class InfluxExporter {
     }
 
     private Path createFilePath(String folder, String prefix, String timestamp) {
-        return Path.of(folder, prefix + timestamp + FILE_EXTENSION);
+        return Path.of(folder, prefix + '_' + timestamp + FILE_EXTENSION);
     }
 
     private <T> Path exportBucket(Path path, Supplier<Stream<T>> dataSupplier, String description) {
