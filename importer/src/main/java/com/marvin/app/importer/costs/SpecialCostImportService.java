@@ -12,6 +12,7 @@ import com.marvin.entities.costs.SpecialCostEntryEntity;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
@@ -121,9 +122,11 @@ public class SpecialCostImportService implements ImportService<SpecialCostDTO> {
     private void createAndPersist(SpecialCostEntity specialCostEntity,
             SpecialCostEntryDTO newEntry) {
 
+        final String additionalInfo = Optional.ofNullable(newEntry.additionalInfo()).orElse("n/a");
+
         final SpecialCostEntryEntity specialCostEntryEntity = new SpecialCostEntryEntity();
         specialCostEntryEntity.setDescription(newEntry.description());
-        specialCostEntryEntity.setAdditionalInfo(newEntry.additionalInfo());
+        specialCostEntryEntity.setAdditionalInfo(additionalInfo);
         specialCostEntryEntity.setValue(newEntry.value());
         specialCostEntryEntity.setSpecialCost(specialCostEntity);
 
