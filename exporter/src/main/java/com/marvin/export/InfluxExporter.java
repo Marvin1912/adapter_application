@@ -31,7 +31,7 @@ public class InfluxExporter {
     public static final String POWER_FILENAME_PREFIX = "power";
     public static final String TEMPERATURE_AGGREGATED_FILENAME_PREFIX = "temperature_aggregated";
     public static final String HUMIDITY_AGGREGATED_FILENAME_PREFIX = "temperature_aggregated";
-    public static final String POWER_AGGREGATED_FILENAME_PREFIX = "temperature_aggregated";
+    public static final String POWER_AGGREGATED_FILENAME_PREFIX = "power_aggregated";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(InfluxExporter.class);
 

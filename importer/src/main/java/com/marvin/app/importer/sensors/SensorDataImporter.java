@@ -20,7 +20,9 @@ public class SensorDataImporter {
         HumidityDataFileTypeHandler humidityDataFileTypeHandler,
         HumidityAggregatedDataFileTypeHandler humidityAggregatedDataFileTypeHandler,
         TemperatureDataFileTypeHandler temperatureDataFileTypeHandler,
-        TemperatureAggregatedDataFileTypeHandler temperatureAggregatedDataFileTypeHandler
+        TemperatureAggregatedDataFileTypeHandler temperatureAggregatedDataFileTypeHandler,
+        PowerDataFileTypeHandler powerDataFileTypeHandler,
+        PowerAggregatedDataFileTypeHandler powerAggregatedDataFileTypeHandler
     ) {
         this.in = in;
         this.genericFileReader = genericFileReader;
@@ -28,7 +30,9 @@ public class SensorDataImporter {
             humidityDataFileTypeHandler,
             humidityAggregatedDataFileTypeHandler,
             temperatureDataFileTypeHandler,
-            temperatureAggregatedDataFileTypeHandler
+            temperatureAggregatedDataFileTypeHandler,
+            powerDataFileTypeHandler,
+            powerAggregatedDataFileTypeHandler
         );
     }
 
