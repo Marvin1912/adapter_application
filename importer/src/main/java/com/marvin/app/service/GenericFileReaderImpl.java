@@ -9,6 +9,7 @@ import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,9 +25,6 @@ public class GenericFileReaderImpl implements GenericFileReader {
     private final String org;
     private final ObjectMapper objectMapper;
     private final FileArchiveService fileArchiveService;
-
-    private long totalItems = 0;
-    private long processedItems = 0;
 
     public GenericFileReaderImpl(
         @Value("${influxdb.org}") String org,
@@ -71,21 +69,21 @@ public class GenericFileReaderImpl implements GenericFileReader {
 
         final InfluxWriteConfig config = InfluxWriteConfig.create(handler.getBucket(), org, WritePrecision.NS);
 
+        final AtomicLong totalItems = new AtomicLong(0);
+        final AtomicLong processedItems = new AtomicLong(0);
+
         try {
             // Count total lines first
             long fileLines = Files.lines(path).count();
-            totalItems += fileLines;
+            totalItems.addAndGet(fileLines);
             LOGGER.info("File {} has {} lines to process", path.getFileName(), fileLines);
-
-            // Reset processed counter for this file
-            processedItems = 0;
 
             // Process lines
             try (Stream<String> lines = Files.lines(path)) {
                 lines.forEach(line -> {
                     processLine(config, line, handler);
-                    processedItems++;
-                    logProgress();
+                    processedItems.incrementAndGet();
+                    logProgress(processedItems, totalItems);
                 });
             }
         } catch (Exception e) {
@@ -114,9 +112,9 @@ public class GenericFileReaderImpl implements GenericFileReader {
         }
     }
 
-    private void logProgress() {
-        if (processedItems % PROGRESS_INTERVAL == 0) {
-            double percentage = totalItems > 0 ? (processedItems * 100.0 / totalItems) : 0;
+    private void logProgress(AtomicLong processedItems, AtomicLong totalItems) {
+        if (processedItems.get() % PROGRESS_INTERVAL == 0) {
+            double percentage = totalItems.get() > 0 ? (processedItems.get() * 100.0 / totalItems.get()) : 0;
             LOGGER.info("Progress: {}/{} items processed ({}%)", processedItems, totalItems,
                 BigDecimal.valueOf(percentage).setScale(2, RoundingMode.HALF_UP));
         }
