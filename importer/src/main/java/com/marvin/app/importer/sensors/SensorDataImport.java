@@ -24,13 +24,34 @@ public class SensorDataImport {
 
     public void importSensorData(final SensorDataDTO sensorData) {
 
-        final SensorData data = new SensorData(
-            sensorData.getMeasurement(),
-            sensorData.getTags().get("entity_id"),
-            sensorData.getTags().get("friendly_name"),
-            Instant.ofEpochMilli(sensorData.getTimestamp()),
-            (double) sensorData.getField()
-        );
+        final SensorData data;
+        if (sensorData.isHumiditySensor()) {
+            data = new HumidityData(
+                sensorData.getMeasurement(),
+                sensorData.getTags().get("entity_id"),
+                sensorData.getTags().get("friendly_name"),
+                Instant.ofEpochMilli(sensorData.getTimestamp()),
+                (double) sensorData.getField()
+            );
+        } else if (sensorData.isTemperatureSensor()) {
+            data = new TemperatureData(
+                sensorData.getMeasurement(),
+                sensorData.getTags().get("entity_id"),
+                sensorData.getTags().get("friendly_name"),
+                Instant.ofEpochMilli(sensorData.getTimestamp()),
+                (double) sensorData.getField()
+            );
+        } else if (sensorData.isPowerSensor()) {
+            data = new PowerData(
+                sensorData.getMeasurement(),
+                sensorData.getTags().get("entity_id"),
+                sensorData.getTags().get("friendly_name"),
+                Instant.ofEpochMilli(sensorData.getTimestamp()),
+                (double) sensorData.getField()
+            );
+        } else {
+            throw new IllegalStateException("Sensor Data not supported");
+        }
 
         genericPojoImporter.importPojo(data);
     }

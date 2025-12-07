@@ -3,23 +3,27 @@ package com.marvin.app.importer.sensors;
 import com.influxdb.annotations.Column;
 import com.influxdb.annotations.Measurement;
 import java.time.Instant;
+import java.util.Objects;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
-@Measurement(name = "%")
-public record SensorData(
+@Data
+@AllArgsConstructor
+public abstract class SensorData {
+
     @Column(name = "measurement", tag = true)
-    String measurement,
+    private String measurement;
 
     @Column(name = "entity_id", tag = true)
-    String entityId,
+    private String entityId;
 
     @Column(name = "friendly_name", tag = true)
-    String friendlyName,
+    private String friendlyName;
 
     @Column(timestamp = true)
-    Instant timestamp,
+    private Instant timestamp;
 
     @Column(name = "value")
-    Double field
-) {
+    private Double field;
 
 }
