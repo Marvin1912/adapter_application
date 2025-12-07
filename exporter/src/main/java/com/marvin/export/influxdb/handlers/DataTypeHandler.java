@@ -71,8 +71,6 @@ public class DataTypeHandler {
 
         T t = supplier.get();
         t.setMeasurement(measurement);
-        t.setEntityId(null);
-        t.setFriendlyName(null);
         t.setTimestamp(timestamp);
         t.setField(field.get());
         t.setTags(tags);

@@ -2,6 +2,8 @@ package com.marvin.app.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marvin.app.service.FilePatternMatcher.FileTypeMatchResult;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -106,7 +108,8 @@ public class GenericFileReaderImpl implements GenericFileReader {
     private void logProgress() {
         if (processedItems % PROGRESS_INTERVAL == 0) {
             double percentage = totalItems > 0 ? (processedItems * 100.0 / totalItems) : 0;
-            LOGGER.info("Progress: {}/{} items processed ({:.2f}%)", processedItems, totalItems, percentage);
+            LOGGER.info("Progress: {}/{} items processed ({}%)", processedItems, totalItems,
+                BigDecimal.valueOf(percentage).setScale(2, RoundingMode.HALF_UP));
         }
     }
 }

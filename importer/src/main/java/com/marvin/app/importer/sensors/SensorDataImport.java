@@ -26,8 +26,8 @@ public class SensorDataImport {
 
         final SensorData data = new SensorData(
             sensorData.getMeasurement(),
-            sensorData.getEntityId(),
-            sensorData.getFriendlyName(),
+            sensorData.getTags().get("entity_id"),
+            sensorData.getTags().get("friendly_name"),
             Instant.ofEpochMilli(sensorData.getTimestamp()),
             (double) sensorData.getField()
         );

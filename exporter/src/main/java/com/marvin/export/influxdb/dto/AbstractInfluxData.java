@@ -9,8 +9,6 @@ import lombok.Setter;
 public abstract class AbstractInfluxData {
 
     protected String measurement;
-    protected String entityId;
-    protected String friendlyName;
     protected Long timestamp;
     protected Object field;
     protected Map<String, String> tags;
