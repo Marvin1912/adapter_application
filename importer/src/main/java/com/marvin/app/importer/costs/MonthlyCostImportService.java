@@ -7,6 +7,7 @@ import com.marvin.camt.model.book_entry.CreditDebitCodeDTO;
 import com.marvin.common.costs.MonthlyCostDTO;
 import com.marvin.database.repository.MonthlyCostRepository;
 import com.marvin.entities.costs.MonthlyCostEntity;
+import com.marvin.influxdb.core.InfluxWriteConfig;
 import com.marvin.influxdb.costs.monthly.service.MonthlyCostImport;
 import java.math.BigDecimal;
 import java.util.Optional;
@@ -53,12 +54,12 @@ public class MonthlyCostImportService implements ImportService<MonthlyCostDTO> {
                                 )
                         )
                 )
-                .doOnNext(this::importData)
+                .doOnNext(config -> importData(null, config))
                 .map(monthlyCostDTO -> "Processed " + monthlyCostDTO + "!");
     }
 
     @Override
-    public void importData(MonthlyCostDTO monthlyCost) {
+    public void importData(InfluxWriteConfig config, MonthlyCostDTO monthlyCost) {
         final Optional<MonthlyCostEntity> persistedStateList = monthlyCostRepository.findByCostDate(
                 monthlyCost.costDate());
         if (persistedStateList.isEmpty()) {

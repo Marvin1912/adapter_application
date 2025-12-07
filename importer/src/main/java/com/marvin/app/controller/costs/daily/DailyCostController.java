@@ -45,7 +45,7 @@ public class DailyCostController {
     public ResponseEntity<Object> importDailyCost(String dailyCostValue) {
         try {
             DailyCostDTO dailyCost = objectMapper.readValue(dailyCostValue, DailyCostDTO.class);
-            dailyCostImportService.importData(dailyCost);
+            dailyCostImportService.importData(null, dailyCost);
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();

@@ -1,12 +1,15 @@
 package com.marvin.app.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.marvin.influxdb.core.InfluxWriteConfig;
 
 public interface FileTypeHandler<T> {
 
     boolean canHandle(String fileType);
 
     Class<T> getDtoClass();
+
+    String getBucket();
 
     default T readValue(String value, ObjectMapper objectMapper) {
         try {
@@ -16,5 +19,5 @@ public interface FileTypeHandler<T> {
         }
     }
 
-    void handle(T dto);
+    void handle(InfluxWriteConfig config, T dto);
 }

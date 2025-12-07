@@ -2,6 +2,7 @@ package com.marvin.app.importer.costs;
 
 import com.marvin.app.service.FileTypeHandler;
 import com.marvin.common.costs.MonthlyCostDTO;
+import com.marvin.influxdb.core.InfluxWriteConfig;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -24,9 +25,14 @@ public class MonthlyCostHandler implements FileTypeHandler<MonthlyCostDTO> {
     }
 
     @Override
-    public void handle(MonthlyCostDTO dto) {
+    public String getBucket() {
+        return "costs";
+    }
+
+    @Override
+    public void handle(final InfluxWriteConfig config, MonthlyCostDTO dto) {
         if (dto != null) {
-            monthlyCostImportService.importData(dto);
+            monthlyCostImportService.importData(config, dto);
         }
     }
 }

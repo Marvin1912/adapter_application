@@ -1,7 +1,9 @@
 package com.marvin.app.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.influxdb.client.domain.WritePrecision;
 import com.marvin.app.service.FilePatternMatcher.FileTypeMatchResult;
+import com.marvin.influxdb.core.InfluxWriteConfig;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.file.Files;
@@ -10,6 +12,7 @@ import java.util.List;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -18,15 +21,19 @@ public class GenericFileReaderImpl implements GenericFileReader {
     private static final Logger LOGGER = LoggerFactory.getLogger(GenericFileReaderImpl.class);
     private static final int PROGRESS_INTERVAL = 500;
 
+    private final String org;
     private final ObjectMapper objectMapper;
     private final FileArchiveService fileArchiveService;
+
     private long totalItems = 0;
     private long processedItems = 0;
 
     public GenericFileReaderImpl(
+        @Value("${influxdb.org}") String org,
         ObjectMapper objectMapper,
         FileArchiveService fileArchiveService
     ) {
+        this.org = org;
         this.objectMapper = objectMapper;
         this.fileArchiveService = fileArchiveService;
     }
@@ -62,6 +69,8 @@ public class GenericFileReaderImpl implements GenericFileReader {
             return;
         }
 
+        final InfluxWriteConfig config = InfluxWriteConfig.create(handler.getBucket(), org, WritePrecision.NS);
+
         try {
             // Count total lines first
             long fileLines = Files.lines(path).count();
@@ -74,7 +83,7 @@ public class GenericFileReaderImpl implements GenericFileReader {
             // Process lines
             try (Stream<String> lines = Files.lines(path)) {
                 lines.forEach(line -> {
-                    processLine(line, handler);
+                    processLine(config, line, handler);
                     processedItems++;
                     logProgress();
                 });
@@ -96,10 +105,10 @@ public class GenericFileReaderImpl implements GenericFileReader {
     }
 
     @SuppressWarnings("unchecked")
-    private void processLine(String line, FileTypeHandler<?> handler) {
+    private void processLine(InfluxWriteConfig config, String line, FileTypeHandler<?> handler) {
         try {
             Object dto = handler.readValue(line, objectMapper);
-            ((FileTypeHandler<Object>) handler).handle(dto);
+            ((FileTypeHandler<Object>) handler).handle(config, dto);
         } catch (Exception e) {
             LOGGER.error("Could not process line: {}", line, e);
         }

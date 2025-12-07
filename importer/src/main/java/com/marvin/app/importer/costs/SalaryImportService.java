@@ -7,6 +7,7 @@ import com.marvin.camt.model.book_entry.CreditDebitCodeDTO;
 import com.marvin.common.costs.SalaryDTO;
 import com.marvin.database.repository.SalaryRepository;
 import com.marvin.entities.costs.SalaryEntity;
+import com.marvin.influxdb.core.InfluxWriteConfig;
 import com.marvin.influxdb.costs.salary.service.SalaryImport;
 import java.util.Optional;
 import org.springframework.stereotype.Component;
@@ -39,12 +40,12 @@ public class SalaryImportService implements ImportService<SalaryDTO> {
 
                 .map(dto -> new SalaryDTO(dto.firstOfMonth(), dto.amount()))
 
-                .doOnNext(this::importData)
+                .doOnNext(config -> importData(null, config))
                 .map(salary -> "Processed " + salary + "!");
     }
 
     @Override
-    public void importData(SalaryDTO salary) {
+    public void importData(InfluxWriteConfig config, SalaryDTO salary) {
         final Optional<SalaryEntity> persistedStateList = salaryRepository.findBySalaryDate(
                 salary.salaryDate());
         if (persistedStateList.isEmpty()) {

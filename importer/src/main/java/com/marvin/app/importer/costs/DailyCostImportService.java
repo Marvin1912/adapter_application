@@ -5,6 +5,7 @@ import com.marvin.camt.model.book_entry.BookingEntryDTO;
 import com.marvin.common.costs.DailyCostDTO;
 import com.marvin.database.repository.DailyCostRepository;
 import com.marvin.entities.costs.DailyCostEntity;
+import com.marvin.influxdb.core.InfluxWriteConfig;
 import com.marvin.influxdb.costs.daily.service.DailyCostImport;
 import java.math.BigDecimal;
 import java.util.regex.Pattern;
@@ -54,13 +55,13 @@ public class DailyCostImportService implements ImportService<DailyCostDTO> {
                                         )
                         )
                 )
-                .doOnNext(dailyCostImportService::importData)
+                .doOnNext(config -> dailyCostImportService.importData(null, config))
                 .map(monthlyCostDTO -> "Processed " + monthlyCostDTO + "!");
     }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void importData(DailyCostDTO dailyCost) {
+    public void importData(InfluxWriteConfig config, DailyCostDTO dailyCost) {
         dailyCostRepository.findByCostDateAndDescriptionOrderByCostDate(dailyCost.costDate(),
                         dailyCost.description())
                 .ifPresentOrElse(

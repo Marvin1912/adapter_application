@@ -9,6 +9,7 @@ import com.marvin.common.costs.SpecialCostEntryDTO;
 import com.marvin.database.repository.SpecialCostEntryRepository;
 import com.marvin.entities.costs.SpecialCostEntity;
 import com.marvin.entities.costs.SpecialCostEntryEntity;
+import com.marvin.influxdb.core.InfluxWriteConfig;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -68,13 +69,13 @@ public class SpecialCostImportService implements ImportService<SpecialCostDTO> {
                                 }
                         )
                 )
-                .doOnNext(selfReference::importData)
+                .doOnNext(config -> selfReference.importData(null, config))
                 .map(specialCost -> "Processed " + specialCost + "!");
     }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void importData(SpecialCostDTO specialCost) {
+    public void importData(InfluxWriteConfig config, SpecialCostDTO specialCost) {
 
         final List<SpecialCostEntryEntity> specialCostEntryEntities = specialCostEntryRepository.findBySpecialCostCostDate(
                 specialCost.costDate());

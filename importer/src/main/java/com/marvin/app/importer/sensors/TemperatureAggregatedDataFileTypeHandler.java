@@ -3,6 +3,7 @@ package com.marvin.app.importer.sensors;
 import com.marvin.app.service.FileTypeHandler;
 import com.marvin.export.InfluxExporter;
 import com.marvin.export.influxdb.dto.SensorDataDTO;
+import com.marvin.influxdb.core.InfluxWriteConfig;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -25,7 +26,12 @@ public class TemperatureAggregatedDataFileTypeHandler implements FileTypeHandler
     }
 
     @Override
-    public void handle(final SensorDataDTO sensorData) {
-        sensorDataImportService.importData(sensorData);
+    public String getBucket() {
+        return "sensor_data_30m";
+    }
+
+    @Override
+    public void handle(final InfluxWriteConfig config, final SensorDataDTO sensorData) {
+        sensorDataImportService.importData(config, sensorData);
     }
 }
