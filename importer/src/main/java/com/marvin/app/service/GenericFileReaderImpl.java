@@ -14,9 +14,12 @@ import org.springframework.stereotype.Component;
 public class GenericFileReaderImpl implements GenericFileReader {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GenericFileReaderImpl.class);
+    private static final int PROGRESS_INTERVAL = 500;
 
     private final ObjectMapper objectMapper;
     private final FileArchiveService fileArchiveService;
+    private long totalItems = 0;
+    private long processedItems = 0;
 
     public GenericFileReaderImpl(
         ObjectMapper objectMapper,
@@ -57,8 +60,23 @@ public class GenericFileReaderImpl implements GenericFileReader {
             return;
         }
 
-        try (Stream<String> lines = Files.lines(path)) {
-            lines.forEach(line -> processLine(line, handler));
+        try {
+            // Count total lines first
+            long fileLines = Files.lines(path).count();
+            totalItems += fileLines;
+            LOGGER.info("File {} has {} lines to process", path.getFileName(), fileLines);
+
+            // Reset processed counter for this file
+            processedItems = 0;
+
+            // Process lines
+            try (Stream<String> lines = Files.lines(path)) {
+                lines.forEach(line -> {
+                    processLine(line, handler);
+                    processedItems++;
+                    logProgress();
+                });
+            }
         } catch (Exception e) {
             LOGGER.error("Could read lines from {}!", path.getFileName(), e);
         }
@@ -82,6 +100,13 @@ public class GenericFileReaderImpl implements GenericFileReader {
             ((FileTypeHandler<Object>) handler).handle(dto);
         } catch (Exception e) {
             LOGGER.error("Could not process line: {}", line, e);
+        }
+    }
+
+    private void logProgress() {
+        if (processedItems % PROGRESS_INTERVAL == 0) {
+            double percentage = totalItems > 0 ? (processedItems * 100.0 / totalItems) : 0;
+            LOGGER.info("Progress: {}/{} items processed ({:.2f}%)", processedItems, totalItems, percentage);
         }
     }
 }
