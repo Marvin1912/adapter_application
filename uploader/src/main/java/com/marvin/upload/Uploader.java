@@ -22,23 +22,32 @@ public class Uploader {
     private static final Logger LOGGER = LoggerFactory.getLogger(Uploader.class);
 
     private static final DateTimeFormatter FILE_DTF = DateTimeFormatter.ofPattern(
-            "yyyyMMdd_HHmmssSSS");
+        "yyyyMMdd_HHmmssSSS");
 
+    private final boolean enabled;
     private final String costExportFolder;
     private final String parentFolderName;
     private final GoogleDrive googleDrive;
 
     public Uploader(
-            @Value("${uploader.cost-export-folder}") String costExportFolder,
-            @Value("${uploader.parent-folder-name}") String parentFolderName,
-            GoogleDrive googleDrive
+        @Value("${uploader.enabled}") boolean enabled,
+        @Value("${uploader.cost-export-folder}") String costExportFolder,
+        @Value("${uploader.parent-folder-name}") String parentFolderName,
+        GoogleDrive googleDrive
     ) {
+        this.enabled = enabled;
         this.costExportFolder = costExportFolder;
         this.parentFolderName = parentFolderName;
         this.googleDrive = googleDrive;
     }
 
-    public void zipAndUploadCostFiles(String fileNamePrefix, List<Path> filesToZipAndUpload) {
+    public void zipAndUploadFiles(String fileNamePrefix, List<Path> filesToZipAndUpload) {
+
+        if (!enabled) {
+            LOGGER.info("Upload is disabled!");
+            return;
+        }
+
         LOGGER.info("Going to zip and upload files with prefix: {}!", fileNamePrefix);
 
         final Path dirPath = Paths.get(costExportFolder);
@@ -57,11 +66,11 @@ public class Uploader {
 
     private void createZipFile(List<Path> filesToZipAndUpload, Path dirPath, Path zipFilePath) {
         try (final ZipOutputStream zipOutputStream = new ZipOutputStream(
-                Files.newOutputStream(zipFilePath))) {
+            Files.newOutputStream(zipFilePath))) {
             zipOutputStream.setLevel(9);
             filesToZipAndUpload.stream()
-                    .filter(path -> !Files.isDirectory(path))
-                    .forEach(path -> addFileToZip(path, dirPath, zipOutputStream));
+                .filter(path -> !Files.isDirectory(path))
+                .forEach(path -> addFileToZip(path, dirPath, zipOutputStream));
         } catch (IOException e) {
             throw new RuntimeException("Could not create zip file!", e);
         }

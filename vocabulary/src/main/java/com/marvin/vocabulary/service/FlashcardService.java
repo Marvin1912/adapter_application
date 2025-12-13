@@ -180,7 +180,7 @@ public class FlashcardService {
                         entity.getFront(),
                         entity.getBack(),
                         entity.getDescription(),
-                        entity.getUpdated()
+                        entity.isUpdated()
                 ));
     }
 
