@@ -1,4 +1,4 @@
-package com.marvin.export;
+package com.marvin.export.core;
 
 import java.util.Objects;
 import lombok.Getter;
@@ -16,11 +16,11 @@ public class ExportConfig {
     private final boolean influxdbExportEnabled;
 
     public ExportConfig(
-            @Value("${exporter.folder}") String costExportFolder,
-            @Value("${influxdb.url:}") String influxdbUrl,
-            @Value("${influxdb.token:}") String influxdbToken,
-            @Value("${influxdb.org:}") String influxdbOrg,
-            @Value("${influxdb.export.enabled:false}") boolean influxdbExportEnabled
+        @Value("${exporter.folder}") String costExportFolder,
+        @Value("${influxdb.url:}") String influxdbUrl,
+        @Value("${influxdb.token:}") String influxdbToken,
+        @Value("${influxdb.org:}") String influxdbOrg,
+        @Value("${influxdb.export.enabled:false}") boolean influxdbExportEnabled
     ) {
         this.costExportFolder = validateCostExportFolder(costExportFolder);
         this.influxdbUrl = influxdbUrl;
@@ -46,10 +46,10 @@ public class ExportConfig {
         }
         final ExportConfig that = (ExportConfig) obj;
         return Objects.equals(costExportFolder, that.costExportFolder)
-                && Objects.equals(influxdbUrl, that.influxdbUrl)
-                && Objects.equals(influxdbToken, that.influxdbToken)
-                && Objects.equals(influxdbOrg, that.influxdbOrg)
-                && Objects.equals(influxdbExportEnabled, that.influxdbExportEnabled);
+            && Objects.equals(influxdbUrl, that.influxdbUrl)
+            && Objects.equals(influxdbToken, that.influxdbToken)
+            && Objects.equals(influxdbOrg, that.influxdbOrg)
+            && Objects.equals(influxdbExportEnabled, that.influxdbExportEnabled);
     }
 
     @Override
@@ -60,11 +60,11 @@ public class ExportConfig {
     @Override
     public String toString() {
         return "ExportConfig{"
-                + "costExportFolder='" + costExportFolder + '\''
-                + ", influxdbUrl='" + influxdbUrl + '\''
-                + ", influxdbToken='" + (influxdbToken != null ? "***" : "null") + '\''
-                + ", influxdbOrg='" + influxdbOrg + '\''
-                + ", influxdbExportEnabled=" + influxdbExportEnabled
-                + '}';
+            + "costExportFolder='" + costExportFolder + '\''
+            + ", influxdbUrl='" + influxdbUrl + '\''
+            + ", influxdbToken='" + (influxdbToken != null ? "***" : "null") + '\''
+            + ", influxdbOrg='" + influxdbOrg + '\''
+            + ", influxdbExportEnabled=" + influxdbExportEnabled
+            + '}';
     }
 }

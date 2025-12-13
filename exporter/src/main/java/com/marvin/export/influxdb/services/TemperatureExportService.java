@@ -26,22 +26,22 @@ public class TemperatureExportService extends AbstractInfluxExport<SensorDataDTO
     @Override
     protected String buildQuery(Instant startTime, Instant endTime) {
         return InfluxQueryBuilder.from(getBucketName())
-                .timeRange(startTime, endTime)
-                .measurement("°C")
-                .field("value")
-                .map("""
-                        fn: (r) => ({
-                              r with friendly_name:
-                                if r.entity_id == "lumi_lumi_weather_temperatur" then "Badezimmer"
-                                else if r.entity_id == "lumi_lumi_weather_temperatur_2" then "Flur"
-                                else if r.entity_id == "lumi_lumi_weather_temperatur_3" then "Küche"
-                                else if r.entity_id == "lumi_lumi_weather_temperatur_4" then "Schlafzimmer"
-                                else if r.entity_id == "lumi_lumi_weather_temperatur_5" then "Wohnzimmer"
-                                else "Nicht bekannt"
-                            })""")
-                .keepOriginalColumns(false)
-                .sort("desc")
-                .build();
+            .timeRange(startTime, endTime)
+            .measurement("°C")
+            .field("value")
+            .map("""
+                fn: (r) => ({
+                      r with friendly_name:
+                        if r.entity_id == "lumi_lumi_weather_temperatur" then "Badezimmer"
+                        else if r.entity_id == "lumi_lumi_weather_temperatur_2" then "Flur"
+                        else if r.entity_id == "lumi_lumi_weather_temperatur_3" then "Küche"
+                        else if r.entity_id == "lumi_lumi_weather_temperatur_4" then "Schlafzimmer"
+                        else if r.entity_id == "lumi_lumi_weather_temperatur_5" then "Wohnzimmer"
+                        else "Nicht bekannt"
+                    })""")
+            .keepOriginalColumns(false)
+            .sort("desc")
+            .build();
     }
 
     @Override

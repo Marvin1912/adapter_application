@@ -1,4 +1,4 @@
-package com.marvin.export;
+package com.marvin.export.core;
 
 import java.nio.file.Path;
 import java.time.LocalDateTime;
@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 public abstract class AbstractExporterBase {
 
     protected static final DateTimeFormatter FILE_DATE_TIME_FORMATTER =
-            DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
+        DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
 
     protected final ExportConfig exportConfig;
     protected final ExportFileWriter exportFileWriter;

@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 import com.marvin.app.controller.dto.InfluxBucketResponse;
-import com.marvin.export.InfluxExporter;
+import com.marvin.export.influxdb.InfluxExporter;
 import com.marvin.upload.Uploader;
 import java.util.Arrays;
 import java.util.List;
