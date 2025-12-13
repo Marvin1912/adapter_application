@@ -1,7 +1,7 @@
 package com.marvin.app.importer.sensors;
 
 import com.marvin.app.service.FileTypeHandler;
-import com.marvin.export.InfluxExporter;
+import com.marvin.export.influxdb.InfluxExporter;
 import com.marvin.export.influxdb.dto.SensorDataDTO;
 import com.marvin.influxdb.core.InfluxWriteConfig;
 import org.springframework.stereotype.Component;
