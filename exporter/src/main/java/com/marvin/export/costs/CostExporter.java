@@ -1,4 +1,4 @@
-package com.marvin.export;
+package com.marvin.export.costs;
 
 import com.marvin.common.costs.DailyCostDTO;
 import com.marvin.common.costs.MonthlyCostDTO;
@@ -24,7 +24,7 @@ import java.util.stream.Stream;
 import org.springframework.stereotype.Component;
 
 @Component
-public class Exporter extends AbstractExporterBase {
+public class CostExporter extends AbstractExporterBase {
 
     private static final String DAILY_COSTS_FILENAME_PREFIX = "daily_costs";
     private static final String MONTHLY_COSTS_FILENAME_PREFIX = "monthly_costs";
@@ -58,7 +58,7 @@ public class Exporter extends AbstractExporterBase {
     private final SpecialCostEntryRepository specialCostEntryRepository;
     private final SalaryRepository salaryRepository;
 
-    public Exporter(
+    public CostExporter(
             ExportConfig exportConfig,
             ExportFileWriter exportFileWriter,
             DailyCostRepository dailyCostRepository,
