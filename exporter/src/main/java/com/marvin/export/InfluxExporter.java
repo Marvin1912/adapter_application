@@ -8,8 +8,6 @@ import com.marvin.export.influxdb.services.TemperatureAggregatedExportService;
 import com.marvin.export.influxdb.services.TemperatureExportService;
 import java.nio.file.Path;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
@@ -19,12 +17,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-/**
- * Main orchestrator for exporting data from InfluxDB user buckets. Follows the same patterns as the existing Exporter.java to maintain consistency. Supports
- * selective bucket exports and timestamped output file generation.
- */
 @Component
-public class InfluxExporter {
+public class InfluxExporter extends AbstractExporterBase {
 
     public static final String TEMPERATURE_FILENAME_PREFIX = "temperature";
     public static final String HUMIDITY_FILENAME_PREFIX = "humidity";
@@ -35,12 +29,7 @@ public class InfluxExporter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(InfluxExporter.class);
 
-    private static final DateTimeFormatter FILE_DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
-
     private static final String FILE_EXTENSION = ".jsonl";
-
-    private final ExportConfig exportConfig;
-    private final ExportFileWriter exportFileWriter;
     private final TemperatureExportService temperatureExportService;
     private final HumidityExportService humidityExportService;
     private final HumidityAggregatedExportService humidityAggregatedExportService;
@@ -58,8 +47,7 @@ public class InfluxExporter {
         PowerExportService powerExportService,
         PowerAggregatedExportService powerAggregatedExportService
     ) {
-        this.exportConfig = exportConfig;
-        this.exportFileWriter = exportFileWriter;
+        super(exportConfig, exportFileWriter);
         this.temperatureExportService = temperatureExportService;
         this.humidityExportService = humidityExportService;
         this.humidityAggregatedExportService = humidityAggregatedExportService;
@@ -79,24 +67,24 @@ public class InfluxExporter {
     public List<Path> exportSelectedBucket(InfluxBucket bucket, Instant startTime, Instant endTime) {
         LOGGER.info("Starting export of selected InfluxDB bucket: {}", bucket);
 
-        final String timestamp = LocalDateTime.now().format(FILE_DATE_TIME_FORMATTER);
+        final String timestamp = getCurrentTimestamp();
         final String influxExportFolder = exportConfig.getCostExportFolder();
 
         final List<Path> exportedFiles = new ArrayList<>();
 
         try {
             final Path filePath = switch (bucket) {
-                case TEMPERATURE -> exportBucket(createFilePath(influxExportFolder, TEMPERATURE_FILENAME_PREFIX, timestamp),
+                case TEMPERATURE -> exportBucket(createFilePath(influxExportFolder, TEMPERATURE_FILENAME_PREFIX, timestamp, FILE_EXTENSION),
                     () -> temperatureExportService.exportData(startTime, endTime).stream(), "temperature data");
-                case HUMIDITY -> exportBucket(createFilePath(influxExportFolder, HUMIDITY_FILENAME_PREFIX, timestamp),
+                case HUMIDITY -> exportBucket(createFilePath(influxExportFolder, HUMIDITY_FILENAME_PREFIX, timestamp, FILE_EXTENSION),
                     () -> humidityExportService.exportData(startTime, endTime).stream(), "humidity data");
-                case POWER -> exportBucket(createFilePath(influxExportFolder, POWER_FILENAME_PREFIX, timestamp),
+                case POWER -> exportBucket(createFilePath(influxExportFolder, POWER_FILENAME_PREFIX, timestamp, FILE_EXTENSION),
                     () -> powerExportService.exportData(startTime, endTime).stream(), "power data");
-                case POWER_AGGREGATED -> exportBucket(createFilePath(influxExportFolder, POWER_AGGREGATED_FILENAME_PREFIX, timestamp),
+                case POWER_AGGREGATED -> exportBucket(createFilePath(influxExportFolder, POWER_AGGREGATED_FILENAME_PREFIX, timestamp, FILE_EXTENSION),
                     () -> powerAggregatedExportService.exportData(startTime, endTime).stream(), "aggregated power data");
-                case TEMPERATURE_AGGREGATED -> exportBucket(createFilePath(influxExportFolder, TEMPERATURE_AGGREGATED_FILENAME_PREFIX, timestamp),
+                case TEMPERATURE_AGGREGATED -> exportBucket(createFilePath(influxExportFolder, TEMPERATURE_AGGREGATED_FILENAME_PREFIX, timestamp, FILE_EXTENSION),
                     () -> temperatureAggregatedExportService.exportData(startTime, endTime).stream(), "aggregated temperature data");
-                case HUMIDITY_AGGREGATED -> exportBucket(createFilePath(influxExportFolder, HUMIDITY_AGGREGATED_FILENAME_PREFIX, timestamp),
+                case HUMIDITY_AGGREGATED -> exportBucket(createFilePath(influxExportFolder, HUMIDITY_AGGREGATED_FILENAME_PREFIX, timestamp, FILE_EXTENSION),
                     () -> humidityAggregatedExportService.exportData(startTime, endTime).stream(), "aggregated humidity data");
             };
 
@@ -109,8 +97,21 @@ public class InfluxExporter {
         return exportedFiles.stream().map(Path::getFileName).toList();
     }
 
-    private Path createFilePath(String folder, String prefix, String timestamp) {
-        return Path.of(folder, prefix + '_' + timestamp + FILE_EXTENSION);
+    @Override
+    protected List<Path> export() {
+        return exportAllBuckets();
+    }
+
+    private List<Path> exportAllBuckets() {
+        Instant now = Instant.now();
+        Instant oneHourAgo = now.minusSeconds(3600);
+        List<Path> allFiles = new ArrayList<>();
+
+        for (InfluxBucket bucket : InfluxBucket.values()) {
+            allFiles.addAll(exportSelectedBucket(bucket, oneHourAgo, now));
+        }
+
+        return allFiles;
     }
 
     private <T> Path exportBucket(Path path, Supplier<Stream<T>> dataSupplier, String description) {
@@ -118,7 +119,7 @@ public class InfluxExporter {
 
         try {
             final Stream<T> dataStream = dataSupplier.get();
-            exportFileWriter.writeFile(path, dataStream);
+            exportData(path, dataSupplier);
             LOGGER.info("Successfully exported {} records to {}", description, path);
             return path;
         } catch (Exception e) {

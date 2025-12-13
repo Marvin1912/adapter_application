@@ -15,8 +15,6 @@ import com.marvin.entities.costs.SalaryEntity;
 import com.marvin.entities.costs.SpecialCostEntryEntity;
 import java.nio.file.Path;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -26,15 +24,12 @@ import java.util.stream.Stream;
 import org.springframework.stereotype.Component;
 
 @Component
-public class Exporter {
+public class Exporter extends AbstractExporterBase {
 
-    private static final DateTimeFormatter FILE_DATE_TIME_FORMATTER =
-            DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
-
-    private static final String DAILY_COSTS_FILENAME_PREFIX = "daily_costs_";
-    private static final String MONTHLY_COSTS_FILENAME_PREFIX = "monthly_costs_";
-    private static final String SPECIAL_COSTS_FILENAME_PREFIX = "special_costs_";
-    private static final String SALARIES_FILENAME_PREFIX = "salaries_";
+    private static final String DAILY_COSTS_FILENAME_PREFIX = "daily_costs";
+    private static final String MONTHLY_COSTS_FILENAME_PREFIX = "monthly_costs";
+    private static final String SPECIAL_COSTS_FILENAME_PREFIX = "special_costs";
+    private static final String SALARIES_FILENAME_PREFIX = "salaries";
     private static final String FILE_EXTENSION = ".json";
 
     private static final Function<SpecialCostEntryEntity, SpecialCostEntryDTO>
@@ -58,8 +53,6 @@ public class Exporter {
                     monthlyCostEntity.getCostDate(),
                     monthlyCostEntity.getValue());
 
-    private final ExportConfig exportConfig;
-    private final ExportFileWriter exportFileWriter;
     private final DailyCostRepository dailyCostRepository;
     private final MonthlyCostRepository monthlyCostRepository;
     private final SpecialCostEntryRepository specialCostEntryRepository;
@@ -72,8 +65,7 @@ public class Exporter {
             MonthlyCostRepository monthlyCostRepository,
             SpecialCostEntryRepository specialCostEntryRepository,
             SalaryRepository salaryRepository) {
-        this.exportConfig = exportConfig;
-        this.exportFileWriter = exportFileWriter;
+        super(exportConfig, exportFileWriter);
         this.dailyCostRepository = dailyCostRepository;
         this.monthlyCostRepository = monthlyCostRepository;
         this.specialCostEntryRepository = specialCostEntryRepository;
@@ -81,28 +73,28 @@ public class Exporter {
     }
 
     public List<Path> exportCosts() {
-        final String timestamp = LocalDateTime.now().format(FILE_DATE_TIME_FORMATTER);
+        final String timestamp = getCurrentTimestamp();
         final String costExportFolder = exportConfig.getCostExportFolder();
 
         final Path dailyCostsPath = createFilePath(costExportFolder, DAILY_COSTS_FILENAME_PREFIX,
-                timestamp);
-        exportCost(dailyCostsPath, () -> dailyCostRepository.findAll()
+                timestamp, FILE_EXTENSION);
+        exportData(dailyCostsPath, () -> dailyCostRepository.findAll()
                 .stream()
                 .map(DAILY_COST_MAPPER));
 
         final Path monthlyCostsPath = createFilePath(costExportFolder,
-                MONTHLY_COSTS_FILENAME_PREFIX, timestamp);
-        exportCost(monthlyCostsPath, () -> monthlyCostRepository.findAll()
+                MONTHLY_COSTS_FILENAME_PREFIX, timestamp, FILE_EXTENSION);
+        exportData(monthlyCostsPath, () -> monthlyCostRepository.findAll()
                 .stream()
                 .map(MONTHLY_COST_MAPPER));
 
         final Path specialCostsPath = createFilePath(costExportFolder,
-                SPECIAL_COSTS_FILENAME_PREFIX, timestamp);
-        exportCost(specialCostsPath, this::createSpecialCostsStream);
+                SPECIAL_COSTS_FILENAME_PREFIX, timestamp, FILE_EXTENSION);
+        exportData(specialCostsPath, this::createSpecialCostsStream);
 
         final Path salariesPath = createFilePath(costExportFolder, SALARIES_FILENAME_PREFIX,
-                timestamp);
-        exportCost(salariesPath, () -> salaryRepository.findAll()
+                timestamp, FILE_EXTENSION);
+        exportData(salariesPath, () -> salaryRepository.findAll()
                 .stream()
                 .map(SALARY_MAPPER));
 
@@ -111,8 +103,9 @@ public class Exporter {
                 .toList();
     }
 
-    private Path createFilePath(String folder, String prefix, String timestamp) {
-        return Path.of(folder, prefix + timestamp + FILE_EXTENSION);
+    @Override
+    protected List<Path> export() {
+        return exportCosts();
     }
 
     private Stream<SpecialCostDTO> createSpecialCostsStream() {
@@ -125,9 +118,5 @@ public class Exporter {
                 .entrySet()
                 .stream()
                 .map(SPECIAL_COST_MAPPER);
-    }
-
-    private <T> void exportCost(Path path, Supplier<Stream<T>> costs) {
-        exportFileWriter.writeFile(path, costs.get());
     }
 }
