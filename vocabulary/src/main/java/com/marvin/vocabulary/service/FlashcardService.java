@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.databind.SequenceWriter;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
+import com.marvin.vocabulary.dto.Flashcard;
 import com.marvin.vocabulary.dto.FlashcardCsvDTO;
 import com.marvin.vocabulary.model.FlashcardEntity;
 import com.marvin.vocabulary.repository.FlashcardRepository;
@@ -13,6 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -167,6 +169,19 @@ public class FlashcardService {
                     );
             count.incrementAndGet();
         }
+    }
+
+    public Stream<Flashcard> getAllFlashcardsForExport() {
+        return flashcardRepository.findAll().stream()
+                .map(entity -> new Flashcard(
+                        entity.getId(),
+                        entity.getDeck(),
+                        entity.getAnkiId(),
+                        entity.getFront(),
+                        entity.getBack(),
+                        entity.getDescription(),
+                        entity.getUpdated()
+                ));
     }
 
 }
