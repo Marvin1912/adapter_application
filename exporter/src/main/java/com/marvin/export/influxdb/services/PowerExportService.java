@@ -25,21 +25,21 @@ public class PowerExportService extends AbstractInfluxExport<SensorDataDTO> {
     @Override
     protected String buildQuery(Instant startTime, Instant endTime) {
         return InfluxQueryBuilder.from(getBucketName())
-                .timeRange(startTime, endTime)
-                .measurement("W")
-                .field("value")
-                .map("""
-                        fn: (r) => ({
-                              r with friendly_name:
-                                if r.entity_id == "tasmota_energy_power" then "Kühlschrank"
-                                else if r.entity_id == "tasmota_energy_power_2" then "Server"
-                                else if r.entity_id == "tasmota_energy_power_3" then "Workstation"
-                                else if r.entity_id == "tasmota_energy_power_4" then "Waschmaschine"
-                                else "Nicht bekannt"
-                            })""")
-                .keepOriginalColumns(false)
-                .sort("desc")
-                .build();
+            .timeRange(startTime, endTime)
+            .measurement("W")
+            .field("value")
+            .map("""
+                fn: (r) => ({
+                      r with friendly_name:
+                        if r.entity_id == "tasmota_energy_power" then "Kühlschrank"
+                        else if r.entity_id == "tasmota_energy_power_2" then "Server"
+                        else if r.entity_id == "tasmota_energy_power_3" then "Workstation"
+                        else if r.entity_id == "tasmota_energy_power_4" then "Waschmaschine"
+                        else "Nicht bekannt"
+                    })""")
+            .keepOriginalColumns(false)
+            .sort("desc")
+            .build();
     }
 
     @Override

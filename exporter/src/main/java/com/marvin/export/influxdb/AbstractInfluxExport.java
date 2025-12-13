@@ -58,14 +58,14 @@ public abstract class AbstractInfluxExport<T> {
 
             // Convert records to DTOs
             final List<T> result = tables.stream()
-                    .flatMap(table -> table.getRecords().stream())
-                    .map(this::convertRecord)
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .collect(Collectors.toList());
+                .flatMap(table -> table.getRecords().stream())
+                .map(this::convertRecord)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
 
             LOGGER.info("Successfully exported {} records from bucket: {}", result.size(),
-                    getBucketName());
+                getBucketName());
             return result;
 
         } catch (Exception e) {
@@ -79,15 +79,15 @@ public abstract class AbstractInfluxExport<T> {
      */
     protected void validateConfiguration() {
         if (exportConfig.getInfluxdbUrl() == null || exportConfig.getInfluxdbUrl().trim()
-                .isEmpty()) {
+            .isEmpty()) {
             throw new InfluxExportException("InfluxDB URL is not configured");
         }
         if (exportConfig.getInfluxdbToken() == null || exportConfig.getInfluxdbToken().trim()
-                .isEmpty()) {
+            .isEmpty()) {
             throw new InfluxExportException("InfluxDB token is not configured");
         }
         if (exportConfig.getInfluxdbOrg() == null || exportConfig.getInfluxdbOrg().trim()
-                .isEmpty()) {
+            .isEmpty()) {
             throw new InfluxExportException("InfluxDB organization is not configured");
         }
         if (!exportConfig.isInfluxdbExportEnabled()) {

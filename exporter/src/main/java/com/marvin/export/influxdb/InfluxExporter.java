@@ -85,8 +85,9 @@ public class InfluxExporter extends AbstractExporterBase {
                     () -> powerExportService.exportData(startTime, endTime).stream(), "power data");
                 case POWER_AGGREGATED -> exportBucket(createFilePath(influxExportFolder, POWER_AGGREGATED_FILENAME_PREFIX, timestamp, FILE_EXTENSION),
                     () -> powerAggregatedExportService.exportData(startTime, endTime).stream(), "aggregated power data");
-                case TEMPERATURE_AGGREGATED -> exportBucket(createFilePath(influxExportFolder, TEMPERATURE_AGGREGATED_FILENAME_PREFIX, timestamp, FILE_EXTENSION),
-                    () -> temperatureAggregatedExportService.exportData(startTime, endTime).stream(), "aggregated temperature data");
+                case TEMPERATURE_AGGREGATED ->
+                    exportBucket(createFilePath(influxExportFolder, TEMPERATURE_AGGREGATED_FILENAME_PREFIX, timestamp, FILE_EXTENSION),
+                        () -> temperatureAggregatedExportService.exportData(startTime, endTime).stream(), "aggregated temperature data");
                 case HUMIDITY_AGGREGATED -> exportBucket(createFilePath(influxExportFolder, HUMIDITY_AGGREGATED_FILENAME_PREFIX, timestamp, FILE_EXTENSION),
                     () -> humidityAggregatedExportService.exportData(startTime, endTime).stream(), "aggregated humidity data");
             };
