@@ -37,6 +37,7 @@ importer:
   in:
     costs: ${IMPORTER_IN_COSTS:./app/import/costs}
     sensordata: ${IMPORTER_IN_SENSORDATA:./app/import/sensordata}
+    vocabulary: ${IMPORTER_IN_VOCABULARY:./app/import/vocabulary}
   done: ${IMPORTER_DONE:./app/import/done}
 
 exporter:
