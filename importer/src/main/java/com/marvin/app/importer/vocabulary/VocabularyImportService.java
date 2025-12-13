@@ -20,10 +20,12 @@ public class VocabularyImportService implements ImportService<Flashcard> {
     @Override
     @Transactional
     public void importData(InfluxWriteConfig config, Flashcard flashcard) {
-        if (flashcard == null) return;
+        if (flashcard == null) {
+            return;
+        }
 
-        FlashcardEntity entity = new FlashcardEntity(
-            flashcard.id(),
+        final FlashcardEntity entity = new FlashcardEntity(
+            null,
             flashcard.deck(),
             flashcard.ankiId(),
             flashcard.front(),
@@ -32,10 +34,6 @@ public class VocabularyImportService implements ImportService<Flashcard> {
             flashcard.updated()
         );
 
-        if (flashcard.id() != null) {
-            flashcardService.update(entity);
-        } else {
-            flashcardService.save(entity);
-        }
+        flashcardService.save(entity);
     }
 }
