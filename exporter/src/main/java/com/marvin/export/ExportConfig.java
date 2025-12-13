@@ -1,9 +1,11 @@
 package com.marvin.export;
 
 import java.util.Objects;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+@Getter
 @Component
 public class ExportConfig {
 
@@ -25,26 +27,6 @@ public class ExportConfig {
         this.influxdbToken = influxdbToken;
         this.influxdbOrg = influxdbOrg;
         this.influxdbExportEnabled = influxdbExportEnabled;
-    }
-
-    public String getCostExportFolder() {
-        return costExportFolder;
-    }
-
-    public String getInfluxdbUrl() {
-        return influxdbUrl;
-    }
-
-    public String getInfluxdbToken() {
-        return influxdbToken;
-    }
-
-    public String getInfluxdbOrg() {
-        return influxdbOrg;
-    }
-
-    public boolean isInfluxdbExportEnabled() {
-        return influxdbExportEnabled;
     }
 
     private String validateCostExportFolder(String folder) {
