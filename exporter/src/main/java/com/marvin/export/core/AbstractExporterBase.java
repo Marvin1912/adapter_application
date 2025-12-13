@@ -1,4 +1,4 @@
-package com.marvin.export;
+package com.marvin.export.core;
 
 import java.nio.file.Path;
 import java.time.LocalDateTime;

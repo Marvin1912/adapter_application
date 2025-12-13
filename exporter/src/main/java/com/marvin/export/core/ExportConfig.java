@@ -1,4 +1,4 @@
-package com.marvin.export;
+package com.marvin.export.core;
 
 import java.util.Objects;
 import lombok.Getter;

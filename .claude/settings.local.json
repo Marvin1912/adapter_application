@@ -22,7 +22,8 @@
       "Bash(mvn compile test-compile:*)",
       "Bash(mvn compile:*)",
       "Bash(mvn checkstyle:check:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(mv:*)"
     ],
     "deny": [],
     "ask": []
