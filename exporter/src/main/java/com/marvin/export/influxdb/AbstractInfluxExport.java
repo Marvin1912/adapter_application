@@ -3,7 +3,7 @@ package com.marvin.export.influxdb;
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.query.FluxRecord;
 import com.influxdb.query.FluxTable;
-import com.marvin.export.ExportConfig;
+import com.marvin.export.core.ExportConfig;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;

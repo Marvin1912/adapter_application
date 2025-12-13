@@ -1,4 +1,4 @@
-package com.marvin.export;
+package com.marvin.export.influxdb;
 
 import com.marvin.export.influxdb.services.HumidityAggregatedExportService;
 import com.marvin.export.influxdb.services.HumidityExportService;

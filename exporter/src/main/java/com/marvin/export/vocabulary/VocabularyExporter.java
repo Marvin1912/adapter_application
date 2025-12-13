@@ -1,8 +1,8 @@
 package com.marvin.export.vocabulary;
 
-import com.marvin.export.AbstractExporterBase;
-import com.marvin.export.ExportConfig;
-import com.marvin.export.ExportFileWriter;
+import com.marvin.export.core.AbstractExporterBase;
+import com.marvin.export.core.ExportConfig;
+import com.marvin.export.core.ExportFileWriter;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.function.Supplier;

@@ -2,7 +2,7 @@ package com.marvin.app.controller;
 
 import com.marvin.app.importer.costs.CostImporter;
 import com.marvin.app.importer.sensors.SensorDataImporter;
-import com.marvin.export.Exporter;
+import com.marvin.export.costs.CostExporter;
 import com.marvin.upload.Uploader;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,9 +14,9 @@ public class AdapterController {
     private final CostImporter costImporter;
     private final SensorDataImporter sensorDataImporter;
     private final Uploader uploader;
-    private final Exporter exporter;
+    private final CostExporter exporter;
 
-    public AdapterController(CostImporter costImporter, SensorDataImporter sensorDataImporter, Uploader uploader, Exporter exporter) {
+    public AdapterController(CostImporter costImporter, SensorDataImporter sensorDataImporter, Uploader uploader, CostExporter exporter) {
         this.costImporter = costImporter;
         this.sensorDataImporter = sensorDataImporter;
         this.uploader = uploader;
