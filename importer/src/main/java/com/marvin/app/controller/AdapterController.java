@@ -3,6 +3,7 @@ package com.marvin.app.controller;
 import com.marvin.app.importer.costs.CostImporter;
 import com.marvin.app.importer.sensors.SensorDataImporter;
 import com.marvin.export.costs.CostExporter;
+import com.marvin.export.vocabulary.VocabularyExporter;
 import com.marvin.upload.Uploader;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,12 +16,15 @@ public class AdapterController {
     private final SensorDataImporter sensorDataImporter;
     private final Uploader uploader;
     private final CostExporter exporter;
+    private final VocabularyExporter vocabularyExporter;
 
-    public AdapterController(CostImporter costImporter, SensorDataImporter sensorDataImporter, Uploader uploader, CostExporter exporter) {
+    public AdapterController(CostImporter costImporter, SensorDataImporter sensorDataImporter, Uploader uploader, CostExporter exporter,
+        VocabularyExporter vocabularyExporter) {
         this.costImporter = costImporter;
         this.sensorDataImporter = sensorDataImporter;
         this.uploader = uploader;
         this.exporter = exporter;
+        this.vocabularyExporter = vocabularyExporter;
     }
 
     @PostMapping("/import/costs")
@@ -36,8 +40,14 @@ public class AdapterController {
     }
 
     @PostMapping("/export/costs")
-    public ResponseEntity<Void> triggerCostUpload() {
-        uploader.zipAndUploadCostFiles("costs", exporter.exportCosts());
+    public ResponseEntity<Void> exportCosts() {
+        uploader.zipAndUploadFiles("costs", exporter.exportCosts());
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/export/vocabulary")
+    public ResponseEntity<Void> exportVocabulary() {
+        uploader.zipAndUploadFiles("vocabulary", vocabularyExporter.exportVocabulary());
         return ResponseEntity.ok().build();
     }
 

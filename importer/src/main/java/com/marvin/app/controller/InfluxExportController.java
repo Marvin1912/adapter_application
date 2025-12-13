@@ -128,7 +128,7 @@ public class InfluxExportController {
                     endTime != null ? ZonedDateTime.parse(endTime).toInstant() : null
             );
 
-            uploader.zipAndUploadCostFiles(bucketEnum.name(), exportedFiles);
+            uploader.zipAndUploadFiles(bucketEnum.name(), exportedFiles);
 
             return ResponseEntity.ok(InfluxExportResponse.success("InfluxDB buckets exported and uploaded successfully", exportedFiles));
         } catch (IllegalArgumentException e) {
