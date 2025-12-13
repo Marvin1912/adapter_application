@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 public class VocabularyExporter extends AbstractExporterBase {
 
     public static final String FILENAME_PREFIX = "vocabulary";
-    private static final String FILE_EXTENSION = ".json";
+    private static final String FILE_EXTENSION = ".jsonl";
 
     private final FlashcardService flashcardService;
 
