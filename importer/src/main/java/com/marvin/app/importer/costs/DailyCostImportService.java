@@ -68,6 +68,7 @@ public class DailyCostImportService implements ImportService<DailyCostDTO> {
                         persistedState -> updateIfNecessary(persistedState, dailyCost),
                         () -> saveNewDailyCost(dailyCost)
                 );
+        dailyCostImport.importCost(dailyCost);
     }
 
     private void updateIfNecessary(DailyCostEntity persistedState, DailyCostDTO dailyCost) {
@@ -78,7 +79,6 @@ public class DailyCostImportService implements ImportService<DailyCostDTO> {
                     persistedValue, newValue);
             persistedState.setValue(newValue);
             dailyCostRepository.save(persistedState);
-            dailyCostImport.importCost(dailyCost);
         }
     }
 
@@ -86,6 +86,5 @@ public class DailyCostImportService implements ImportService<DailyCostDTO> {
         DailyCostEntity newDailyCostEntity = new DailyCostEntity(dailyCost.costDate(),
                 dailyCost.value(), dailyCost.description());
         dailyCostRepository.save(newDailyCostEntity);
-        dailyCostImport.importCost(dailyCost);
     }
 }
