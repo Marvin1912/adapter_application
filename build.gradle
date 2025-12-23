@@ -66,8 +66,9 @@ subprojects {
 	if (name == 'api') {
 		apply plugin: 'org.springframework.boot'
 		bootJar {
-			mainClass = 'com.marvin.app.api.Application'
+			mainClass = 'com.marvin.Application'
 			duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+			archiveFileName = 'backend.jar'
 		}
 	} else {
 		// Disable bootJar task for non-Spring Boot modules if it exists
