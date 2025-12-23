@@ -5,4 +5,8 @@ import com.marvin.influxdb.core.InfluxWriteConfig;
 public interface ImportService<T> {
 
     void importData(InfluxWriteConfig config, T data);
+
+    default void importData(T data) {
+        importData(null, data);
+    }
 }
