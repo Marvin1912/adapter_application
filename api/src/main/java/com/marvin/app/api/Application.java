@@ -1,4 +1,4 @@
-package com.marvin;
+package com.marvin.app.api;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

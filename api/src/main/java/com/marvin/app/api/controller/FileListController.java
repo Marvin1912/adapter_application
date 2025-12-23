@@ -1,7 +1,7 @@
-package com.marvin.app.controller;
+package com.marvin.app.api.controller;
 
-import com.marvin.app.controller.dto.FileListResponse;
-import com.marvin.app.controller.dto.FileDeleteResponse;
+import com.marvin.app.api.dto.FileListResponse;
+import com.marvin.app.api.dto.FileDeleteResponse;
 import com.marvin.upload.FileLister;
 import com.marvin.upload.FileDeleter;
 import com.marvin.upload.DriveFileInfo;

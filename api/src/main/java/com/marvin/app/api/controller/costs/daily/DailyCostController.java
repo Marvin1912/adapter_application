@@ -1,4 +1,4 @@
-package com.marvin.app.controller.costs.daily;
+package com.marvin.app.api.controller.costs.daily;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marvin.app.importer.costs.DailyCostImportService;

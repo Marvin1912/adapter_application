@@ -2,12 +2,19 @@ group = 'com.marvin.app'
 version = '0.0.1-SNAPSHOT'
 
 dependencies {
+    implementation project(':importer')
     implementation project(':common')
     implementation project(':influxdb')
-    implementation project(':consul')
     implementation project(':camt')
-    implementation project(':database')
-    implementation project(':vocabulary')
+    implementation project(':exporter')
+    implementation project(':uploader')
+
+    // Swagger/OpenAPI dependencies
+    implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.2.0'
+
+    // Spring WebFlux for controllers
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
 
     // Test dependencies
     testImplementation 'org.junit.jupiter:junit-jupiter'
@@ -15,6 +22,10 @@ dependencies {
     testImplementation 'org.mockito:mockito-core'
     testImplementation 'org.mockito:mockito-junit-jupiter'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+bootJar {
+    duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
 }
 
 tasks.named('test') {

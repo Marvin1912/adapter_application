@@ -24,7 +24,9 @@
       "Bash(mvn checkstyle:check:*)",
       "Bash(find:*)",
       "Bash(mv:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(tree:*)",
+      "Bash(xargs:*)"
     ],
     "deny": [],
     "ask": []
