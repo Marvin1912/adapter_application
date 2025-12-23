@@ -7,7 +7,7 @@ RUN mkdir -p /app/import/done
 RUN mkdir -p /app/export
 RUN mkdir -p /app/google
 
-COPY importer/build/libs/importer-*.jar /app/importer.jar
+COPY api/build/libs/backend.jar /app/backend.jar
 COPY app/google/credentials.json /app/google
 
-ENTRYPOINT ["java", "-jar", "importer.jar"]
+ENTRYPOINT ["java", "-jar", "backend.jar"]
