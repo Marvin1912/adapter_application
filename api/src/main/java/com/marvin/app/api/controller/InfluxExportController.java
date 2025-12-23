@@ -1,8 +1,8 @@
-package com.marvin.app.controller;
+package com.marvin.app.api.controller;
 
-import com.marvin.app.controller.dto.InfluxBucketResponse;
-import com.marvin.app.controller.dto.InfluxExportRequest;
-import com.marvin.app.controller.dto.InfluxExportResponse;
+import com.marvin.app.api.dto.InfluxBucketResponse;
+import com.marvin.app.api.dto.InfluxExportRequest;
+import com.marvin.app.api.dto.InfluxExportResponse;
 import com.marvin.export.influxdb.InfluxExporter;
 import com.marvin.export.influxdb.InfluxExporter.InfluxBucket;
 import com.marvin.upload.Uploader;

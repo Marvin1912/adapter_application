@@ -1,5 +1,6 @@
 rootProject.name = 'applications'
 
+include 'api'
 include 'importer'
 include 'influxdb'
 include 'camt'

@@ -1,0 +1,12 @@
+group = 'com.marvin.app'
+version = '0.0.1-SNAPSHOT'
+
+dependencies {
+    implementation project(':importer')
+    implementation project(':exporter')
+    implementation project(':uploader')
+    implementation project(':camt')
+
+    // Swagger/OpenAPI dependencies
+    implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.2.0'
+}

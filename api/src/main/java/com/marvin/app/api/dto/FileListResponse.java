@@ -1,4 +1,4 @@
-package com.marvin.app.controller.dto;
+package com.marvin.app.api.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.marvin.upload.DriveFileInfo;

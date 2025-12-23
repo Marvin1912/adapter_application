@@ -6,7 +6,7 @@ spring:
     schemas: public
     enabled: true
   datasource:
-    url: ${DATA_SOURCE:jdbc:postgresql://192.168.178.29:5432/costs}
+    url: ${DATA_SOURCE:jdbc:postgresql://postgres.home-lab.com/costs}
     username: ${DATA_SOURCE_USERNAME:marvin}
     password: ${DATA_SOURCE_PASSWORD:password}
     driver-class-name: org.postgresql.Driver
@@ -53,7 +53,7 @@ uploader:
 influxdb:
 #  url: ${INFLUX_URL:http://localhost:8086}
 #  token: ${INFLUX_TOKEN:temp-init-token-will-be-replaced}
-  url: ${INFLUX_URL:http://192.168.178.29:8086}
+  url: ${INFLUX_URL:http://influxdb.home-lab.com}
   token: ${INFLUX_TOKEN:rmz5aaaKYSpgvXSO3C1UFZmXjvtpwI81b7hcMaMJJqOTjvgI82iNAbSsF7fpGIy2fduNDKACQ759cyaiECrulg==}
   org: ${INFLUX_ORG:wildfly_domain}
   export:

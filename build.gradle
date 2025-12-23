@@ -62,11 +62,13 @@ subprojects {
 		options.encoding = 'UTF-8'
 	}
 
-	// Only apply Spring Boot plugin to importer module
-	if (name == 'importer') {
+	// Only apply Spring Boot plugin to api module
+	if (name == 'api') {
 		apply plugin: 'org.springframework.boot'
 		bootJar {
 			mainClass = 'com.marvin.Application'
+			duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+			archiveFileName = 'backend.jar'
 		}
 	} else {
 		// Disable bootJar task for non-Spring Boot modules if it exists
@@ -82,13 +84,13 @@ subprojects {
 		}
 
 		// Only Spring Boot dependencies for modules that need them
-		if (name in ['importer', 'camt', 'database', 'consul', 'plants', 'image-server', 'vocabulary']) {
+		if (name in ['api', 'importer', 'camt', 'database', 'consul', 'plants', 'image-server', 'vocabulary']) {
 			implementation 'org.springframework.boot:spring-boot-starter-webflux'
 			implementation 'org.springframework.boot:spring-boot-starter-security'
 		}
 
 		// Common dependencies for modules that need Jackson/Spring annotations
-		if (name in ['common', 'importer', 'camt', 'database', 'consul', 'plants', 'image-server', 'vocabulary', 'influxdb', 'uploader']) {
+		if (name in ['common', 'api', 'importer', 'camt', 'database', 'consul', 'plants', 'image-server', 'vocabulary', 'influxdb', 'uploader']) {
 			implementation 'org.springframework.boot:spring-boot-starter'
 			implementation 'com.fasterxml.jackson.core:jackson-databind'
 			implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
@@ -110,7 +112,7 @@ subprojects {
 }
 
 tasks.register('buildAdapterDockerImage', DockerBuildImage) {
-	dependsOn ':importer:bootJar'
+	dependsOn ':api:bootJar'
 
 	inputDir = file("$project.rootDir")
 	dockerFile = file("$project.rootDir/Dockerfile")

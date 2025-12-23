@@ -8,13 +8,7 @@ dependencies {
     implementation project(':camt')
     implementation project(':database')
     implementation project(':exporter')
-    implementation project(':uploader')
-    implementation project(':plants')
-    implementation project(':image-server')
     implementation project(':vocabulary')
-
-    // Swagger/OpenAPI dependencies
-    implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.2.0'
 
     // Test dependencies
     testImplementation 'org.junit.jupiter:junit-jupiter'
@@ -22,10 +16,6 @@ dependencies {
     testImplementation 'org.mockito:mockito-core'
     testImplementation 'org.mockito:mockito-junit-jupiter'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-}
-
-bootJar {
-    duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
 }
 
 tasks.named('test') {

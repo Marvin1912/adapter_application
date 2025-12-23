@@ -1,4 +1,4 @@
-package com.marvin.app.controller;
+package com.marvin.app.api.controller;
 
 import com.marvin.app.importer.costs.CostImporter;
 import com.marvin.app.importer.sensors.SensorDataImporter;
