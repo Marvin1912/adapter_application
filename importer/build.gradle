@@ -7,6 +7,7 @@ dependencies {
     implementation project(':consul')
     implementation project(':camt')
     implementation project(':database')
+    implementation project(':exporter')
     implementation project(':vocabulary')
 
     // Test dependencies
