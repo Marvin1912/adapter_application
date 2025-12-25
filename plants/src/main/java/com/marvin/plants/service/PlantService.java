@@ -4,14 +4,13 @@ import com.marvin.plants.dto.PlantDTO;
 import com.marvin.plants.entity.Plant;
 import com.marvin.plants.mapper.PlantMapper;
 import com.marvin.plants.repository.PlantRepository;
+import io.micrometer.core.instrument.Gauge;
+import io.micrometer.core.instrument.MeterRegistry;
+import jakarta.annotation.PostConstruct;
 import java.time.LocalDate;
-import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
-import jakarta.annotation.PostConstruct;
-import io.micrometer.core.instrument.Gauge;
-import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
@@ -22,7 +21,7 @@ public class PlantService {
     private final PlantRepository plantRepository;
     private final PlantMapper plantMapper;
     private final MeterRegistry meterRegistry;
-    private final Map<Long, AtomicInteger> wateringStates = new ConcurrentHashMap<>();
+    private final Map<Integer, AtomicInteger> wateringStates = new ConcurrentHashMap<>();
 
     public PlantService(
             PlantRepository plantRepository,

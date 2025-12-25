@@ -15,7 +15,7 @@ public class SchedulerConfig {
         this.plantService = plantService;
     }
 
-    @Scheduled(cron = "0 0 2 * * *")
+    @Scheduled(cron = "0 0 0/4 * * *")
     public void scheduleWatering() {
         log.info("Scheduling watering");
         plantService.sendWateringNotification();

@@ -6,7 +6,6 @@ dependencies {
     implementation project(':database')
     implementation project(':image-server')
 
-    implementation 'org.springframework.boot:spring-boot-starter-mail'
     implementation 'io.micrometer:micrometer-registry-prometheus'
 
     // Test dependencies
