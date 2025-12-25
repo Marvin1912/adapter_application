@@ -7,9 +7,8 @@ import com.marvin.plants.repository.PlantRepository;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.stream.Collectors;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
+import io.micrometer.core.instrument.Gauge;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
@@ -17,21 +16,18 @@ import reactor.core.publisher.Flux;
 @Service
 public class PlantService {
 
-    private final String mailUsername;
     private final PlantRepository plantRepository;
     private final PlantMapper plantMapper;
-    private final JavaMailSender mailSender;
+    private final MeterRegistry meterRegistry;
 
     public PlantService(
-            @Value("${spring.mail.username}") String mailUsername,
             PlantRepository plantRepository,
             PlantMapper plantMapper,
-            JavaMailSender mailSender
+            MeterRegistry meterRegistry
     ) {
-        this.mailUsername = mailUsername;
         this.plantRepository = plantRepository;
         this.plantMapper = plantMapper;
-        this.mailSender = mailSender;
+        this.meterRegistry = meterRegistry;
     }
 
     @Transactional
@@ -81,27 +77,11 @@ public class PlantService {
     }
 
     public void sendWateringNotification() {
-
         final LocalDate today = LocalDate.now();
-
-        final Collection<Plant> plantsToWater = plantRepository.findByNextWateredDate(today);
-        if (plantsToWater.isEmpty()) {
-            return;
-        }
-
-        final String text = plantsToWater.stream()
-                .map(plant -> """
-                        Plant: %s, Location: %s
-                        """.formatted(plant.getName(), plant.getLocation())
-                )
-                .collect(Collectors.joining("\n"));
-
-        final SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom(mailUsername);
-        message.setTo(mailUsername);
-        message.setSubject("Plants to water at: %s".formatted(today));
-        message.setText(text);
-
-        mailSender.send(message);
+        plantRepository.findAll().forEach(plant ->
+                Gauge.builder("water_plant", plant, p -> p.getNextWateredDate().isEqual(today) ? 1 : 0)
+                        .tag("plant", plant.getName())
+                        .register(meterRegistry)
+        );
     }
 }
