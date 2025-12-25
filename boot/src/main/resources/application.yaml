@@ -51,8 +51,8 @@ uploader:
   parent-folder-name: backup
 
 influxdb:
-#  url: ${INFLUX_URL:http://localhost:8086}
-#  token: ${INFLUX_TOKEN:temp-init-token-will-be-replaced}
+  #  url: ${INFLUX_URL:http://localhost:8086}
+  #  token: ${INFLUX_TOKEN:temp-init-token-will-be-replaced}
   url: ${INFLUX_URL:http://influxdb.home-lab.com}
   token: ${INFLUX_TOKEN:rmz5aaaKYSpgvXSO3C1UFZmXjvtpwI81b7hcMaMJJqOTjvgI82iNAbSsF7fpGIy2fduNDKACQ759cyaiECrulg==}
   org: ${INFLUX_ORG:wildfly_domain}

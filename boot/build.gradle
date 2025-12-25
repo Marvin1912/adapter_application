@@ -1,0 +1,18 @@
+group = 'com.marvin.boot'
+version = '0.0.1-SNAPSHOT'
+
+dependencies {
+    implementation project(':api')
+    implementation project(':importer')
+    implementation project(':influxdb')
+    implementation project(':camt')
+    implementation project(':common')
+    implementation project(':entities')
+    implementation project(':database')
+    implementation project(':consul')
+    implementation project(':exporter')
+    implementation project(':uploader')
+    implementation project(':plants')
+    implementation project(':image-server')
+    implementation project(':vocabulary')
+}

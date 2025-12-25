@@ -1,4 +1,4 @@
-package com.marvin.app.api.controller;
+package com.marvin.api.controller;
 
 import com.marvin.app.importer.costs.DailyCostImportService;
 import com.marvin.camt.model.book_entry.BookingEntryDTO;

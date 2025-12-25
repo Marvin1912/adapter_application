@@ -1,4 +1,4 @@
-package com.marvin.app.api.configuration;
+package com.marvin.api.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -1,4 +1,4 @@
-package com.marvin.app.api.dto;
+package com.marvin.api.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.List;

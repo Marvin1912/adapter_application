@@ -62,8 +62,8 @@ subprojects {
 		options.encoding = 'UTF-8'
 	}
 
-	// Only apply Spring Boot plugin to api module
-	if (name == 'api') {
+	// Only apply Spring Boot plugin to boot module
+	if (name == 'boot') {
 		apply plugin: 'org.springframework.boot'
 		bootJar {
 			mainClass = 'com.marvin.Application'
@@ -112,7 +112,7 @@ subprojects {
 }
 
 tasks.register('buildAdapterDockerImage', DockerBuildImage) {
-	dependsOn ':api:bootJar'
+	dependsOn ':boot:bootJar'
 
 	inputDir = file("$project.rootDir")
 	dockerFile = file("$project.rootDir/Dockerfile")

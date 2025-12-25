@@ -7,7 +7,6 @@ RUN mkdir -p /app/import/done
 RUN mkdir -p /app/export
 RUN mkdir -p /app/google
 
-COPY api/build/libs/backend.jar /app/backend.jar
-COPY app/google/credentials.json /app/google
+COPY boot/build/libs/backend.jar /app/backend.jar
 
 ENTRYPOINT ["java", "-jar", "backend.jar"]

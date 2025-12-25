@@ -1,5 +1,6 @@
 rootProject.name = 'applications'
 
+include 'boot'
 include 'api'
 include 'importer'
 include 'influxdb'

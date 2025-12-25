@@ -1,35 +1,40 @@
-package com.marvin.app.api.dto;
+package com.marvin.api.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import java.nio.file.Path;
 import java.time.Instant;
+import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class FileDeleteResponse {
+public class InfluxExportResponse {
 
     private boolean success;
 
     private String message;
 
-    private String fileId;
+    private List<String> exportedFiles;
 
     private Instant timestamp;
 
     private String error;
 
-    private FileDeleteResponse(boolean success, String message, String fileId, String error) {
+    private InfluxExportResponse(boolean success, String message, List<String> exportedFiles, String error) {
         this.success = success;
         this.message = message;
-        this.fileId = fileId;
+        this.exportedFiles = exportedFiles;
         this.error = error;
         this.timestamp = Instant.now();
     }
 
-    public static FileDeleteResponse success(String message, String fileId) {
-        return new FileDeleteResponse(true, message, fileId, null);
+    public static InfluxExportResponse success(String message, List<Path> exportedFiles) {
+        final List<String> fileNames = exportedFiles.stream()
+                .map(path -> path.getFileName().toString())
+                .toList();
+        return new InfluxExportResponse(true, message, fileNames, null);
     }
 
-    public static FileDeleteResponse error(String errorMessage) {
-        return new FileDeleteResponse(false, null, null, errorMessage);
+    public static InfluxExportResponse error(String errorMessage) {
+        return new InfluxExportResponse(false, null, null, errorMessage);
     }
 
     public boolean isSuccess() {
@@ -48,12 +53,12 @@ public class FileDeleteResponse {
         this.message = message;
     }
 
-    public String getFileId() {
-        return fileId;
+    public List<String> getExportedFiles() {
+        return exportedFiles;
     }
 
-    public void setFileId(String fileId) {
-        this.fileId = fileId;
+    public void setExportedFiles(List<String> exportedFiles) {
+        this.exportedFiles = exportedFiles;
     }
 
     public Instant getTimestamp() {

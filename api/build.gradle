@@ -1,4 +1,4 @@
-group = 'com.marvin.app'
+group = 'com.marvin.api'
 version = '0.0.1-SNAPSHOT'
 
 dependencies {
