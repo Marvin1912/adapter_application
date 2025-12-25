@@ -4,12 +4,13 @@ import com.marvin.plants.dto.PlantDTO;
 import com.marvin.plants.entity.Plant;
 import com.marvin.plants.mapper.PlantMapper;
 import com.marvin.plants.repository.PlantRepository;
+import io.micrometer.core.instrument.Gauge;
+import io.micrometer.core.instrument.MeterRegistry;
+import jakarta.annotation.PostConstruct;
 import java.time.LocalDate;
-import java.util.Collection;
-import java.util.stream.Collectors;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
@@ -17,21 +18,29 @@ import reactor.core.publisher.Flux;
 @Service
 public class PlantService {
 
-    private final String mailUsername;
     private final PlantRepository plantRepository;
     private final PlantMapper plantMapper;
-    private final JavaMailSender mailSender;
+    private final MeterRegistry meterRegistry;
+    private final Map<Integer, AtomicInteger> wateringStates = new ConcurrentHashMap<>();
 
     public PlantService(
-            @Value("${spring.mail.username}") String mailUsername,
             PlantRepository plantRepository,
             PlantMapper plantMapper,
-            JavaMailSender mailSender
+            MeterRegistry meterRegistry
     ) {
-        this.mailUsername = mailUsername;
         this.plantRepository = plantRepository;
         this.plantMapper = plantMapper;
-        this.mailSender = mailSender;
+        this.meterRegistry = meterRegistry;
+    }
+
+    @PostConstruct
+    public void initGauges() {
+        plantRepository.findAll().forEach(plant -> {
+            AtomicInteger state = wateringStates.computeIfAbsent(plant.getId(), id -> new AtomicInteger(0));
+            Gauge.builder("water_plant", state, AtomicInteger::get)
+                    .tag("plant", plant.getName())
+                    .register(meterRegistry);
+        });
     }
 
     @Transactional
@@ -81,27 +90,9 @@ public class PlantService {
     }
 
     public void sendWateringNotification() {
-
         final LocalDate today = LocalDate.now();
-
-        final Collection<Plant> plantsToWater = plantRepository.findByNextWateredDate(today);
-        if (plantsToWater.isEmpty()) {
-            return;
-        }
-
-        final String text = plantsToWater.stream()
-                .map(plant -> """
-                        Plant: %s, Location: %s
-                        """.formatted(plant.getName(), plant.getLocation())
-                )
-                .collect(Collectors.joining("\n"));
-
-        final SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom(mailUsername);
-        message.setTo(mailUsername);
-        message.setSubject("Plants to water at: %s".formatted(today));
-        message.setText(text);
-
-        mailSender.send(message);
+        plantRepository.findAll().forEach(plant ->
+                wateringStates.get(plant.getId()).set(plant.getNextWateredDate().isEqual(today) ? 1 : 0)
+        );
     }
 }
