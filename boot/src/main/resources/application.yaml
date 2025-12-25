@@ -65,3 +65,12 @@ consul:
 logging:
   level:
     org.springframework: INFO
+
+management:
+  health:
+    mail:
+      enabled: false
+  endpoints:
+    web:
+      exposure:
+        include: "prometheus,info,beans"

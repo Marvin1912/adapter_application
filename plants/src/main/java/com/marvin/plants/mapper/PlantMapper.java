@@ -12,6 +12,7 @@ public interface PlantMapper {
     PlantDTO toPlantDTO(Plant plant);
 
     @Mapping(source = "imageUuid", target = "image")
+    @Mapping(target = "id", ignore = true)
     Plant toPlant(PlantDTO plantDto, String imageUuid);
 
     @Mapping(target = "id", ignore = true)

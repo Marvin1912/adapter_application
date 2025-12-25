@@ -4,6 +4,7 @@ import com.marvin.image.entity.Image;
 import com.marvin.image.repository.ImageRepository;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
@@ -16,6 +17,7 @@ public class ImageService {
         this.imageRepository = imageRepository;
     }
 
+    @Transactional
     public Mono<UUID> saveImage(byte[] rawImage, String contentType) {
 
         final Image image = new Image(rawImage, contentType);

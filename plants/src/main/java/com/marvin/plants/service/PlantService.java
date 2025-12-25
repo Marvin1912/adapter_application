@@ -34,6 +34,7 @@ public class PlantService {
         this.mailSender = mailSender;
     }
 
+    @Transactional
     public long createPlant(PlantDTO plantDto, String imageUuid) {
         return plantRepository.save(plantMapper.toPlant(plantDto, imageUuid)).getId();
     }
