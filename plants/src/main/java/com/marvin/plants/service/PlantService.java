@@ -6,7 +6,10 @@ import com.marvin.plants.mapper.PlantMapper;
 import com.marvin.plants.repository.PlantRepository;
 import java.time.LocalDate;
 import java.util.Collection;
-import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
+import jakarta.annotation.PostConstruct;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.stereotype.Service;
@@ -19,6 +22,7 @@ public class PlantService {
     private final PlantRepository plantRepository;
     private final PlantMapper plantMapper;
     private final MeterRegistry meterRegistry;
+    private final Map<Long, AtomicInteger> wateringStates = new ConcurrentHashMap<>();
 
     public PlantService(
             PlantRepository plantRepository,
@@ -28,6 +32,16 @@ public class PlantService {
         this.plantRepository = plantRepository;
         this.plantMapper = plantMapper;
         this.meterRegistry = meterRegistry;
+    }
+
+    @PostConstruct
+    public void initGauges() {
+        plantRepository.findAll().forEach(plant -> {
+            AtomicInteger state = wateringStates.computeIfAbsent(plant.getId(), id -> new AtomicInteger(0));
+            Gauge.builder("water_plant", state, AtomicInteger::get)
+                    .tag("plant", plant.getName())
+                    .register(meterRegistry);
+        });
     }
 
     @Transactional
@@ -79,9 +93,7 @@ public class PlantService {
     public void sendWateringNotification() {
         final LocalDate today = LocalDate.now();
         plantRepository.findAll().forEach(plant ->
-                Gauge.builder("water_plant", plant, p -> p.getNextWateredDate().isEqual(today) ? 1 : 0)
-                        .tag("plant", plant.getName())
-                        .register(meterRegistry)
+                wateringStates.get(plant.getId()).set(plant.getNextWateredDate().isEqual(today) ? 1 : 0)
         );
     }
 }
