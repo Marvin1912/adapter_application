@@ -67,6 +67,7 @@ public class PlantService {
                 plant -> {
                     plantMapper.toPlant(plant, dto);
                     waterPlant(plant, dto.lastWateredDate());
+                    fertilizePlant(plant, dto.lastFertilizedDate());
                 },
                 () -> {
                     throw new IllegalArgumentException(
@@ -87,6 +88,13 @@ public class PlantService {
     private void waterPlant(Plant plant, LocalDate lastWatered) {
         plant.setLastWateredDate(lastWatered);
         plant.setNextWateredDate(lastWatered.plusDays(plant.getWateringFrequency()));
+    }
+
+    private void fertilizePlant(Plant plant, LocalDate lastFertilized) {
+        if (lastFertilized != null && plant.getFertilizingFrequency() != null) {
+            plant.setLastFertilizedDate(lastFertilized);
+            plant.setNextFertilizedDate(lastFertilized.plusDays(plant.getFertilizingFrequency()));
+        }
     }
 
     public void sendWateringNotification() {

@@ -12,7 +12,10 @@ public record PlantDTO(
         Integer wateringFrequency,
         LocalDate lastWateredDate,
         LocalDate nextWateredDate,
-        String image
+        String image,
+        Integer fertilizingFrequency,
+        LocalDate lastFertilizedDate,
+        LocalDate nextFertilizedDate
 ) {
 
 }
