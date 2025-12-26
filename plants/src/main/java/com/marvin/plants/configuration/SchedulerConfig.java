@@ -21,4 +21,10 @@ public class SchedulerConfig {
         plantService.sendWateringNotification();
     }
 
+    @Scheduled(cron = "0 5 0 * * *")
+    public void scheduleFertilizing() {
+        log.info("Scheduling Fertilizing");
+        plantService.sendFertilizingNotification();
+    }
+
 }
