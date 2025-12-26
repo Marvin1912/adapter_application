@@ -29,20 +29,15 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 
 @ExtendWith(MockitoExtension.class)
 class PlantServiceTest {
 
-    private final String testMailUsername = "test@example.com";
     private final String testImageUuid = "test-uuid-123";
     @Mock
     private PlantRepository plantRepository;
     @Mock
     private PlantMapper plantMapper;
-    @Mock
-    private JavaMailSender mailSender;
     @InjectMocks
     private PlantService plantService;
     private Plant testPlant;
@@ -72,7 +67,10 @@ class PlantServiceTest {
                 7,
                 LocalDate.now().minusDays(3),
                 LocalDate.now().plusDays(4),
-                "test-image.jpg"
+                "test-image.jpg",
+                null,
+                null,
+                null
         );
     }
 
@@ -87,6 +85,9 @@ class PlantServiceTest {
                 "New Care Instructions",
                 PlantLocation.BEDROOM,
                 5,
+                null,
+                null,
+                null,
                 null,
                 null,
                 null
@@ -169,6 +170,9 @@ class PlantServiceTest {
                 10,
                 null,
                 null,
+                null,
+                null,
+                null,
                 null
         );
 
@@ -213,7 +217,10 @@ class PlantServiceTest {
                 10,
                 waterDate,
                 waterDate.plusDays(10),
-                "updated-image.jpg"
+                "updated-image.jpg",
+                null,
+                null,
+                null
         );
 
         when(plantRepository.findById(1L)).thenReturn(Optional.of(testPlant));
@@ -243,7 +250,10 @@ class PlantServiceTest {
                 10,
                 LocalDate.now(),
                 LocalDate.now().plusDays(10),
-                "updated-image.jpg"
+                "updated-image.jpg",
+                null,
+                null,
+                null
         );
 
         when(plantRepository.findById(999L)).thenReturn(Optional.empty());
@@ -292,66 +302,6 @@ class PlantServiceTest {
     }
 
     @Test
-    void sendWateringNotification_ShouldNotSendEmail_WhenNoPlantsToWater() {
-        // Given
-        final LocalDate today = LocalDate.now();
-        when(plantRepository.findByNextWateredDate(today)).thenReturn(List.of());
-
-        // When
-        plantService.sendWateringNotification();
-
-        // Then
-        verify(plantRepository).findByNextWateredDate(today);
-        verify(mailSender, never()).send(any(SimpleMailMessage.class));
-    }
-
-    @Test
-    void sendWateringNotification_ShouldSendEmail_WhenPlantsToWaterExist() {
-        // Given
-        final LocalDate today = LocalDate.now();
-
-        final Plant plantToWater1 = new Plant();
-        plantToWater1.setId(1);
-        plantToWater1.setName("Rose");
-        plantToWater1.setLocation(PlantLocation.LIVING_ROOM);
-
-        final Plant plantToWater2 = new Plant();
-        plantToWater2.setId(2);
-        plantToWater2.setName("Tulip");
-        plantToWater2.setLocation(PlantLocation.KITCHEN);
-
-        final Collection<Plant> plantsToWater = List.of(plantToWater1, plantToWater2);
-        when(plantRepository.findByNextWateredDate(today)).thenReturn(plantsToWater);
-
-        // Use reflection to set the private mailUsername field
-        try {
-            final java.lang.reflect.Field field = PlantService.class.getDeclaredField("mailUsername");
-            field.setAccessible(true);
-            field.set(plantService, testMailUsername);
-        } catch (Exception e) {
-            fail("Failed to set mailUsername field: " + e.getMessage());
-        }
-
-        // When
-        plantService.sendWateringNotification();
-
-        // Then
-        verify(plantRepository).findByNextWateredDate(today);
-        verify(mailSender).send(any(SimpleMailMessage.class));
-
-        final ArgumentCaptor<SimpleMailMessage> messageCaptor = ArgumentCaptor.forClass(
-                SimpleMailMessage.class);
-        verify(mailSender).send(messageCaptor.capture());
-
-        final SimpleMailMessage sentMessage = messageCaptor.getValue();
-        assertEquals(testMailUsername, sentMessage.getFrom());
-        assertEquals(testMailUsername, sentMessage.getTo()[0]);
-        assertEquals("Plants to water at: " + today, sentMessage.getSubject());
-        assertTrue(sentMessage.getText().contains("Plant: Rose, Location: LIVING_ROOM"));
-        assertTrue(sentMessage.getText().contains("Plant: Tulip, Location: KITCHEN"));
-    }
-
-    @Test
     void waterPlant_ShouldCalculateNextWateringDateCorrectly() {
         // Given
         final Plant localTestPlant = new Plant();
@@ -373,72 +323,6 @@ class PlantServiceTest {
     }
 
     @Test
-    void updatePlant_ShouldThrowException_WhenLastWateredDateIsNull() {
-        // Given
-        final PlantDTO updateDTO = new PlantDTO(
-                1L,
-                "Updated Plant",
-                "Updated Species",
-                "Updated Description",
-                "Updated Care Instructions",
-                PlantLocation.KITCHEN,
-                10,
-                null,
-                null,
-                "updated-image.jpg"
-        );
-
-        when(plantRepository.findById(1L)).thenReturn(Optional.of(testPlant));
-        doNothing().when(plantMapper).toPlant(testPlant, updateDTO);
-
-        // When & Then
-        assertThrows(NullPointerException.class, () -> plantService.updatePlant(updateDTO));
-        verify(plantRepository).findById(1L);
-        verify(plantMapper).toPlant(testPlant, updateDTO);
-    }
-
-    @Test
-    void sendWateringNotification_ShouldHandleMultiplePlantsWithSameLocation() {
-        // Given
-        final LocalDate today = LocalDate.now();
-
-        final Plant plant1 = new Plant();
-        plant1.setId(1);
-        plant1.setName("Rose");
-        plant1.setLocation(PlantLocation.LIVING_ROOM);
-
-        final Plant plant2 = new Plant();
-        plant2.setId(2);
-        plant2.setName("Lily");
-        plant2.setLocation(PlantLocation.LIVING_ROOM);
-
-        final Collection<Plant> plantsToWater = List.of(plant1, plant2);
-        when(plantRepository.findByNextWateredDate(today)).thenReturn(plantsToWater);
-
-        // Use reflection to set the private mailUsername field
-        try {
-            final java.lang.reflect.Field field = PlantService.class.getDeclaredField("mailUsername");
-            field.setAccessible(true);
-            field.set(plantService, testMailUsername);
-        } catch (Exception e) {
-            fail("Failed to set mailUsername field: " + e.getMessage());
-        }
-
-        // When
-        plantService.sendWateringNotification();
-
-        // Then
-        final ArgumentCaptor<SimpleMailMessage> messageCaptor = ArgumentCaptor.forClass(
-                SimpleMailMessage.class);
-        verify(mailSender).send(messageCaptor.capture());
-
-        final SimpleMailMessage sentMessage = messageCaptor.getValue();
-        final String emailText = sentMessage.getText();
-        assertTrue(emailText.contains("Plant: Rose, Location: LIVING_ROOM"));
-        assertTrue(emailText.contains("Plant: Lily, Location: LIVING_ROOM"));
-    }
-
-    @Test
     void createPlant_ShouldHandleNullImageUuid() {
         // Given
         final PlantDTO plantDto = new PlantDTO(
@@ -449,6 +333,9 @@ class PlantServiceTest {
                 "New Care Instructions",
                 PlantLocation.BEDROOM,
                 5,
+                null,
+                null,
+                null,
                 null,
                 null,
                 null

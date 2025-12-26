@@ -54,6 +54,15 @@ public class Plant {
     @Column(name = "next_watered_date")
     private LocalDate nextWateredDate;
 
+    @Column(name = "fertilizing_frequency")
+    private Integer fertilizingFrequency;
+
+    @Column(name = "last_fertilized_date")
+    private LocalDate lastFertilizedDate;
+
+    @Column(name = "next_fertilized_date")
+    private LocalDate nextFertilizedDate;
+
     @Column(name = "image")
     private String image;
 
