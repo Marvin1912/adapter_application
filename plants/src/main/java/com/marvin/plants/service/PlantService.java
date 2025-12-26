@@ -22,6 +22,7 @@ public class PlantService {
     private final PlantMapper plantMapper;
     private final MeterRegistry meterRegistry;
     private final Map<Integer, AtomicInteger> wateringStates = new ConcurrentHashMap<>();
+    private final Map<Integer, AtomicInteger> fertilizingStates = new ConcurrentHashMap<>();
 
     public PlantService(
             PlantRepository plantRepository,
@@ -36,8 +37,13 @@ public class PlantService {
     @PostConstruct
     public void initGauges() {
         plantRepository.findAll().forEach(plant -> {
-            AtomicInteger state = wateringStates.computeIfAbsent(plant.getId(), id -> new AtomicInteger(0));
-            Gauge.builder("water_plant", state, AtomicInteger::get)
+            AtomicInteger waterState = wateringStates.computeIfAbsent(plant.getId(), id -> new AtomicInteger(0));
+            Gauge.builder("water_plant", waterState, AtomicInteger::get)
+                    .tag("plant", plant.getName())
+                    .register(meterRegistry);
+
+            AtomicInteger fertilizeState = fertilizingStates.computeIfAbsent(plant.getId(), id -> new AtomicInteger(0));
+            Gauge.builder("fertilize_plant", fertilizeState, AtomicInteger::get)
                     .tag("plant", plant.getName())
                     .register(meterRegistry);
         });
@@ -124,6 +130,13 @@ public class PlantService {
         final LocalDate today = LocalDate.now();
         plantRepository.findAll().forEach(plant ->
                 wateringStates.get(plant.getId()).set(plant.getNextWateredDate().isEqual(today) ? 1 : 0)
+        );
+    }
+
+    public void sendFertilizingNotification() {
+        final LocalDate today = LocalDate.now();
+        plantRepository.findAll().forEach(plant ->
+                fertilizingStates.get(plant.getId()).set(plant.getNextFertilizedDate() != null && plant.getNextFertilizedDate().isEqual(today) ? 1 : 0)
         );
     }
 }
