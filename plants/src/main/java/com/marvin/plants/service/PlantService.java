@@ -85,6 +85,15 @@ public class PlantService {
         return plantMapper.toPlantDTO(plant);
     }
 
+    @Transactional
+    public PlantDTO fertilizePlant(long id, LocalDate lastFertilized) {
+
+        final Plant plant = plantRepository.findById(id).orElseThrow();
+        fertilizePlant(plant, lastFertilized);
+
+        return plantMapper.toPlantDTO(plant);
+    }
+
     private void waterPlant(Plant plant, LocalDate lastWatered) {
         plant.setLastWateredDate(lastWatered);
         plant.setNextWateredDate(lastWatered.plusDays(plant.getWateringFrequency()));
