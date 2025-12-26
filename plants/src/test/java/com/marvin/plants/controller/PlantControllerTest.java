@@ -63,7 +63,10 @@ class PlantControllerTest {
                 7,
                 LocalDate.now().minusDays(3),
                 LocalDate.now().plusDays(4),
-                testImageUuid.toString()
+                testImageUuid.toString(),
+                null,
+                null,
+                null
         );
     }
 
@@ -79,6 +82,9 @@ class PlantControllerTest {
                 "New Care Instructions",
                 PlantLocation.BEDROOM,
                 5,
+                null,
+                null,
+                null,
                 null,
                 null,
                 null
@@ -114,6 +120,9 @@ class PlantControllerTest {
                 "New Care Instructions",
                 PlantLocation.BEDROOM,
                 5,
+                null,
+                null,
+                null,
                 null,
                 null,
                 null
@@ -162,6 +171,9 @@ class PlantControllerTest {
                 5,
                 null,
                 null,
+                null,
+                null,
+                null,
                 null
         );
 
@@ -199,6 +211,9 @@ class PlantControllerTest {
                 "New Care Instructions",
                 PlantLocation.BEDROOM,
                 5,
+                null,
+                null,
+                null,
                 null,
                 null,
                 null
@@ -240,7 +255,10 @@ class PlantControllerTest {
                 10,
                 LocalDate.now(),
                 LocalDate.now().plusDays(10),
-                "updated-image.jpg"
+                "updated-image.jpg",
+                null,
+                null,
+                null
         );
 
         doNothing().when(plantService).updatePlant(any(PlantDTO.class));
@@ -270,6 +288,9 @@ class PlantControllerTest {
                 "Care 2",
                 PlantLocation.KITCHEN,
                 10,
+                null,
+                null,
+                null,
                 null,
                 null,
                 null
@@ -373,7 +394,10 @@ class PlantControllerTest {
                 7,
                 waterDate,
                 waterDate.plusDays(7),
-                testImageUuid.toString()
+                testImageUuid.toString(),
+                null,
+                null,
+                null
         );
 
         when(plantService.waterPlant(1L, waterDate)).thenReturn(wateredPlantDTO);
@@ -407,7 +431,10 @@ class PlantControllerTest {
                 7,
                 pastDate,
                 pastDate.plusDays(7),
-                testImageUuid.toString()
+                testImageUuid.toString(),
+                null,
+                null,
+                null
         );
 
         when(plantService.waterPlant(1L, pastDate)).thenReturn(wateredPlantDTO);
@@ -441,7 +468,10 @@ class PlantControllerTest {
                 7,
                 futureDate,
                 futureDate.plusDays(7),
-                testImageUuid.toString()
+                testImageUuid.toString(),
+                null,
+                null,
+                null
         );
 
         when(plantService.waterPlant(1L, futureDate)).thenReturn(wateredPlantDTO);
@@ -491,7 +521,10 @@ class PlantControllerTest {
                 7,
                 waterDate,
                 waterDate.plusDays(7),
-                testImageUuid.toString()
+                testImageUuid.toString(),
+                null,
+                null,
+                null
         );
 
         when(plantService.waterPlant(1L, waterDate)).thenReturn(wateredPlantDTO);
@@ -522,6 +555,9 @@ class PlantControllerTest {
                 "New Care Instructions",
                 PlantLocation.BEDROOM,
                 5,
+                null,
+                null,
+                null,
                 null,
                 null,
                 null
@@ -570,6 +606,9 @@ class PlantControllerTest {
                     "Care " + i,
                     PlantLocation.values()[i % PlantLocation.values().length],
                     i % 30 + 1,
+                    null,
+                    null,
+                    null,
                     null,
                     null,
                     null
