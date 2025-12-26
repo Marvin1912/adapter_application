@@ -102,7 +102,21 @@ public class PlantService {
     private void fertilizePlant(Plant plant, LocalDate lastFertilized) {
         if (lastFertilized != null && plant.getFertilizingFrequency() != null) {
             plant.setLastFertilizedDate(lastFertilized);
-            plant.setNextFertilizedDate(lastFertilized.plusDays(plant.getFertilizingFrequency()));
+            LocalDate nextFertilized = lastFertilized.plusDays(plant.getFertilizingFrequency());
+
+            // Fertilizing period is April (month 4) to October (month 10)
+            // If next fertilizing date is outside this range, set to April 15th
+            int month = nextFertilized.getMonthValue();
+            if (month < 4 || month > 10) {
+                int year = nextFertilized.getYear();
+                // If current month is October, November, or December, increment year
+                if (month >= 10) {
+                    year++;
+                }
+                nextFertilized = LocalDate.of(year, 4, 15);
+            }
+
+            plant.setNextFertilizedDate(nextFertilized);
         }
     }
 
