@@ -258,4 +258,33 @@ public class PlantController {
         return Mono.fromCallable(() -> plantService.waterPlant(plantId, lastWatered))
                 .subscribeOn(Schedulers.boundedElastic());
     }
+
+    /**
+     * Records that a plant has been fertilized and updates fertilizing schedule.
+     *
+     * @param id             ID of the plant to fertilize
+     * @param lastFertilized Date when the plant was last fertilized
+     * @return Mono containing ResponseEntity with updated plant data
+     */
+    @PatchMapping("/{id}/fertilized")
+    public Mono<ResponseEntity<PlantDTO>> fertilizePlant(
+            @PathVariable long id,
+            @RequestParam("last-fertilized") LocalDate lastFertilized
+    ) {
+        return Mono.just(id)
+                .flatMap(plantId -> updateFertilizingDate(plantId, lastFertilized))
+                .map(ResponseEntity::ok);
+    }
+
+    /**
+     * Updates the fertilizing date for a plant. Runs on boundedElastic scheduler to avoid blocking the event loop.
+     *
+     * @param plantId        ID of the plant to update
+     * @param lastFertilized Date when the plant was last fertilized
+     * @return Mono containing updated plant data
+     */
+    private Mono<PlantDTO> updateFertilizingDate(long plantId, LocalDate lastFertilized) {
+        return Mono.fromCallable(() -> plantService.fertilizePlant(plantId, lastFertilized))
+                .subscribeOn(Schedulers.boundedElastic());
+    }
 }
