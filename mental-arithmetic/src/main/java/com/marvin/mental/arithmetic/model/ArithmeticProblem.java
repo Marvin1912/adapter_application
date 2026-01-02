@@ -2,21 +2,16 @@ package com.marvin.mental.arithmetic.model;
 
 import com.marvin.mental.arithmetic.enums.Difficulty;
 import com.marvin.mental.arithmetic.enums.OperationType;
-import com.fasterxml.jackson.annotation.JsonInclude;
+import java.time.Instant;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.Instant;
-
 @Setter
 @Getter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ArithmeticProblem {
 
     private String id;
