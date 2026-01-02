@@ -47,7 +47,7 @@ public class ArithmeticSessionEntity {
     @Column(name = "status", nullable = false)
     private SessionStatus status;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "settings_id", nullable = false)
     private ArithmeticSettingsEntity settings;
 
