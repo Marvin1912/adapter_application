@@ -6,21 +6,24 @@ import com.marvin.mental.arithmetic.enums.SessionStatus;
 import com.marvin.mental.arithmetic.model.ArithmeticProblem;
 import com.marvin.mental.arithmetic.model.ArithmeticSession;
 import com.marvin.mental.arithmetic.model.ArithmeticSettings;
+import com.marvin.mental.arithmetic.repository.reactive.ReactiveArithmeticRepository;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.Instant;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 @Service
 public class ArithmeticService {
 
-    private final Map<String, ArithmeticSession> sessions = new HashMap<>();
+    private final ReactiveArithmeticRepository repository;
     private ArithmeticSettings defaultSettings = createDefaultSettings();
+
+    public ArithmeticService(ReactiveArithmeticRepository repository) {
+        this.repository = repository;
+    }
 
     private static ArithmeticSettings createDefaultSettings() {
         ArithmeticSettings settings = new ArithmeticSettings();
@@ -65,85 +68,82 @@ public class ArithmeticService {
         session.setIsCompleted(false);
         session.setIsTimedOut(false);
 
-        sessions.put(sessionId, session);
-        return Mono.just(session);
+        return repository.save(session);
     }
 
     public Mono<ArithmeticSession> updateSession(String id, ArithmeticSession updates) {
-        ArithmeticSession session = sessions.get(id);
-        if (session == null) {
-            return Mono.empty();
-        }
-
-        if (updates.getProblems() != null) {
-            session.setProblems(updates.getProblems());
-        }
-        if (updates.getCurrentProblemIndex() != null) {
-            session.setCurrentProblemIndex(updates.getCurrentProblemIndex());
-        }
-
-        recalculateMetrics(session);
-
-        if (session.getProblemsCompleted().equals(session.getTotalProblems())) {
-            session.setStatus(SessionStatus.COMPLETED);
-            session.setEndTime(Instant.now());
-            session.setIsCompleted(true);
-        }
-
-        sessions.put(id, session);
-        return Mono.just(session);
+        return repository.update(id, updates)
+                .flatMap(session -> {
+                    if (session == null) {
+                        return Mono.empty();
+                    }
+                    if (session.getProblemsCompleted().equals(session.getTotalProblems())) {
+                        session.setStatus(SessionStatus.COMPLETED);
+                        session.setEndTime(Instant.now());
+                        session.setIsCompleted(true);
+                        return repository.save(session);
+                    }
+                    return Mono.just(session);
+                });
     }
 
     public Flux<ArithmeticSession> getAllSessions() {
-        return Flux.fromIterable(sessions.values());
+        return repository.findAll();
     }
 
     public Mono<ArithmeticSession> getSession(String id) {
-        return Mono.justOrEmpty(sessions.get(id));
+        return repository.findById(id);
     }
 
     public Mono<Void> deleteSession(String id) {
-        sessions.remove(id);
-        return Mono.empty();
+        return repository.deleteById(id);
     }
 
     public Mono<ArithmeticSession> startSession(String id) {
-        ArithmeticSession session = sessions.get(id);
-        if (session == null) {
-            return Mono.empty();
-        }
-        session.setStartTime(Instant.now());
-        session.setStatus(SessionStatus.ACTIVE);
-        return Mono.just(session);
+        return repository.findById(id)
+                .flatMap(session -> {
+                    if (session == null) {
+                        return Mono.empty();
+                    }
+                    session.setStartTime(Instant.now());
+                    session.setStatus(SessionStatus.ACTIVE);
+                    return repository.save(session);
+                });
     }
 
     public Mono<ArithmeticSession> pauseSession(String id) {
-        ArithmeticSession session = sessions.get(id);
-        if (session == null) {
-            return Mono.empty();
-        }
-        session.setStatus(SessionStatus.PAUSED);
-        return Mono.just(session);
+        return repository.findById(id)
+                .flatMap(session -> {
+                    if (session == null) {
+                        return Mono.empty();
+                    }
+                    session.setStatus(SessionStatus.PAUSED);
+                    return repository.save(session);
+                });
     }
 
     public Mono<ArithmeticSession> resumeSession(String id) {
-        ArithmeticSession session = sessions.get(id);
-        if (session == null) {
-            return Mono.empty();
-        }
-        session.setStatus(SessionStatus.ACTIVE);
-        return Mono.just(session);
+        return repository.findById(id)
+                .flatMap(session -> {
+                    if (session == null) {
+                        return Mono.empty();
+                    }
+                    session.setStatus(SessionStatus.ACTIVE);
+                    return repository.save(session);
+                });
     }
 
     public Mono<ArithmeticSession> completeSession(String id) {
-        ArithmeticSession session = sessions.get(id);
-        if (session == null) {
-            return Mono.empty();
-        }
-        session.setEndTime(Instant.now());
-        session.setStatus(SessionStatus.COMPLETED);
-        session.setIsCompleted(true);
-        return Mono.just(session);
+        return repository.findById(id)
+                .flatMap(session -> {
+                    if (session == null) {
+                        return Mono.empty();
+                    }
+                    session.setEndTime(Instant.now());
+                    session.setStatus(SessionStatus.COMPLETED);
+                    session.setIsCompleted(true);
+                    return repository.save(session);
+                });
     }
 
     public Mono<ArithmeticSettings> getSettings() {
@@ -225,33 +225,5 @@ public class ArithmeticService {
             case MEDIUM -> 999;
             case HARD -> 9999;
         };
-    }
-
-    private void recalculateMetrics(ArithmeticSession session) {
-        List<ArithmeticProblem> problems = session.getProblems();
-        int correctAnswers = 0;
-        int incorrectAnswers = 0;
-        int problemsCompleted = 0;
-        long totalTimeSpent = 0;
-
-        for (ArithmeticProblem problem : problems) {
-            if (problem.getIsCorrect() != null) {
-                if (problem.getIsCorrect()) {
-                    correctAnswers++;
-                } else {
-                    incorrectAnswers++;
-                }
-                problemsCompleted++;
-            }
-            totalTimeSpent += problem.getTimeSpent();
-        }
-
-        session.setCorrectAnswers(correctAnswers);
-        session.setIncorrectAnswers(incorrectAnswers);
-        session.setProblemsCompleted(problemsCompleted);
-        session.setScore(correctAnswers);
-        session.setTotalTimeSpent(totalTimeSpent);
-        session.setAccuracy(problemsCompleted > 0 ? (correctAnswers * 100.0 / problemsCompleted) : 0.0);
-        session.setAverageTimePerProblem(problemsCompleted > 0 ? (totalTimeSpent * 1.0 / problemsCompleted) : 0.0);
     }
 }
