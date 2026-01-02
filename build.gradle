@@ -84,7 +84,7 @@ subprojects {
 		}
 
 		// Only Spring Boot dependencies for modules that need them
-		if (name in ['api', 'importer', 'camt', 'database', 'consul', 'plants', 'image-server', 'vocabulary']) {
+		if (name in ['api', 'importer', 'camt', 'database', 'consul', 'plants', 'image-server', 'vocabulary', 'mental-arithmetic']) {
 			implementation 'org.springframework.boot:spring-boot-starter-webflux'
 			implementation 'org.springframework.boot:spring-boot-starter-security'
 		}
