@@ -95,7 +95,7 @@ public class ReactiveArithmeticRepository {
     @Transactional
     public Mono<ArithmeticSession> findById(String id) {
         return Mono.fromCallable(() ->
-                        sessionRepository.findById(id)
+                        sessionRepository.findByIdWithProblemsAndSettings(id)
                                 .map(sessionMapper::toModel)
                                 .orElse(null)
                 )
@@ -105,7 +105,7 @@ public class ReactiveArithmeticRepository {
     @Transactional
     public Flux<ArithmeticSession> findAll() {
         return Flux.defer(() ->
-                        Flux.fromIterable(sessionRepository.findAll())
+                        Flux.fromIterable(sessionRepository.findAllWithProblemsAndSettings())
                                 .map(sessionMapper::toModel)
                 )
                 .subscribeOn(Schedulers.boundedElastic());
