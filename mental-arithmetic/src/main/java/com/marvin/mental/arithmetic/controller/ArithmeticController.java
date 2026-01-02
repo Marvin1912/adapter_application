@@ -18,7 +18,7 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/mental_arithmetic")
 public class ArithmeticController {
 
     private final ArithmeticService service;
