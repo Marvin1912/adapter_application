@@ -95,7 +95,7 @@ public class ArithmeticSessionEntity {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        ArithmeticSessionEntity that = (ArithmeticSessionEntity) o;
+        final ArithmeticSessionEntity that = (ArithmeticSessionEntity) o;
         return Objects.equals(id, that.id);
     }
 

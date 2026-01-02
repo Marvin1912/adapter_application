@@ -41,7 +41,7 @@ public class SettingsOperationEntity {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        SettingsOperationEntity that = (SettingsOperationEntity) o;
+        final SettingsOperationEntity that = (SettingsOperationEntity) o;
         return Objects.equals(settings, that.settings) && operationType == that.operationType;
     }
 

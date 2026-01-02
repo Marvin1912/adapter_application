@@ -92,7 +92,7 @@ public class ArithmeticSettingsEntity {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        ArithmeticSettingsEntity that = (ArithmeticSettingsEntity) o;
+        final ArithmeticSettingsEntity that = (ArithmeticSettingsEntity) o;
         return Objects.equals(id, that.id);
     }
 
