@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 @RestController
 @RequestMapping("/api")
@@ -30,32 +31,35 @@ public class ArithmeticController {
 
     @PostMapping("/sessions")
     public Mono<ResponseEntity<ArithmeticSession>> createSession(@RequestBody ArithmeticSettings settings) {
-        return service.createSession(settings)
+        return Mono.fromCallable(() -> service.createSession(settings))
+                .subscribeOn(Schedulers.boundedElastic())
                 .map(session -> ResponseEntity.status(HttpStatus.CREATED).body(session));
     }
 
     @PutMapping("/sessions/{id}")
     public Mono<ResponseEntity<ArithmeticSession>> updateSession(@PathVariable String id, @RequestBody ArithmeticSession session) {
-        return service.updateSession(id, session)
-                .map(ResponseEntity::ok)
-                .defaultIfEmpty(ResponseEntity.notFound().build());
+        return Mono.fromCallable(() -> service.updateSession(id, session))
+                .subscribeOn(Schedulers.boundedElastic())
+                .map(result -> result != null ? ResponseEntity.ok(result) : ResponseEntity.notFound().build());
     }
 
     @GetMapping("/sessions")
     public Flux<ArithmeticSession> getAllSessions() {
-        return service.getAllSessions();
+        return Flux.defer(() -> Flux.fromIterable(service.getAllSessions()))
+                .subscribeOn(Schedulers.boundedElastic());
     }
 
     @GetMapping("/sessions/{id}")
     public Mono<ResponseEntity<ArithmeticSession>> getSession(@PathVariable String id) {
-        return service.getSession(id)
-                .map(ResponseEntity::ok)
-                .defaultIfEmpty(ResponseEntity.notFound().build());
+        return Mono.fromCallable(() -> service.getSession(id))
+                .subscribeOn(Schedulers.boundedElastic())
+                .map(result -> result != null ? ResponseEntity.ok(result) : ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/sessions/{id}")
     public Mono<ResponseEntity<Void>> deleteSession(@PathVariable String id) {
-        return service.deleteSession(id)
+        return Mono.fromRunnable(() -> service.deleteSession(id))
+                .subscribeOn(Schedulers.boundedElastic())
                 .then(Mono.just(ResponseEntity.noContent().build()));
     }
 
@@ -63,41 +67,43 @@ public class ArithmeticController {
 
     @PostMapping("/sessions/{id}/start")
     public Mono<ResponseEntity<ArithmeticSession>> startSession(@PathVariable String id) {
-        return service.startSession(id)
-                .map(ResponseEntity::ok)
-                .defaultIfEmpty(ResponseEntity.notFound().build());
+        return Mono.fromCallable(() -> service.startSession(id))
+                .subscribeOn(Schedulers.boundedElastic())
+                .map(result -> result != null ? ResponseEntity.ok(result) : ResponseEntity.notFound().build());
     }
 
     @PostMapping("/sessions/{id}/pause")
     public Mono<ResponseEntity<ArithmeticSession>> pauseSession(@PathVariable String id) {
-        return service.pauseSession(id)
-                .map(ResponseEntity::ok)
-                .defaultIfEmpty(ResponseEntity.notFound().build());
+        return Mono.fromCallable(() -> service.pauseSession(id))
+                .subscribeOn(Schedulers.boundedElastic())
+                .map(result -> result != null ? ResponseEntity.ok(result) : ResponseEntity.notFound().build());
     }
 
     @PostMapping("/sessions/{id}/resume")
     public Mono<ResponseEntity<ArithmeticSession>> resumeSession(@PathVariable String id) {
-        return service.resumeSession(id)
-                .map(ResponseEntity::ok)
-                .defaultIfEmpty(ResponseEntity.notFound().build());
+        return Mono.fromCallable(() -> service.resumeSession(id))
+                .subscribeOn(Schedulers.boundedElastic())
+                .map(result -> result != null ? ResponseEntity.ok(result) : ResponseEntity.notFound().build());
     }
 
     @PostMapping("/sessions/{id}/complete")
     public Mono<ResponseEntity<ArithmeticSession>> completeSession(@PathVariable String id) {
-        return service.completeSession(id)
-                .map(ResponseEntity::ok)
-                .defaultIfEmpty(ResponseEntity.notFound().build());
+        return Mono.fromCallable(() -> service.completeSession(id))
+                .subscribeOn(Schedulers.boundedElastic())
+                .map(result -> result != null ? ResponseEntity.ok(result) : ResponseEntity.notFound().build());
     }
 
     // Settings
 
     @GetMapping("/settings")
     public Mono<ArithmeticSettings> getSettings() {
-        return service.getSettings();
+        return Mono.fromCallable(service::getSettings)
+                .subscribeOn(Schedulers.boundedElastic());
     }
 
     @PutMapping("/settings")
     public Mono<ArithmeticSettings> updateSettings(@RequestBody ArithmeticSettings settings) {
-        return service.updateSettings(settings);
+        return Mono.fromCallable(() -> service.updateSettings(settings))
+                .subscribeOn(Schedulers.boundedElastic());
     }
 }

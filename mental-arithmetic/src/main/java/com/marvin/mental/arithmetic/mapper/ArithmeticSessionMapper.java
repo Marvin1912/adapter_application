@@ -2,12 +2,10 @@ package com.marvin.mental.arithmetic.mapper;
 
 import com.marvin.mental.arithmetic.entity.ArithmeticProblemEntity;
 import com.marvin.mental.arithmetic.entity.ArithmeticSessionEntity;
-import com.marvin.mental.arithmetic.enums.SessionStatus;
 import com.marvin.mental.arithmetic.model.ArithmeticProblem;
 import com.marvin.mental.arithmetic.model.ArithmeticSession;
 import org.mapstruct.Mapper;
 
-import java.time.Instant;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -18,7 +16,7 @@ public interface ArithmeticSessionMapper {
         if (model == null) {
             return null;
         }
-        ArithmeticSessionEntity entity = new ArithmeticSessionEntity();
+        final ArithmeticSessionEntity entity = new ArithmeticSessionEntity();
         entity.setId(model.getId());
         entity.setCreatedAt(model.getCreatedAt());
         entity.setStartTime(model.getStartTime());
@@ -37,14 +35,14 @@ public interface ArithmeticSessionMapper {
         entity.setIsTimedOut(model.getIsTimedOut());
         entity.setNotes(model.getNotes());
 
-        ArithmeticSettingsMapper settingsMapper = new ArithmeticSettingsMapper() {};
+        final ArithmeticSettingsMapper settingsMapper = new ArithmeticSettingsMapper() { };
         if (model.getSettings() != null) {
             entity.setSettings(settingsMapper.toEntity(model.getSettings()));
         }
 
         if (model.getProblems() != null) {
-            ArithmeticProblemMapper problemMapper = new ArithmeticProblemMapper() {};
-            Set<ArithmeticProblemEntity> problemEntities = model.getProblems().stream()
+            final ArithmeticProblemMapper problemMapper = new ArithmeticProblemMapper() { };
+            final Set<ArithmeticProblemEntity> problemEntities = model.getProblems().stream()
                     .map(p -> problemMapper.toEntity(p, entity.getId()))
                     .peek(e -> e.setSession(entity))
                     .collect(Collectors.toSet());
@@ -59,10 +57,10 @@ public interface ArithmeticSessionMapper {
             return null;
         }
 
-        ArithmeticSettingsMapper settingsMapper = new ArithmeticSettingsMapper() {};
-        ArithmeticProblemMapper problemMapper = new ArithmeticProblemMapper() {};
+        final ArithmeticSettingsMapper settingsMapper = new ArithmeticSettingsMapper() { };
+        final ArithmeticProblemMapper problemMapper = new ArithmeticProblemMapper() { };
 
-        java.util.List<ArithmeticProblem> problems = entity.getProblems() != null
+        final java.util.List<ArithmeticProblem> problems = entity.getProblems() != null
                 ? entity.getProblems().stream()
                         .map(problemMapper::toModel)
                         .toList()

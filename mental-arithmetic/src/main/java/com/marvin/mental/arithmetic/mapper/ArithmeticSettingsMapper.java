@@ -16,7 +16,7 @@ public interface ArithmeticSettingsMapper {
         if (model == null) {
             return null;
         }
-        ArithmeticSettingsEntity entity = new ArithmeticSettingsEntity();
+        final ArithmeticSettingsEntity entity = new ArithmeticSettingsEntity();
         entity.setDifficulty(model.getDifficulty());
         entity.setProblemCount(model.getProblemCount());
         entity.setTimeLimit(model.getTimeLimit());
@@ -36,9 +36,9 @@ public interface ArithmeticSettingsMapper {
             entity.setHighContrast(model.getDisplaySettings().getHighContrast());
         }
         if (model.getOperations() != null) {
-            Set<SettingsOperationEntity> ops = model.getOperations().stream()
+            final Set<SettingsOperationEntity> ops = model.getOperations().stream()
                     .map(op -> {
-                        SettingsOperationEntity opEntity = new SettingsOperationEntity();
+                        final SettingsOperationEntity opEntity = new SettingsOperationEntity();
                         opEntity.setSettings(entity);
                         opEntity.setOperationType(op);
                         return opEntity;
@@ -53,7 +53,7 @@ public interface ArithmeticSettingsMapper {
         if (entity == null) {
             return null;
         }
-        java.util.List<OperationType> operations = entity.getOperations() != null
+        final java.util.List<OperationType> operations = entity.getOperations() != null
                 ? entity.getOperations().stream()
                         .map(SettingsOperationEntity::getOperationType)
                         .toList()

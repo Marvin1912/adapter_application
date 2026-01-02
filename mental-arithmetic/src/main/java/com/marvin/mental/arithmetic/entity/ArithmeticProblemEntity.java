@@ -75,7 +75,7 @@ public class ArithmeticProblemEntity {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        ArithmeticProblemEntity that = (ArithmeticProblemEntity) o;
+        final ArithmeticProblemEntity that = (ArithmeticProblemEntity) o;
         return Objects.equals(id, that.id);
     }
 

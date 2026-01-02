@@ -22,7 +22,7 @@ public class SettingsOperationId implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        SettingsOperationId that = (SettingsOperationId) o;
+        final SettingsOperationId that = (SettingsOperationId) o;
         return Objects.equals(settings, that.settings) && operationType == that.operationType;
     }
 

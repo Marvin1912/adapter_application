@@ -8,11 +8,11 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface ArithmeticProblemMapper {
 
-    default ArithmeticProblemEntity toEntity(ArithmeticProblem model, String sessionId) {
+    default ArithmeticProblemEntity toEntity(ArithmeticProblem model, final String sessionId) {
         if (model == null) {
             return null;
         }
-        ArithmeticProblemEntity entity = new ArithmeticProblemEntity();
+        final ArithmeticProblemEntity entity = new ArithmeticProblemEntity();
         entity.setId(model.getId());
         entity.setExpression(model.getExpression());
         entity.setAnswer(model.getAnswer());
@@ -26,7 +26,7 @@ public interface ArithmeticProblemMapper {
         entity.setOperand1(model.getOperand1());
         entity.setOperand2(model.getOperand2());
         if (sessionId != null) {
-            ArithmeticSessionEntity session = new ArithmeticSessionEntity();
+            final ArithmeticSessionEntity session = new ArithmeticSessionEntity();
             session.setId(sessionId);
             entity.setSession(session);
         }
