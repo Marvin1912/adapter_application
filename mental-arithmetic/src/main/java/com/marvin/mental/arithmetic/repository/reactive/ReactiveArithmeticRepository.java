@@ -148,7 +148,7 @@ public class ReactiveArithmeticRepository {
     @Transactional
     public Mono<ArithmeticSettings> getSettings() {
         return Mono.fromCallable(() -> {
-                    List<ArithmeticSettingsEntity> all = settingsRepository.findAll();
+                    List<ArithmeticSettingsEntity> all = settingsRepository.findAllWithOperations();
                     if (all.isEmpty()) {
                         ArithmeticSettingsEntity entity = createDefaultSettingsEntity();
                         ArithmeticSettingsEntity saved = settingsRepository.save(entity);
@@ -162,7 +162,7 @@ public class ReactiveArithmeticRepository {
     @Transactional
     public Mono<ArithmeticSettings> updateSettings(ArithmeticSettings settings) {
         return Mono.fromCallable(() -> {
-                    List<ArithmeticSettingsEntity> all = settingsRepository.findAll();
+                    List<ArithmeticSettingsEntity> all = settingsRepository.findAllWithOperations();
                     ArithmeticSettingsEntity entity;
                     if (all.isEmpty()) {
                         entity = settingsRepository.save(settingsMapper.toEntity(settings));
