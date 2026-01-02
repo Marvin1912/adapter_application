@@ -3,7 +3,6 @@ CREATE SCHEMA IF NOT EXISTS mental_arithmetic;
 CREATE TABLE mental_arithmetic.arithmetic_settings
 (
     id                       SERIAL PRIMARY KEY,
-    operations               VARCHAR(50)[],
     difficulty               VARCHAR(50)    NOT NULL,
     problem_count            INT            NOT NULL,
     time_limit               INT,
@@ -20,6 +19,14 @@ CREATE TABLE mental_arithmetic.arithmetic_settings
     show_correct_answer      BOOLEAN        NOT NULL,
     font_size                VARCHAR(50),
     high_contrast            BOOLEAN
+);
+
+CREATE TABLE mental_arithmetic.settings_operations
+(
+    settings_id    INT            NOT NULL,
+    operation_type VARCHAR(50)    NOT NULL,
+    PRIMARY KEY (settings_id, operation_type),
+    FOREIGN KEY (settings_id) REFERENCES mental_arithmetic.arithmetic_settings (id) ON DELETE CASCADE
 );
 
 CREATE TABLE mental_arithmetic.arithmetic_session
