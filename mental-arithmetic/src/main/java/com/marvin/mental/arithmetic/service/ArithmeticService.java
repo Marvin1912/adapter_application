@@ -19,29 +19,9 @@ import java.util.Random;
 public class ArithmeticService {
 
     private final ReactiveArithmeticRepository repository;
-    private ArithmeticSettings defaultSettings = createDefaultSettings();
 
     public ArithmeticService(ReactiveArithmeticRepository repository) {
         this.repository = repository;
-    }
-
-    private static ArithmeticSettings createDefaultSettings() {
-        ArithmeticSettings settings = new ArithmeticSettings();
-        settings.setOperations(List.of(OperationType.ADDITION));
-        settings.setDifficulty(Difficulty.EASY);
-        settings.setProblemCount(10);
-        settings.setTimeLimit(null);
-        settings.setShowImmediateFeedback(true);
-        settings.setAllowPause(true);
-        settings.setShowProgress(true);
-        settings.setShowTimer(true);
-        settings.setEnableSound(false);
-        settings.setUseKeypad(false);
-        settings.setShuffleProblems(false);
-        settings.setRepeatIncorrectProblems(false);
-        settings.setMaxRetries(3);
-        settings.setShowCorrectAnswer(true);
-        return settings;
     }
 
     public Mono<ArithmeticSession> createSession(ArithmeticSettings settings) {
@@ -147,12 +127,11 @@ public class ArithmeticService {
     }
 
     public Mono<ArithmeticSettings> getSettings() {
-        return Mono.just(defaultSettings);
+        return repository.getSettings();
     }
 
     public Mono<ArithmeticSettings> updateSettings(ArithmeticSettings settings) {
-        this.defaultSettings = settings;
-        return Mono.just(settings);
+        return repository.updateSettings(settings);
     }
 
     private List<ArithmeticProblem> generateProblems(ArithmeticSettings settings) {

@@ -3,9 +3,14 @@ package com.marvin.mental.arithmetic.repository.reactive;
 import com.marvin.mental.arithmetic.entity.ArithmeticProblemEntity;
 import com.marvin.mental.arithmetic.entity.ArithmeticSessionEntity;
 import com.marvin.mental.arithmetic.entity.ArithmeticSettingsEntity;
+import com.marvin.mental.arithmetic.entity.SettingsOperationEntity;
+import com.marvin.mental.arithmetic.enums.Difficulty;
+import com.marvin.mental.arithmetic.enums.OperationType;
 import com.marvin.mental.arithmetic.mapper.ArithmeticSessionMapper;
+import com.marvin.mental.arithmetic.mapper.ArithmeticSettingsMapper;
 import com.marvin.mental.arithmetic.model.ArithmeticProblem;
 import com.marvin.mental.arithmetic.model.ArithmeticSession;
+import com.marvin.mental.arithmetic.model.ArithmeticSettings;
 import com.marvin.mental.arithmetic.repository.ArithmeticProblemRepository;
 import com.marvin.mental.arithmetic.repository.ArithmeticSessionRepository;
 import com.marvin.mental.arithmetic.repository.ArithmeticSettingsRepository;
@@ -15,6 +20,9 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+import java.util.List;
+import java.util.Set;
+
 @Component
 public class ReactiveArithmeticRepository {
 
@@ -22,15 +30,18 @@ public class ReactiveArithmeticRepository {
     private final ArithmeticProblemRepository problemRepository;
     private final ArithmeticSettingsRepository settingsRepository;
     private final ArithmeticSessionMapper sessionMapper;
+    private final ArithmeticSettingsMapper settingsMapper;
 
     public ReactiveArithmeticRepository(ArithmeticSessionRepository sessionRepository,
                                         ArithmeticProblemRepository problemRepository,
                                         ArithmeticSettingsRepository settingsRepository,
-                                        ArithmeticSessionMapper sessionMapper) {
+                                        ArithmeticSessionMapper sessionMapper,
+                                        ArithmeticSettingsMapper settingsMapper) {
         this.sessionRepository = sessionRepository;
         this.problemRepository = problemRepository;
         this.settingsRepository = settingsRepository;
         this.sessionMapper = sessionMapper;
+        this.settingsMapper = settingsMapper;
     }
 
     @Transactional
@@ -132,5 +143,85 @@ public class ReactiveArithmeticRepository {
         session.setTotalTimeSpent(totalTimeSpent);
         session.setAccuracy(problemsCompleted > 0 ? (correctAnswers * 100.0 / problemsCompleted) : 0.0);
         session.setAvgTimePerProblem(problemsCompleted > 0 ? (totalTimeSpent * 1.0 / problemsCompleted) : 0.0);
+    }
+
+    @Transactional
+    public Mono<ArithmeticSettings> getSettings() {
+        return Mono.fromCallable(() -> {
+                    List<ArithmeticSettingsEntity> all = settingsRepository.findAll();
+                    if (all.isEmpty()) {
+                        ArithmeticSettingsEntity entity = createDefaultSettingsEntity();
+                        ArithmeticSettingsEntity saved = settingsRepository.save(entity);
+                        return settingsMapper.toModel(saved);
+                    }
+                    return settingsMapper.toModel(all.get(0));
+                })
+                .subscribeOn(Schedulers.boundedElastic());
+    }
+
+    @Transactional
+    public Mono<ArithmeticSettings> updateSettings(ArithmeticSettings settings) {
+        return Mono.fromCallable(() -> {
+                    List<ArithmeticSettingsEntity> all = settingsRepository.findAll();
+                    ArithmeticSettingsEntity entity;
+                    if (all.isEmpty()) {
+                        entity = settingsRepository.save(settingsMapper.toEntity(settings));
+                    } else {
+                        entity = all.get(0);
+                        ArithmeticSettingsEntity updated = settingsMapper.toEntity(settings);
+                        entity.setDifficulty(updated.getDifficulty());
+                        entity.setProblemCount(updated.getProblemCount());
+                        entity.setTimeLimit(updated.getTimeLimit());
+                        entity.setShowImmediateFeedback(updated.getShowImmediateFeedback());
+                        entity.setAllowPause(updated.getAllowPause());
+                        entity.setShowProgress(updated.getShowProgress());
+                        entity.setShowTimer(updated.getShowTimer());
+                        entity.setEnableSound(updated.getEnableSound());
+                        entity.setUseKeypad(updated.getUseKeypad());
+                        entity.setSessionName(updated.getSessionName());
+                        entity.setShuffleProblems(updated.getShuffleProblems());
+                        entity.setRepeatIncorrectProblems(updated.getRepeatIncorrectProblems());
+                        entity.setMaxRetries(updated.getMaxRetries());
+                        entity.setShowCorrectAnswer(updated.getShowCorrectAnswer());
+                        entity.setFontSize(updated.getFontSize());
+                        entity.setHighContrast(updated.getHighContrast());
+                        entity.getOperations().clear();
+                        for (SettingsOperationEntity op : updated.getOperations()) {
+                            SettingsOperationEntity newOp = new SettingsOperationEntity();
+                            newOp.setSettings(entity);
+                            newOp.setOperationType(op.getOperationType());
+                            entity.getOperations().add(newOp);
+                        }
+                        entity = settingsRepository.save(entity);
+                    }
+                    return settingsMapper.toModel(entity);
+                })
+                .subscribeOn(Schedulers.boundedElastic());
+    }
+
+    private static ArithmeticSettingsEntity createDefaultSettingsEntity() {
+        ArithmeticSettingsEntity entity = new ArithmeticSettingsEntity();
+        entity.setDifficulty(Difficulty.EASY);
+        entity.setProblemCount(10);
+        entity.setTimeLimit(null);
+        entity.setShowImmediateFeedback(true);
+        entity.setAllowPause(true);
+        entity.setShowProgress(true);
+        entity.setShowTimer(true);
+        entity.setEnableSound(false);
+        entity.setUseKeypad(false);
+        entity.setShuffleProblems(false);
+        entity.setRepeatIncorrectProblems(false);
+        entity.setMaxRetries(3);
+        entity.setShowCorrectAnswer(true);
+        entity.setFontSize(null);
+        entity.setHighContrast(null);
+
+        SettingsOperationEntity op = new SettingsOperationEntity();
+        op.setSettings(entity);
+        op.setOperationType(OperationType.ADDITION);
+        entity.setOperations(Set.of(op));
+
+        return entity;
     }
 }
