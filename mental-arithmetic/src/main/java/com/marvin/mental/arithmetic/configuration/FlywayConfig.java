@@ -5,7 +5,7 @@ import org.flywaydb.core.Flyway;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-@Configuration
+@Configuration("FlywayConfigMentalArithmetic")
 public class FlywayConfig {
 
     @Bean(initMethod = "migrate")
