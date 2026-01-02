@@ -15,4 +15,5 @@ dependencies {
     implementation project(':plants')
     implementation project(':image-server')
     implementation project(':vocabulary')
+    implementation project(':mental-arithmetic')
 }
