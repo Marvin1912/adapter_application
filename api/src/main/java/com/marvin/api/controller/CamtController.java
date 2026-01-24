@@ -14,6 +14,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
@@ -24,6 +31,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
+@Tag(name = "CAMT Processing", description = "API for processing CAMT banking files")
 public class CamtController {
 
     private final CamtFileParser camtFileParser;
@@ -39,12 +47,33 @@ public class CamtController {
         return value.replaceAll("\\s+", " ");
     }
 
+    @Operation(
+        summary = "Parse CAMT booking entries",
+        description = "Uploads a zip file containing CAMT.052.001.08 XML files, parses them, and returns categorized booking entries grouped by month"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Successfully parsed CAMT files",
+            content = @Content(
+                mediaType = MediaType.APPLICATION_JSON_VALUE,
+                schema = @Schema(implementation = BookingsDTO.class)
+            )
+        ),
+        @ApiResponse(
+            responseCode = "400",
+            description = "Invalid file format or parsing error",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)
+        )
+    })
     @PostMapping(
             path = "/camt-entries",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public Mono<BookingsDTO> bookings(@RequestPart("file") Mono<FilePart> fileMono) {
+    public Mono<BookingsDTO> bookings(
+            @Parameter(description = "Zip file containing CAMT XML files", required = true)
+            @RequestPart("file") Mono<FilePart> fileMono) {
 
         return fileMono.flatMap(file -> {
 
