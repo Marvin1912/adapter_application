@@ -3,6 +3,7 @@ package com.marvin.api.controller;
 import com.marvin.api.dto.InfluxBucketResponse;
 import com.marvin.api.dto.InfluxExportRequest;
 import com.marvin.api.dto.InfluxExportResponse;
+import com.marvin.api.service.ExportTrackingService;
 import com.marvin.export.influxdb.InfluxExporter;
 import com.marvin.export.influxdb.InfluxExporter.InfluxBucket;
 import com.marvin.upload.Uploader;
@@ -30,15 +31,17 @@ public class InfluxExportController {
 
     private final InfluxExporter influxExporter;
     private final Uploader uploader;
+    private final ExportTrackingService exportTrackingService;
 
-    public InfluxExportController(InfluxExporter influxExporter, Uploader uploader) {
+    public InfluxExportController(InfluxExporter influxExporter, Uploader uploader, ExportTrackingService exportTrackingService) {
         this.influxExporter = influxExporter;
         this.uploader = uploader;
+        this.exportTrackingService = exportTrackingService;
     }
 
     @Operation(
         summary = "Get available InfluxDB buckets",
-        description = "Retrieves a list of all available InfluxDB buckets that can be exported. Each bucket includes its name, bucket identifier, and description."
+        description = "Retrieves a list of all available InfluxDB buckets that can be exported."
     )
     @ApiResponses(value = {
         @ApiResponse(
@@ -78,7 +81,8 @@ public class InfluxExportController {
     @Operation(
         summary = "Export InfluxDB buckets",
         description = "Exports data from selected InfluxDB buckets with optional time range filtering. The export is performed asynchronously and returns information about the generated files. " +
-                   "Time range filters use ISO-8601 format: yyyy-MM-dd'T'HH:mm:ss (e.g., 2024-01-15T10:30:00). If startTime is not provided, defaults to 5 years ago; if endTime is not provided, defaults to current time (implemented in AbstractInfluxExport)."
+                   "Time range filters use ISO-8601 format: yyyy-MM-dd'T'HH:mm:ss (e.g., 2024-01-15T10:30:00). " +
+                   "If startTime is not provided, defaults to 5 years ago; if endTime is not provided, defaults to current time."
     )
     @ApiResponses(value = {
         @ApiResponse(
@@ -116,19 +120,25 @@ public class InfluxExportController {
             @RequestBody InfluxExportRequest request) {
 
         try {
-            final List<Path> exportedFiles;
-
             final InfluxExporter.InfluxBucket bucketEnum = InfluxBucket.valueOf(request.getBucket());
 
             final String startTime = request.getStartTime();
             final String endTime = request.getEndTime();
-            exportedFiles = influxExporter.exportSelectedBucket(
-                    bucketEnum,
-                    startTime != null ? ZonedDateTime.parse(startTime).toInstant() : null,
-                    endTime != null ? ZonedDateTime.parse(endTime).toInstant() : null
-            );
 
-            uploader.zipAndUploadFiles(bucketEnum.name(), exportedFiles);
+            final String requestParams = "bucket=" + request.getBucket() +
+                    (startTime != null ? ",startTime=" + startTime : "") +
+                    (endTime != null ? ",endTime=" + endTime : "");
+
+            final List<Path> exportedFiles = exportTrackingService.trackExport(
+                    ExportTrackingService.ExporterType.INFLUXDB,
+                    bucketEnum.name(),
+                    requestParams,
+                    () -> influxExporter.exportSelectedBucket(
+                            bucketEnum,
+                            startTime != null ? ZonedDateTime.parse(startTime).toInstant() : null,
+                            endTime != null ? ZonedDateTime.parse(endTime).toInstant() : null
+                    )
+            );
 
             return ResponseEntity.ok(InfluxExportResponse.success("InfluxDB buckets exported and uploaded successfully", exportedFiles));
         } catch (IllegalArgumentException e) {

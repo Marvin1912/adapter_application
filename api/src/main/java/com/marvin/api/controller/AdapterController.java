@@ -1,5 +1,6 @@
 package com.marvin.api.controller;
 
+import com.marvin.api.service.ExportTrackingService;
 import com.marvin.app.importer.costs.CostImporter;
 import com.marvin.app.importer.sensors.SensorDataImporter;
 import com.marvin.app.importer.vocabulary.VocabularyImporter;
@@ -19,15 +20,17 @@ public class AdapterController {
     private final Uploader uploader;
     private final CostExporter exporter;
     private final VocabularyExporter vocabularyExporter;
+    private final ExportTrackingService exportTrackingService;
 
     public AdapterController(CostImporter costImporter, SensorDataImporter sensorDataImporter, VocabularyImporter vocabularyImporter, Uploader uploader, CostExporter exporter,
-        VocabularyExporter vocabularyExporter) {
+        VocabularyExporter vocabularyExporter, ExportTrackingService exportTrackingService) {
         this.costImporter = costImporter;
         this.sensorDataImporter = sensorDataImporter;
         this.vocabularyImporter = vocabularyImporter;
         this.uploader = uploader;
         this.exporter = exporter;
         this.vocabularyExporter = vocabularyExporter;
+        this.exportTrackingService = exportTrackingService;
     }
 
     @PostMapping("/import/costs")
@@ -50,13 +53,13 @@ public class AdapterController {
 
     @PostMapping("/export/costs")
     public ResponseEntity<Void> exportCosts() {
-        uploader.zipAndUploadFiles("costs", exporter.exportCosts());
+        exportTrackingService.trackExport(ExportTrackingService.ExporterType.COSTS, null, null, () -> exporter.exportCosts());
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/export/vocabulary")
     public ResponseEntity<Void> exportVocabulary() {
-        uploader.zipAndUploadFiles("vocabulary", vocabularyExporter.exportVocabulary());
+        exportTrackingService.trackExport(ExportTrackingService.ExporterType.VOCABULARY, null, null, () -> vocabularyExporter.exportVocabulary());
         return ResponseEntity.ok().build();
     }
 
