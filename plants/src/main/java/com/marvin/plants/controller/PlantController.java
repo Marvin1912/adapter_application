@@ -3,12 +3,20 @@ package com.marvin.plants.controller;
 import com.marvin.image.service.ImageService;
 import com.marvin.plants.dto.PlantDTO;
 import com.marvin.plants.service.PlantService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.buffer.DataBufferUtils;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -32,6 +40,7 @@ import reactor.util.function.Tuple2;
  */
 @RestController
 @RequestMapping(path = "/plants")
+@Tag(name = "Plant Management", description = "Endpoints for managing plants, including CRUD operations and care tracking")
 public class PlantController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PlantController.class);
@@ -94,11 +103,22 @@ public class PlantController {
      * @param contentType  Content type of the image (optional)
      * @return Mono containing ResponseEntity with location of created plant
      */
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(
+            summary = "Create a new plant",
+            description = "Creates a new plant entry with optional image upload. Returns the location of the created plant in the Location header.",
+            responses = {
+                @ApiResponse(responseCode = "201", description = "Plant created successfully"),
+                @ApiResponse(responseCode = "400", description = "Invalid input data")
+            }
+    )
     public Mono<ResponseEntity<Object>> createPlant(
-            @RequestPart(value = "image", required = false) Mono<FilePart> filePartMono,
-            @RequestPart("plant") Mono<PlantDTO> plantMono,
-            @RequestParam(name = "content-type", required = false) String contentType
+            @RequestPart(value = "image", required = false) 
+            @Parameter(description = "Optional image file of the plant") Mono<FilePart> filePartMono,
+            @RequestPart("plant") 
+            @Parameter(description = "Plant data in JSON format") Mono<PlantDTO> plantMono,
+            @RequestParam(name = "content-type", required = false) 
+            @Parameter(description = "MIME type of the uploaded image") String contentType
     ) {
         return Mono.zip(plantMono, getFileAsByteArray(filePartMono))
                 .doOnError(this::logPlantCreationError)
@@ -179,6 +199,14 @@ public class PlantController {
      * @return Mono containing ResponseEntity with NO_CONTENT status
      */
     @PutMapping
+    @Operation(
+            summary = "Update an existing plant",
+            description = "Updates the details of an existing plant. The plant ID must be provided within the request body.",
+            responses = {
+                @ApiResponse(responseCode = "204", description = "Plant updated successfully"),
+                @ApiResponse(responseCode = "404", description = "Plant not found")
+            }
+    )
     public Mono<ResponseEntity<Object>> updatePlant(@RequestBody Mono<PlantDTO> plantMono) {
         return plantMono.flatMap(this::updatePlantSynchronously);
     }
@@ -203,6 +231,17 @@ public class PlantController {
      * @return Flux containing all plants
      */
     @GetMapping
+    @Operation(
+            summary = "Get all plants",
+            description = "Retrieves a list of all plants currently managed in the system.",
+            responses = {
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "List of plants retrieved successfully",
+                        content = @Content(array = @ArraySchema(schema = @Schema(implementation = PlantDTO.class)))
+                )
+            }
+    )
     public Flux<PlantDTO> getPlants() {
         return plantService.getPlants();
     }
@@ -214,7 +253,20 @@ public class PlantController {
      * @return Mono containing the plant data or empty if not found
      */
     @GetMapping(path = "/{id}")
-    public Mono<PlantDTO> getPlant(@PathVariable long id) {
+    @Operation(
+            summary = "Get plant by ID",
+            description = "Retrieves detailed information about a specific plant by its unique identifier.",
+            responses = {
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "Plant found and returned",
+                        content = @Content(schema = @Schema(implementation = PlantDTO.class))
+                ),
+                @ApiResponse(responseCode = "404", description = "Plant not found")
+            }
+    )
+    public Mono<PlantDTO> getPlant(
+            @PathVariable @Parameter(description = "ID of the plant to retrieve") long id) {
         return Mono.justOrEmpty(plantService.getPlant(id));
     }
 
@@ -225,7 +277,16 @@ public class PlantController {
      * @return Mono containing ResponseEntity with NO_CONTENT status
      */
     @DeleteMapping("/{id}")
-    public Mono<ResponseEntity<Void>> deletePlant(@PathVariable long id) {
+    @Operation(
+            summary = "Delete a plant",
+            description = "Removes a plant from the system by its ID.",
+            responses = {
+                @ApiResponse(responseCode = "204", description = "Plant deleted successfully"),
+                @ApiResponse(responseCode = "404", description = "Plant not found")
+            }
+    )
+    public Mono<ResponseEntity<Void>> deletePlant(
+            @PathVariable @Parameter(description = "ID of the plant to delete") long id) {
         plantService.deletePlant(id);
         return Mono.just(ResponseEntity.noContent().build());
     }
@@ -238,9 +299,21 @@ public class PlantController {
      * @return Mono containing ResponseEntity with updated plant data
      */
     @PatchMapping("/{id}/watered")
+    @Operation(
+            summary = "Record watering",
+            description = "Updates the last watered date for a plant and recalculates the next scheduled watering date.",
+            responses = {
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "Watering recorded successfully",
+                        content = @Content(schema = @Schema(implementation = PlantDTO.class))
+                ),
+                @ApiResponse(responseCode = "404", description = "Plant not found")
+            }
+    )
     public Mono<ResponseEntity<PlantDTO>> waterPlant(
-            @PathVariable long id,
-            @RequestParam("last-watered") LocalDate lastWatered
+            @PathVariable @Parameter(description = "ID of the plant that was watered") long id,
+            @RequestParam("last-watered") @Parameter(description = "Date when the plant was watered", example = "2024-01-24") LocalDate lastWatered
     ) {
         return Mono.just(id)
                 .flatMap(plantId -> updateWateringDate(plantId, lastWatered))
@@ -267,9 +340,21 @@ public class PlantController {
      * @return Mono containing ResponseEntity with updated plant data
      */
     @PatchMapping("/{id}/fertilized")
+    @Operation(
+            summary = "Record fertilizing",
+            description = "Updates the last fertilized date for a plant and recalculates the next scheduled fertilizing date.",
+            responses = {
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "Fertilizing recorded successfully",
+                        content = @Content(schema = @Schema(implementation = PlantDTO.class))
+                ),
+                @ApiResponse(responseCode = "404", description = "Plant not found")
+            }
+    )
     public Mono<ResponseEntity<PlantDTO>> fertilizePlant(
-            @PathVariable long id,
-            @RequestParam("last-fertilized") LocalDate lastFertilized
+            @PathVariable @Parameter(description = "ID of the plant that was fertilized") long id,
+            @RequestParam("last-fertilized") @Parameter(description = "Date when the plant was fertilized", example = "2024-01-24") LocalDate lastFertilized
     ) {
         return Mono.just(id)
                 .flatMap(plantId -> updateFertilizingDate(plantId, lastFertilized))
