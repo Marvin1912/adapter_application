@@ -12,6 +12,7 @@ version = '0.0.1-SNAPSHOT'
 dependencies {
 
     implementation project(':common')
+    implementation 'io.projectreactor:reactor-core'
     implementation group: 'com.sun.xml.bind', name: 'jaxb-xjc', version: jaxbVersion
     implementation group: 'com.sun.xml.bind', name: 'jaxb-impl', version: jaxbVersion
 

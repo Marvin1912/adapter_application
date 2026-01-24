@@ -84,7 +84,7 @@ subprojects {
 		}
 
 		// Only Spring Boot dependencies for modules that need them
-		if (name in ['api', 'importer', 'camt', 'database', 'consul', 'plants', 'image-server', 'vocabulary', 'mental-arithmetic']) {
+		if (name in ['api', 'vocabulary', 'image-server', 'mental-arithmetic', 'plants']) {
 			implementation 'org.springframework.boot:spring-boot-starter-webflux'
 			implementation 'org.springframework.boot:spring-boot-starter-security'
 		}
@@ -98,10 +98,6 @@ subprojects {
             implementation 'org.springframework.boot:spring-boot-starter-actuator'
         }
 
-		implementation 'org.apache.commons:commons-lang3'
-
-		implementation 'org.mapstruct:mapstruct:1.6.3'
-		annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
 	}
 
 	// Configure Checkstyle for each subproject

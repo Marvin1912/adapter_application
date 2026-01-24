@@ -9,6 +9,7 @@ dependencies {
     implementation project(':database')
     implementation project(':exporter')
     implementation project(':vocabulary')
+    implementation 'io.projectreactor:reactor-core'
 
     // Test dependencies
     testImplementation 'org.junit.jupiter:junit-jupiter'
