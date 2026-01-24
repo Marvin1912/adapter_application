@@ -6,7 +6,6 @@ import com.marvin.app.importer.sensors.SensorDataImporter;
 import com.marvin.app.importer.vocabulary.VocabularyImporter;
 import com.marvin.export.costs.CostExporter;
 import com.marvin.export.vocabulary.VocabularyExporter;
-import com.marvin.upload.Uploader;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,17 +16,21 @@ public class AdapterController {
     private final CostImporter costImporter;
     private final SensorDataImporter sensorDataImporter;
     private final VocabularyImporter vocabularyImporter;
-    private final Uploader uploader;
     private final CostExporter exporter;
     private final VocabularyExporter vocabularyExporter;
     private final ExportTrackingService exportTrackingService;
 
-    public AdapterController(CostImporter costImporter, SensorDataImporter sensorDataImporter, VocabularyImporter vocabularyImporter, Uploader uploader, CostExporter exporter,
-        VocabularyExporter vocabularyExporter, ExportTrackingService exportTrackingService) {
+    public AdapterController(
+        CostImporter costImporter,
+        SensorDataImporter sensorDataImporter,
+        VocabularyImporter vocabularyImporter,
+        CostExporter exporter,
+        VocabularyExporter vocabularyExporter,
+        ExportTrackingService exportTrackingService
+    ) {
         this.costImporter = costImporter;
         this.sensorDataImporter = sensorDataImporter;
         this.vocabularyImporter = vocabularyImporter;
-        this.uploader = uploader;
         this.exporter = exporter;
         this.vocabularyExporter = vocabularyExporter;
         this.exportTrackingService = exportTrackingService;
@@ -53,13 +56,13 @@ public class AdapterController {
 
     @PostMapping("/export/costs")
     public ResponseEntity<Void> exportCosts() {
-        exportTrackingService.trackExport(ExportTrackingService.ExporterType.COSTS, null, null, () -> exporter.exportCosts());
+        exportTrackingService.trackExport(ExportTrackingService.ExporterType.COSTS, null, null, exporter::exportCosts);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/export/vocabulary")
     public ResponseEntity<Void> exportVocabulary() {
-        exportTrackingService.trackExport(ExportTrackingService.ExporterType.VOCABULARY, null, null, () -> vocabularyExporter.exportVocabulary());
+        exportTrackingService.trackExport(ExportTrackingService.ExporterType.VOCABULARY, null, null, vocabularyExporter::exportVocabulary);
         return ResponseEntity.ok().build();
     }
 
