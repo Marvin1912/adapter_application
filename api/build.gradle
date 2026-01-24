@@ -6,7 +6,16 @@ dependencies {
     implementation project(':exporter')
     implementation project(':uploader')
     implementation project(':camt')
+    implementation project(':database')
+    implementation project(':entities')
 
     // Swagger/OpenAPI dependencies
     implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.2.0'
+
+    // Test dependencies
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.junit.platform:junit-platform-launcher'
+    testImplementation 'org.mockito:mockito-core'
+    testImplementation 'org.mockito:mockito-junit-jupiter'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
