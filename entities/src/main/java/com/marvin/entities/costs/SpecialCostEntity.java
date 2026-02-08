@@ -11,7 +11,7 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 @Entity
-@Table(name = "special_cost", schema = "public", catalog = "costs")
+@Table(name = "special_cost", schema = "finance")
 public class SpecialCostEntity extends BasicEntity {
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)

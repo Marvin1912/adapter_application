@@ -12,7 +12,7 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 @Entity
-@Table(name = "daily_cost", schema = "public", catalog = "costs")
+@Table(name = "daily_cost", schema = "finance")
 public class DailyCostEntity extends BasicEntity {
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -15,7 +15,7 @@ import java.math.BigDecimal;
 import java.util.Objects;
 
 @Entity
-@Table(name = "special_cost_entry", schema = "public", catalog = "costs")
+@Table(name = "special_cost_entry", schema = "finance")
 public class SpecialCostEntryEntity extends BasicEntity {
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
