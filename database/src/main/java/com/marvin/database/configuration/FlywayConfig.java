@@ -13,6 +13,7 @@ public class FlywayConfig {
         return Flyway.configure()
                 .dataSource(dataSource)
                 .locations("classpath:db/migration/costs")
+                .schemas("finance")
                 .baselineOnMigrate(true)
                 .load();
     }
