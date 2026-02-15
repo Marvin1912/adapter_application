@@ -2,6 +2,9 @@ package com.marvin.vocabulary.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -28,8 +31,13 @@ public class FlashcardEntity {
     @Column(name = "id", nullable = false)
     private Integer id;
 
-    @Column(name = "deck", nullable = false)
-    private String deck;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "deck_id", nullable = false)
+    private DeckEntity deck;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "reverse_flashcard_id")
+    private FlashcardEntity reverseFlashcard;
 
     @Column(name = "anki_id")
     private String ankiId;

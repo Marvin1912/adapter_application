@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 import com.marvin.vocabulary.dictionaryapi.DictionaryClient;
 import com.marvin.vocabulary.dto.DictionaryEntry;
 import com.marvin.vocabulary.dto.Flashcard;
+import com.marvin.vocabulary.model.DeckEntity;
 import com.marvin.vocabulary.model.FlashcardEntity;
 import com.marvin.vocabulary.service.FlashcardService;
 import java.nio.charset.StandardCharsets;
@@ -32,9 +33,11 @@ import reactor.core.publisher.Mono;
 @ExtendWith(MockitoExtension.class)
 class FlashcardControllerTest {
 
+    private final DeckEntity testDeck = new DeckEntity(10, "test-deck");
     private final FlashcardEntity testFlashcardEntity = new FlashcardEntity(
             1,
-            "test-deck",
+            testDeck,
+            null,
             "anki-123",
             "test front",
             "test back",
@@ -43,7 +46,7 @@ class FlashcardControllerTest {
     );
     private final Flashcard testFlashcard = new Flashcard(
             1,
-            "test-deck",
+            10,
             "anki-123",
             "test front",
             "test back",
@@ -194,7 +197,7 @@ class FlashcardControllerTest {
     void addFlashcardShouldCreateFlashcardAndReturnLocation() {
         final Flashcard newFlashcard = new Flashcard(
                 null,
-                "new-deck",
+                10,
                 "anki-456",
                 "new front",
                 "new back",
@@ -204,7 +207,8 @@ class FlashcardControllerTest {
 
         final FlashcardEntity savedEntity = new FlashcardEntity(
                 2,
-                "new-deck",
+                testDeck,
+                null,
                 "anki-456",
                 "new front",
                 "new back",
@@ -212,7 +216,7 @@ class FlashcardControllerTest {
                 false
         );
 
-        when(flashcardService.save(any(FlashcardEntity.class))).thenReturn(savedEntity);
+        when(flashcardService.save(any(Flashcard.class))).thenReturn(savedEntity);
 
         webTestClient.post()
                 .uri("/vocabulary/flashcards")
@@ -226,7 +230,7 @@ class FlashcardControllerTest {
 
     @Test
     void updateFlashcardShouldUpdateFlashcardAndReturnNoContent() {
-        when(flashcardService.update(any(FlashcardEntity.class))).thenReturn(1);
+        when(flashcardService.update(any(Flashcard.class))).thenReturn(1);
 
         webTestClient.put()
                 .uri("/vocabulary/flashcards")

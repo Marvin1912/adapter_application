@@ -6,7 +6,9 @@ import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import com.marvin.vocabulary.dto.Flashcard;
 import com.marvin.vocabulary.dto.FlashcardCsvDTO;
+import com.marvin.vocabulary.model.DeckEntity;
 import com.marvin.vocabulary.model.FlashcardEntity;
+import com.marvin.vocabulary.repository.DeckRepository;
 import com.marvin.vocabulary.repository.FlashcardRepository;
 import jakarta.transaction.Transactional;
 import java.io.ByteArrayOutputStream;
@@ -24,9 +26,11 @@ public class FlashcardService {
 
     private final CsvSchema schema;
     private final FlashcardRepository flashcardRepository;
+    private final DeckRepository deckRepository;
 
-    public FlashcardService(FlashcardRepository flashcardRepository) {
+    public FlashcardService(FlashcardRepository flashcardRepository, DeckRepository deckRepository) {
         this.flashcardRepository = flashcardRepository;
+        this.deckRepository = deckRepository;
 
         this.schema = CsvSchema.builder()
                 .setColumnSeparator('\t')
@@ -61,27 +65,70 @@ public class FlashcardService {
         return flashcardRepository.findAll();
     }
 
-    public FlashcardEntity save(FlashcardEntity flashcard) {
-        return flashcardRepository.save(flashcard);
+    @Transactional
+    public FlashcardEntity save(Flashcard flashcard) {
+        DeckEntity deck = getDeckOrThrow(flashcard.deckId());
+        DeckEntity reverseDeck = getOrCreateReverseDeck(deck);
+
+        FlashcardEntity original = new FlashcardEntity();
+        original.setDeck(deck);
+        original.setAnkiId(flashcard.ankiId());
+        original.setFront(flashcard.front());
+        original.setBack(flashcard.back());
+        original.setDescription(flashcard.description());
+        original.setUpdated(flashcard.updated());
+        FlashcardEntity savedOriginal = flashcardRepository.save(original);
+
+        FlashcardEntity reverse = new FlashcardEntity();
+        reverse.setDeck(reverseDeck);
+        reverse.setFront(flashcard.back());
+        reverse.setBack(flashcard.front());
+        reverse.setDescription(flashcard.description());
+        reverse.setUpdated(flashcard.updated());
+        FlashcardEntity savedReverse = flashcardRepository.save(reverse);
+
+        savedOriginal.setReverseFlashcard(savedReverse);
+        savedReverse.setReverseFlashcard(savedOriginal);
+        flashcardRepository.save(savedOriginal);
+        flashcardRepository.save(savedReverse);
+
+        return savedOriginal;
     }
 
     @Transactional
-    public Integer update(FlashcardEntity flashcard) {
-        flashcardRepository.findById(flashcard.getId())
+    public Integer update(Flashcard flashcard) {
+        flashcardRepository.findById(flashcard.id())
                 .ifPresentOrElse(
                         f -> {
-                            f.setFront(flashcard.getFront());
-                            f.setBack(flashcard.getBack());
-                            f.setDescription(flashcard.getDescription());
-                            f.setAnkiId(flashcard.getAnkiId());
-                            f.setUpdated(flashcard.isUpdated());
+                            DeckEntity deck = getDeckOrThrow(flashcard.deckId());
+                            DeckEntity reverseDeck = getOrCreateReverseDeck(deck);
+                            f.setDeck(deck);
+                            f.setFront(flashcard.front());
+                            f.setBack(flashcard.back());
+                            f.setDescription(flashcard.description());
+                            f.setAnkiId(flashcard.ankiId());
+                            f.setUpdated(flashcard.updated());
+
+                            FlashcardEntity reverse = f.getReverseFlashcard();
+                            if (reverse == null) {
+                                reverse = new FlashcardEntity();
+                            }
+                            reverse.setDeck(reverseDeck);
+                            reverse.setFront(flashcard.back());
+                            reverse.setBack(flashcard.front());
+                            reverse.setDescription(flashcard.description());
+                            reverse.setUpdated(flashcard.updated());
+                            FlashcardEntity savedReverse = flashcardRepository.save(reverse);
+                            f.setReverseFlashcard(savedReverse);
+                            savedReverse.setReverseFlashcard(f);
+                            flashcardRepository.save(savedReverse);
                         },
                         () -> {
                             throw new IllegalArgumentException(
-                                    "No flashcard found with id: " + flashcard.getId());
+                                    "No flashcard found with id: " + flashcard.id());
                         }
                 );
-        return flashcard.getId();
+        return flashcard.id();
     }
 
     @Transactional
@@ -110,7 +157,7 @@ public class FlashcardService {
 
             for (final FlashcardEntity flashcardEntity : flashcardRepository.findAll()) {
                 sequenceWriter.write(new FlashcardCsvDTO(
-                        flashcardEntity.getDeck(),
+                        flashcardEntity.getDeck().getName(),
                         flashcardEntity.getAnkiId(),
                         flashcardEntity.getFront(),
                         flashcardEntity.getBack(),
@@ -156,16 +203,15 @@ public class FlashcardService {
                     .findByFrontAndBack(flashcardCsvDto.front(), flashcardCsvDto.back())
                     .ifPresentOrElse(
                             flashcard -> flashcard.setAnkiId(flashcardCsvDto.guid()),
-                            () -> flashcardRepository.save(new FlashcardEntity(
-                                            null,
-                                            flashcardCsvDto.deck(),
-                                            flashcardCsvDto.guid(),
-                                            flashcardCsvDto.front(),
-                                            flashcardCsvDto.back(),
-                                            flashcardCsvDto.description(),
-                                            false
-                                    )
-                            )
+                            () -> save(new Flashcard(
+                                    null,
+                                    getOrCreateDeck(flashcardCsvDto.deck()).getId(),
+                                    flashcardCsvDto.guid(),
+                                    flashcardCsvDto.front(),
+                                    flashcardCsvDto.back(),
+                                    flashcardCsvDto.description(),
+                                    false
+                            ))
                     );
             count.incrementAndGet();
         }
@@ -175,13 +221,30 @@ public class FlashcardService {
         return flashcardRepository.findAll().stream()
                 .map(entity -> new Flashcard(
                         entity.getId(),
-                        entity.getDeck(),
+                        entity.getDeck().getId(),
                         entity.getAnkiId(),
                         entity.getFront(),
                         entity.getBack(),
                         entity.getDescription(),
                         entity.isUpdated()
                 ));
+    }
+
+    private DeckEntity getDeckOrThrow(Integer deckId) {
+        return deckRepository.findById(deckId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "No deck found with id: " + deckId));
+    }
+
+    private DeckEntity getOrCreateDeck(String name) {
+        return deckRepository.findByName(name)
+                .orElseGet(() -> deckRepository.save(new DeckEntity(null, name)));
+    }
+
+    private DeckEntity getOrCreateReverseDeck(DeckEntity deck) {
+        String reverseName = deck.getName() + "_reversed";
+        return deckRepository.findByName(reverseName)
+                .orElseGet(() -> deckRepository.save(new DeckEntity(null, reverseName)));
     }
 
 }
