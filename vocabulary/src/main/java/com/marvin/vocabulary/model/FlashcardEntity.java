@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -35,8 +36,8 @@ public class FlashcardEntity {
     @JoinColumn(name = "deck_id", nullable = false)
     private DeckEntity deck;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "reverse_flashcard_id")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "reverse_flashcard_id", unique = true)
     private FlashcardEntity reverseFlashcard;
 
     @Column(name = "anki_id")

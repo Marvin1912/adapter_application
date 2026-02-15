@@ -238,13 +238,30 @@ public class FlashcardService {
 
     private DeckEntity getOrCreateDeck(String name) {
         return deckRepository.findByName(name)
-                .orElseGet(() -> deckRepository.save(new DeckEntity(null, name)));
+                .orElseGet(() -> {
+                    DeckEntity entity = new DeckEntity();
+                    entity.setName(name);
+                    return deckRepository.save(entity);
+                });
     }
 
     private DeckEntity getOrCreateReverseDeck(DeckEntity deck) {
+        if (deck.getReverseDeck() != null) {
+            return deck.getReverseDeck();
+        }
+
         String reverseName = deck.getName() + "_reversed";
-        return deckRepository.findByName(reverseName)
-                .orElseGet(() -> deckRepository.save(new DeckEntity(null, reverseName)));
+        DeckEntity reverseDeck = deckRepository.findByName(reverseName)
+                .orElseGet(() -> {
+                    DeckEntity entity = new DeckEntity();
+                    entity.setName(reverseName);
+                    return deckRepository.save(entity);
+                });
+        deck.setReverseDeck(reverseDeck);
+        reverseDeck.setReverseDeck(deck);
+        deckRepository.save(deck);
+        deckRepository.save(reverseDeck);
+        return reverseDeck;
     }
 
 }

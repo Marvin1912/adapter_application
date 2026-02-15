@@ -1,5 +1,10 @@
 CREATE TABLE vocabulary.deck
 (
+    id              SERIAL PRIMARY KEY,
+    name            VARCHAR(128) NOT NULL UNIQUE,
+    reverse_deck_id INTEGER
+);
+(
     id   SERIAL PRIMARY KEY,
     name VARCHAR(128) NOT NULL UNIQUE
 );
@@ -22,6 +27,18 @@ SELECT DISTINCT deck || '_reversed'
 FROM vocabulary.flashcard
 WHERE deck IS NOT NULL
 ON CONFLICT (name) DO NOTHING;
+
+UPDATE vocabulary.deck d
+SET reverse_deck_id = d_rev.id
+FROM vocabulary.deck d_rev
+WHERE d.reverse_deck_id IS NULL
+  AND d_rev.name = d.name || '_reversed';
+
+UPDATE vocabulary.deck d_rev
+SET reverse_deck_id = d.id
+FROM vocabulary.deck d
+WHERE d_rev.reverse_deck_id IS NULL
+  AND d_rev.name = d.name || '_reversed';
 
 UPDATE vocabulary.flashcard f
 SET deck_id = d.id
@@ -57,10 +74,16 @@ WHERE r.reverse_flashcard_id IS NULL
 ALTER TABLE vocabulary.flashcard
     ALTER COLUMN deck_id SET NOT NULL,
     ADD CONSTRAINT flashcard_deck_fk FOREIGN KEY (deck_id) REFERENCES vocabulary.deck (id),
-    ADD CONSTRAINT flashcard_reverse_fk FOREIGN KEY (reverse_flashcard_id) REFERENCES vocabulary.flashcard (id);
+    ADD CONSTRAINT flashcard_reverse_fk FOREIGN KEY (reverse_flashcard_id) REFERENCES vocabulary.flashcard (id),
+    ADD CONSTRAINT flashcard_reverse_flashcard_unique UNIQUE (reverse_flashcard_id);
+
+ALTER TABLE vocabulary.deck
+    ADD CONSTRAINT deck_reverse_deck_fk FOREIGN KEY (reverse_deck_id) REFERENCES vocabulary.deck (id),
+    ADD CONSTRAINT deck_reverse_deck_unique UNIQUE (reverse_deck_id);
 
 CREATE INDEX IF NOT EXISTS flashcard_deck_id_idx ON vocabulary.flashcard (deck_id);
 CREATE INDEX IF NOT EXISTS flashcard_reverse_flashcard_id_idx ON vocabulary.flashcard (reverse_flashcard_id);
+CREATE INDEX IF NOT EXISTS deck_reverse_deck_id_idx ON vocabulary.deck (reverse_deck_id);
 
 ALTER TABLE vocabulary.flashcard
     DROP COLUMN deck;
