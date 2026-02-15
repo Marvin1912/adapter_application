@@ -4,10 +4,6 @@ CREATE TABLE vocabulary.deck
     name            VARCHAR(128) NOT NULL UNIQUE,
     reverse_deck_id INTEGER
 );
-(
-    id   SERIAL PRIMARY KEY,
-    name VARCHAR(128) NOT NULL UNIQUE
-);
 
 ALTER TABLE vocabulary.flashcard
     ADD COLUMN deck_id INTEGER,
@@ -51,7 +47,7 @@ SELECT NULL,
        f.front,
        f.description,
        d_rev.id,
-       f.updated
+       true
 FROM vocabulary.flashcard f
          JOIN vocabulary.deck d_rev ON d_rev.name = f.deck || '_reversed'
 WHERE f.reverse_flashcard_id IS NULL;
