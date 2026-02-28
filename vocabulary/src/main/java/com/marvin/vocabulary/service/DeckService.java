@@ -5,6 +5,7 @@ import com.marvin.vocabulary.model.DeckEntity;
 import com.marvin.vocabulary.repository.DeckRepository;
 import java.util.List;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class DeckService {
@@ -28,4 +29,12 @@ public class DeckService {
         entity.setName(deck.name());
         return deckRepository.save(entity);
     }
+
+    @Transactional
+    public DeckEntity update(Deck deck) {
+        DeckEntity deckEntity = deckRepository.findById(deck.id()).orElseThrow();
+        deckEntity.setName(deck.name());
+        return deckRepository.save(deckEntity);
+    }
+
 }
