@@ -206,6 +206,7 @@ public class FlashcardService {
                             () -> save(new Flashcard(
                                     null,
                                     getOrCreateDeck(flashcardCsvDto.deck()).getId(),
+                                    flashcardCsvDto.deck(),
                                     flashcardCsvDto.guid(),
                                     flashcardCsvDto.front(),
                                     flashcardCsvDto.back(),
@@ -222,6 +223,7 @@ public class FlashcardService {
                 .map(entity -> new Flashcard(
                         entity.getId(),
                         entity.getDeck().getId(),
+                        entity.getDeck().getName(),
                         entity.getAnkiId(),
                         entity.getFront(),
                         entity.getBack(),

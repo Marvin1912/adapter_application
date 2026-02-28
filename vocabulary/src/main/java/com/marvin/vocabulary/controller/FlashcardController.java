@@ -125,6 +125,7 @@ public class FlashcardController {
         return new Flashcard(
                 entity.getId(),
                 entity.getDeck().getId(),
+                entity.getDeck().getName(),
                 entity.getAnkiId(),
                 entity.getFront(),
                 entity.getBack(),

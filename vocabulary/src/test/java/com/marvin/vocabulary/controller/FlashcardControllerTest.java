@@ -47,6 +47,7 @@ class FlashcardControllerTest {
     private final Flashcard testFlashcard = new Flashcard(
             1,
             10,
+            "test-deck",
             "anki-123",
             "test front",
             "test back",
@@ -198,6 +199,7 @@ class FlashcardControllerTest {
         final Flashcard newFlashcard = new Flashcard(
                 null,
                 10,
+                "test-deck",
                 "anki-456",
                 "new front",
                 "new back",
