@@ -124,48 +124,12 @@ public class FlashcardController {
     private static Flashcard convertToDto(FlashcardEntity entity) {
         return new Flashcard(
                 entity.getId(),
-                entity.getDeck(),
+                entity.getDeck().getId(),
                 entity.getAnkiId(),
                 entity.getFront(),
                 entity.getBack(),
                 entity.getDescription(),
                 entity.isUpdated()
-        );
-    }
-
-    /**
-     * Creates a FlashcardEntity from a Flashcard DTO for saving.
-     *
-     * @param flashcard the flashcard DTO
-     * @return the corresponding FlashcardEntity for database operations
-     */
-    private static FlashcardEntity convertToEntityForCreate(Flashcard flashcard) {
-        return new FlashcardEntity(
-                null,
-                flashcard.deck(),
-                flashcard.ankiId(),
-                flashcard.front(),
-                flashcard.back(),
-                flashcard.description(),
-                flashcard.updated()
-        );
-    }
-
-    /**
-     * Creates a FlashcardEntity from a Flashcard DTO for updating.
-     *
-     * @param flashcard the flashcard DTO
-     * @return the corresponding FlashcardEntity for database operations
-     */
-    private static FlashcardEntity convertToEntityForUpdate(Flashcard flashcard) {
-        return new FlashcardEntity(
-                flashcard.id(),
-                flashcard.deck(),
-                flashcard.ankiId(),
-                flashcard.front(),
-                flashcard.back(),
-                flashcard.description(),
-                flashcard.updated()
         );
     }
 
@@ -386,7 +350,6 @@ public class FlashcardController {
     @PostMapping("/flashcards")
     public Mono<ResponseEntity<Void>> addFlashcard(@RequestBody Mono<Flashcard> flashcardMono) {
         return flashcardMono
-                .map(FlashcardController::convertToEntityForCreate)
                 .flatMap(entity -> executeBlocking(() -> flashcardService.save(entity)))
                 .map(savedEntity -> ResponseEntity.created(
                         URI.create("/flashcards/" + savedEntity.getId())
@@ -402,7 +365,6 @@ public class FlashcardController {
     @PutMapping("/flashcards")
     public Mono<ResponseEntity<Void>> updateFlashcard(@RequestBody Mono<Flashcard> flashcardMono) {
         return flashcardMono
-                .map(FlashcardController::convertToEntityForUpdate)
                 .flatMap(entity -> executeBlocking(() -> flashcardService.update(entity)))
                 .map(updateResult -> ResponseEntity.noContent().build());
     }

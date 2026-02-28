@@ -3,7 +3,6 @@ package com.marvin.app.importer.vocabulary;
 import com.marvin.app.service.ImportService;
 import com.marvin.influxdb.core.InfluxWriteConfig;
 import com.marvin.vocabulary.dto.Flashcard;
-import com.marvin.vocabulary.model.FlashcardEntity;
 import com.marvin.vocabulary.service.FlashcardService;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
@@ -23,17 +22,6 @@ public class VocabularyImportService implements ImportService<Flashcard> {
         if (flashcard == null) {
             return;
         }
-
-        final FlashcardEntity entity = new FlashcardEntity(
-            null,
-            flashcard.deck(),
-            flashcard.ankiId(),
-            flashcard.front(),
-            flashcard.back(),
-            flashcard.description(),
-            flashcard.updated()
-        );
-
-        flashcardService.save(entity);
+        flashcardService.save(flashcard);
     }
 }

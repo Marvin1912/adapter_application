@@ -2,7 +2,7 @@ package com.marvin.vocabulary.dto;
 
 public record Flashcard(
         Integer id,
-        String deck,
+        Integer deckId,
         String ankiId,
         String front,
         String back,
