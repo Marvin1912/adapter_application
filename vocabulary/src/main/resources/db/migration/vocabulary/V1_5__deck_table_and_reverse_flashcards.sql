@@ -98,4 +98,4 @@ CREATE TABLE vocabulary.deck_aud
 );
 
 ALTER TABLE IF EXISTS vocabulary.deck_aud
-    ADD CONSTRAINT deck_aud_revinfo_fk FOREIGN KEY (rev) REFERENCES revinfo;
+    ADD CONSTRAINT deck_aud_revinfo_fk FOREIGN KEY (rev) REFERENCES public.revinfo;
