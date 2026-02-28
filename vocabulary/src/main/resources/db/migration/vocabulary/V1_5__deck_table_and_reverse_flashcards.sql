@@ -83,3 +83,19 @@ CREATE INDEX IF NOT EXISTS deck_reverse_deck_id_idx ON vocabulary.deck (reverse_
 
 ALTER TABLE vocabulary.flashcard
     DROP COLUMN deck;
+
+ALTER TABLE vocabulary.flashcard_aud
+    DROP COLUMN deck;
+
+CREATE TABLE vocabulary.deck_aud
+(
+    id              INTEGER  NOT NULL,
+    rev             INTEGER  NOT NULL,
+    revtype         SMALLINT,
+    name            VARCHAR(128),
+    reverse_deck_id INTEGER,
+    PRIMARY KEY (id, rev)
+);
+
+ALTER TABLE IF EXISTS vocabulary.deck_aud
+    ADD CONSTRAINT deck_aud_revinfo_fk FOREIGN KEY (rev) REFERENCES revinfo;
