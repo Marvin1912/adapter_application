@@ -19,7 +19,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 @ExtendWith(MockitoExtension.class)
 class DeckControllerTest {
 
-    private final DeckEntity testDeckEntity = new DeckEntity(10, "test-deck");
+    private final DeckEntity testDeckEntity = new DeckEntity(10, "test-deck", null);
     private final Deck testDeck = new Deck(10, "test-deck");
 
     @Mock
@@ -72,7 +72,7 @@ class DeckControllerTest {
     @Test
     void createDeckShouldReturnLocation() {
         Deck input = new Deck(null, "new-deck");
-        DeckEntity saved = new DeckEntity(11, "new-deck");
+        DeckEntity saved = new DeckEntity(11, "new-deck", null);
         when(deckService.create(any(Deck.class))).thenReturn(saved);
 
         webTestClient.post()

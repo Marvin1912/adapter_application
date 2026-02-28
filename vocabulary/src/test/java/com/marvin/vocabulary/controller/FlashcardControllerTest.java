@@ -33,7 +33,7 @@ import reactor.core.publisher.Mono;
 @ExtendWith(MockitoExtension.class)
 class FlashcardControllerTest {
 
-    private final DeckEntity testDeck = new DeckEntity(10, "test-deck");
+    private final DeckEntity testDeck = new DeckEntity(10, "test-deck", null);
     private final FlashcardEntity testFlashcardEntity = new FlashcardEntity(
             1,
             testDeck,
