@@ -56,6 +56,9 @@ Creates an encrypted database backup.
 # Custom public key
 ./backup.sh --public-key /path/to/my_public.pem
 
+# With file-watcher integration (atomic move to watched directory)
+./backup.sh --watch-dir /app/backup/in
+
 # Using environment variables
 DB_HOST=db.example.com DB_PORT=5432 DB_NAME=costs DB_USER=admin PGPASSWORD=secret ./backup.sh
 ```
@@ -71,6 +74,7 @@ DB_HOST=db.example.com DB_PORT=5432 DB_NAME=costs DB_USER=admin PGPASSWORD=secre
 | `PGPASSWORD` | `password` | Database password |
 | `BACKUP_DIR` | `./backups` | Output directory for backup files |
 | `PUBLIC_KEY` | `./keys/backup_public.pem` | Path to RSA public key |
+| `WATCH_DIR` | *(empty)* | Directory to atomically move the final zip into (for file-watcher integration) |
 
 ### `restore.sh`
 
