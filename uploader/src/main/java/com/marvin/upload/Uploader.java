@@ -41,6 +41,24 @@ public class Uploader {
         this.googleDrive = googleDrive;
     }
 
+    public void uploadFile(Path file, String driveFolderName) {
+
+        if (!enabled) {
+            LOGGER.info("Upload is disabled!");
+            return;
+        }
+
+        LOGGER.info("Going to upload file: {} to folder: {}!", file.getFileName(), driveFolderName);
+
+        try {
+            final String parentId = googleDrive.getFileId(driveFolderName);
+            googleDrive.uploadFile(file, parentId);
+            LOGGER.info("Successfully uploaded file: {}", file.getFileName());
+        } catch (GoogleDriveException e) {
+            throw new IllegalStateException("Failed to upload file to Google Drive: " + file.getFileName(), e);
+        }
+    }
+
     public void zipAndUploadFiles(String fileNamePrefix, List<Path> filesToZipAndUpload) {
 
         if (!enabled) {

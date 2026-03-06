@@ -32,6 +32,14 @@ importer:
 exporter:
   folder: ${EXPORTER_FOLDER:./app/export}
 
+backup:
+  upload:
+    enabled: ${BACKUP_UPLOAD_ENABLED:false}
+    watch-dir: ${BACKUP_WATCH_DIR:./app/backup/in}
+    done-dir: ${BACKUP_DONE_DIR:./app/backup/done}
+    error-dir: ${BACKUP_ERROR_DIR:./app/backup/error}
+    drive-folder-name: ${BACKUP_DRIVE_FOLDER:db-backups}
+
 uploader:
   enabled: false
   credentials:

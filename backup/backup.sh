@@ -5,7 +5,7 @@
 # Creates a full database dump (all schemas and data), compresses it,
 # encrypts it using hybrid RSA+AES encryption, and packages it as a zip file.
 #
-# Usage: ./backup.sh [--output-dir DIR] [--public-key PATH]
+# Usage: ./backup.sh [--output-dir DIR] [--public-key PATH] [--watch-dir DIR]
 #
 # Environment Variables:
 #   DB_HOST      - Database host (default: localhost)
@@ -15,6 +15,7 @@
 #   PGPASSWORD   - Database password (default: password)
 #   BACKUP_DIR   - Output directory for backups (default: ./backups)
 #   PUBLIC_KEY   - Path to RSA public key (default: ./keys/backup_public.pem)
+#   WATCH_DIR    - Directory to atomically move the final zip into (optional, for file-watcher integration)
 
 set -euo pipefail
 
@@ -33,6 +34,7 @@ export PGPASSWORD="${PGPASSWORD:-password}"
 
 BACKUP_DIR="${BACKUP_DIR:-${SCRIPT_DIR}/backups}"
 PUBLIC_KEY="${PUBLIC_KEY:-${SCRIPT_DIR}/keys/backup_public.pem}"
+WATCH_DIR="${WATCH_DIR:-}"
 
 # Parse command-line arguments
 while [[ $# -gt 0 ]]; do
@@ -45,8 +47,17 @@ while [[ $# -gt 0 ]]; do
             PUBLIC_KEY="$2"
             shift 2
             ;;
+        --watch-dir)
+            WATCH_DIR="$2"
+            shift 2
+            ;;
         --help|-h)
-            echo "Usage: $0 [--output-dir DIR] [--public-key PATH]"
+            echo "Usage: $0 [--output-dir DIR] [--public-key PATH] [--watch-dir DIR]"
+            echo ""
+            echo "Options:"
+            echo "  --output-dir  Output directory for backups (default: ./backups)"
+            echo "  --public-key  RSA public key path (default: ./keys/backup_public.pem)"
+            echo "  --watch-dir   Directory to atomically move the final zip into (for file-watcher integration)"
             echo ""
             echo "Environment Variables:"
             echo "  DB_HOST      Database host (default: localhost)"
@@ -56,6 +67,7 @@ while [[ $# -gt 0 ]]; do
             echo "  PGPASSWORD   Database password (default: password)"
             echo "  BACKUP_DIR   Output directory (default: ./backups)"
             echo "  PUBLIC_KEY   RSA public key path (default: ./keys/backup_public.pem)"
+            echo "  WATCH_DIR    Watch directory for atomic move (optional)"
             exit 0
             ;;
         *)
@@ -226,3 +238,11 @@ echo ""
 echo "To restore this backup, run:"
 echo "  ./restore.sh ${FINAL_ZIP}"
 echo ""
+
+# Optional: Atomically move the backup to a watch directory for file-watcher integration
+if [[ -n "${WATCH_DIR}" ]]; then
+    log "Moving backup to watch directory: ${WATCH_DIR}"
+    mkdir -p "${WATCH_DIR}"
+    mv "${FINAL_ZIP}" "${WATCH_DIR}/$(basename "${FINAL_ZIP}")"
+    log "Backup moved to: ${WATCH_DIR}/$(basename "${FINAL_ZIP}")"
+fi
