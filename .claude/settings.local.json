@@ -26,7 +26,14 @@
       "Bash(mv:*)",
       "Bash(grep:*)",
       "Bash(tree:*)",
-      "Bash(xargs:*)"
+      "Bash(xargs:*)",
+      "mcp__wikijs__wikijs_list_spaces",
+      "mcp__wikijs__wikijs_search_pages",
+      "mcp__wikijs__wikijs_get_page_children",
+      "mcp__wikijs__wikijs_create_page",
+      "Bash(git checkout:*)",
+      "Bash(gh pr:*)",
+      "Bash(git fetch:*)"
     ],
     "deny": [],
     "ask": []
