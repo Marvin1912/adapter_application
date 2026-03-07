@@ -1,6 +1,7 @@
 package com.marvin.app.service;
 
 import com.marvin.app.model.event.BackupFileEvent;
+import com.marvin.entities.exports.BackupRunEntity;
 import com.marvin.upload.Uploader;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -20,17 +21,20 @@ public class BackupUploadHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(BackupUploadHandler.class);
 
     private final Uploader uploader;
+    private final BackupTrackingService backupTrackingService;
     private final Path doneDirectory;
     private final Path errorDirectory;
     private final String driveFolderName;
 
     public BackupUploadHandler(
             Uploader uploader,
+            BackupTrackingService backupTrackingService,
             @Value("${backup.upload.done-dir}") String doneDir,
             @Value("${backup.upload.error-dir}") String errorDir,
             @Value("${backup.upload.drive-folder-name}") String driveFolderName
     ) {
         this.uploader = uploader;
+        this.backupTrackingService = backupTrackingService;
         this.doneDirectory = Path.of(doneDir);
         this.errorDirectory = Path.of(errorDir);
         this.driveFolderName = driveFolderName;
@@ -42,12 +46,16 @@ public class BackupUploadHandler {
         final Path backupFile = event.path();
         LOGGER.info("Handling backup file for upload: {}", backupFile.getFileName());
 
+        final BackupRunEntity run = backupTrackingService.start(backupFile.getFileName().toString());
+
         try {
             uploader.uploadFile(backupFile, driveFolderName);
             moveFile(backupFile, doneDirectory);
+            backupTrackingService.completeSuccess(run);
             LOGGER.info("Backup file {} uploaded and moved to done.", backupFile.getFileName());
         } catch (Exception e) {
             LOGGER.error("Failed to upload backup file: {}", backupFile.getFileName(), e);
+            backupTrackingService.completeFailure(run, e.getMessage());
             moveFile(backupFile, errorDirectory);
         }
     }

@@ -18,4 +18,15 @@ public class FlywayConfig {
                 .load();
     }
 
+    @Bean(initMethod = "migrate")
+    public Flyway flywayExports(DataSource dataSource) {
+        return Flyway.configure()
+                .dataSource(dataSource)
+                .locations("classpath:db/migration/exports")
+                .schemas("exports")
+                .baselineOnMigrate(true)
+                .baselineVersion("1.1")
+                .load();
+    }
+
 }

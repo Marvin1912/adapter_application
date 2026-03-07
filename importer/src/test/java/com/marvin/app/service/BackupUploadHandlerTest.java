@@ -24,6 +24,9 @@ class BackupUploadHandlerTest {
     @Mock
     private Uploader uploader;
 
+    @Mock
+    private BackupTrackingService backupTrackingService;
+
     @TempDir
     Path tempDir;
 
@@ -37,6 +40,7 @@ class BackupUploadHandlerTest {
         errorDir = tempDir.resolve("error");
         handler = new BackupUploadHandler(
                 uploader,
+                backupTrackingService,
                 doneDir.toString(),
                 errorDir.toString(),
                 DRIVE_FOLDER
