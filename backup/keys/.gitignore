@@ -1,3 +1,0 @@
-# Ignore all key files - never commit private keys!
-*.pem
-*.key
