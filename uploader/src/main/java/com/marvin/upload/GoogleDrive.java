@@ -46,7 +46,8 @@ public class GoogleDrive {
             final FileList result = searchFolderByName(service, folderName);
 
             if (result == null || result.getFiles().isEmpty()) {
-                throw new GoogleDriveException("No folder with name " + folderName + " found!");
+                LOGGER.info("Folder '{}' not found, creating it.", folderName);
+                return createFolder(service, folderName);
             }
 
             return result.getFiles().get(0).getId();
@@ -172,6 +173,20 @@ public class GoogleDrive {
                 .create(fileMetadata, mediaContent)
                 .setFields("id")
                 .execute();
+    }
+
+    private String createFolder(Drive service, String folderName) throws Exception {
+        final File folderMetadata = new File();
+        folderMetadata.setName(folderName);
+        folderMetadata.setMimeType("application/vnd.google-apps.folder");
+
+        final File folder = service.files()
+                .create(folderMetadata)
+                .setFields("id")
+                .execute();
+
+        LOGGER.info("Created folder '{}' with ID: {}", folderName, folder.getId());
+        return folder.getId();
     }
 
     private File createFileMetadata(Path path, String parent) {
