@@ -11,6 +11,7 @@ import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
+import com.google.api.services.drive.model.Permission;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -33,9 +34,13 @@ public class GoogleDrive {
     private static final List<String> SCOPES = Collections.singletonList(DriveScopes.DRIVE);
 
     private final String credentialsPath;
+    private final String ownerEmail;
 
-    public GoogleDrive(@Value("${uploader.credentials.path}") String credentialsPath) {
+    public GoogleDrive(
+            @Value("${uploader.credentials.path}") String credentialsPath,
+            @Value("${uploader.drive.owner-email}") String ownerEmail) {
         this.credentialsPath = credentialsPath;
+        this.ownerEmail = ownerEmail;
     }
 
     public String getFileId(String folderName) throws GoogleDriveException {
@@ -186,7 +191,18 @@ public class GoogleDrive {
                 .execute();
 
         LOGGER.info("Created folder '{}' with ID: {}", folderName, folder.getId());
+        shareFolder(service, folder.getId());
         return folder.getId();
+    }
+
+    private void shareFolder(Drive service, String folderId) throws Exception {
+        final Permission permission = new Permission();
+        permission.setType("user");
+        permission.setRole("writer");
+        permission.setEmailAddress(ownerEmail);
+
+        service.permissions().create(folderId, permission).execute();
+        LOGGER.info("Shared folder {} with {}", folderId, ownerEmail);
     }
 
     private File createFileMetadata(Path path, String parent) {

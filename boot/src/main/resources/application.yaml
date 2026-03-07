@@ -46,6 +46,8 @@ uploader:
     path: ${UPLOADER_CREDENTIALS_PATH:./app/google/credentials.json}
   cost-export-folder: ${UPLOADER_COST_EXPORT_FOLDER:./app/export}
   parent-folder-name: backup
+  drive:
+    owner-email: ${UPLOADER_DRIVE_OWNER_EMAIL:}
 
 influxdb:
   #  url: ${INFLUX_URL:http://localhost:8086}
