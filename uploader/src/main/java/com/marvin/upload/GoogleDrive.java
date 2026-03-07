@@ -11,7 +11,6 @@ import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
-import com.google.api.services.drive.model.Permission;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -34,13 +33,9 @@ public class GoogleDrive {
     private static final List<String> SCOPES = Collections.singletonList(DriveScopes.DRIVE);
 
     private final String credentialsPath;
-    private final String ownerEmail;
 
-    public GoogleDrive(
-            @Value("${uploader.credentials.path}") String credentialsPath,
-            @Value("${uploader.drive.owner-email}") String ownerEmail) {
+    public GoogleDrive(@Value("${uploader.credentials.path}") String credentialsPath) {
         this.credentialsPath = credentialsPath;
-        this.ownerEmail = ownerEmail;
     }
 
     public String getFileId(String folderName) throws GoogleDriveException {
@@ -51,8 +46,7 @@ public class GoogleDrive {
             final FileList result = searchFolderByName(service, folderName);
 
             if (result == null || result.getFiles().isEmpty()) {
-                LOGGER.info("Folder '{}' not found, creating it.", folderName);
-                return createFolder(service, folderName);
+                throw new GoogleDriveException("No folder with name " + folderName + " found!");
             }
 
             return result.getFiles().get(0).getId();
@@ -178,31 +172,6 @@ public class GoogleDrive {
                 .create(fileMetadata, mediaContent)
                 .setFields("id")
                 .execute();
-    }
-
-    private String createFolder(Drive service, String folderName) throws Exception {
-        final File folderMetadata = new File();
-        folderMetadata.setName(folderName);
-        folderMetadata.setMimeType("application/vnd.google-apps.folder");
-
-        final File folder = service.files()
-                .create(folderMetadata)
-                .setFields("id")
-                .execute();
-
-        LOGGER.info("Created folder '{}' with ID: {}", folderName, folder.getId());
-        shareFolder(service, folder.getId());
-        return folder.getId();
-    }
-
-    private void shareFolder(Drive service, String folderId) throws Exception {
-        final Permission permission = new Permission();
-        permission.setType("user");
-        permission.setRole("writer");
-        permission.setEmailAddress(ownerEmail);
-
-        service.permissions().create(folderId, permission).execute();
-        LOGGER.info("Shared folder {} with {}", folderId, ownerEmail);
     }
 
     private File createFileMetadata(Path path, String parent) {
