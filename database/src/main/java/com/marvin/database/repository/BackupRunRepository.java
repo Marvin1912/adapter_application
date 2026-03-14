@@ -11,9 +11,9 @@ import org.springframework.data.repository.query.Param;
 public interface BackupRunRepository extends JpaRepository<BackupRunEntity, Long> {
 
     @Query("SELECT b FROM BackupRunEntity b WHERE " +
-            "(:from IS NULL OR b.startedAt >= :from) AND " +
-            "(:to IS NULL OR b.startedAt <= :to) AND " +
-            "(:status IS NULL OR b.status = :status)")
+            "(cast(:from as LocalDateTime) IS NULL OR b.startedAt >= :from) AND " +
+            "(cast(:to as LocalDateTime) IS NULL OR b.startedAt <= :to) AND " +
+            "(cast(:status as String) IS NULL OR b.status = :status)")
     Page<BackupRunEntity> findByFilters(
             @Param("from") LocalDateTime from,
             @Param("to") LocalDateTime to,
