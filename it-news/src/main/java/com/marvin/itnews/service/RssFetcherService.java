@@ -1,0 +1,148 @@
+package com.marvin.itnews.service;
+
+import com.marvin.itnews.configuration.RssFeedProperties;
+import com.marvin.itnews.entity.Article;
+import com.marvin.itnews.repository.ArticleRepository;
+import com.rometools.rome.feed.synd.SyndEntry;
+import com.rometools.rome.feed.synd.SyndFeed;
+import com.rometools.rome.io.SyndFeedInput;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+import org.xml.sax.InputSource;
+
+@Service
+@Slf4j
+public class RssFetcherService {
+
+    private static final int CONNECT_TIMEOUT_SECONDS = 15;
+    private static final int REQUEST_TIMEOUT_SECONDS = 30;
+    private static final int MAX_DESCRIPTION_LENGTH = 4000;
+
+    private final ArticleRepository articleRepository;
+    private final RssFeedProperties feedProperties;
+    private final HttpClient httpClient;
+
+    public RssFetcherService(
+            ArticleRepository articleRepository,
+            RssFeedProperties feedProperties
+    ) {
+        this.articleRepository = articleRepository;
+        this.feedProperties = feedProperties;
+        this.httpClient = HttpClient.newBuilder()
+                .connectTimeout(Duration.ofSeconds(CONNECT_TIMEOUT_SECONDS))
+                .followRedirects(HttpClient.Redirect.NORMAL)
+                .build();
+    }
+
+    /**
+     * Fetches all configured RSS feeds on a scheduled interval.
+     */
+    @Scheduled(fixedDelayString = "${rss.poll-interval-ms:1800000}")
+    public void fetchAllFeeds() {
+        log.info("Starting RSS feed fetch for {} sources",
+                feedProperties.getFeeds().size());
+        for (RssFeedProperties.FeedSource source : feedProperties.getFeeds()) {
+            fetchFeed(source);
+        }
+        log.info("RSS feed fetch completed");
+    }
+
+    private void fetchFeed(RssFeedProperties.FeedSource source) {
+        try {
+            final SyndFeed feed = downloadFeed(source.getUrl());
+            final int newArticles = processFeedEntries(feed, source);
+            log.info("Fetched {} new articles from {}",
+                    newArticles, source.getName());
+        } catch (Exception e) {
+            log.error("Failed to fetch RSS feed from {}: {}",
+                    source.getName(), e.getMessage());
+        }
+    }
+
+    private SyndFeed downloadFeed(String url) throws Exception {
+        final HttpRequest request = HttpRequest.newBuilder(URI.create(url))
+                .timeout(Duration.ofSeconds(REQUEST_TIMEOUT_SECONDS))
+                .header("User-Agent", "IT-News-Aggregator/1.0")
+                .build();
+        final HttpResponse<InputStream> response = httpClient.send(
+                request, HttpResponse.BodyHandlers.ofInputStream()
+        );
+        return new SyndFeedInput().build(new InputSource(response.body()));
+    }
+
+    private int processFeedEntries(
+            SyndFeed feed, RssFeedProperties.FeedSource source
+    ) {
+        int newArticles = 0;
+        for (SyndEntry entry : feed.getEntries()) {
+            if (saveEntryIfNew(entry, source)) {
+                newArticles++;
+            }
+        }
+        return newArticles;
+    }
+
+    private boolean saveEntryIfNew(
+            SyndEntry entry, RssFeedProperties.FeedSource source
+    ) {
+        final String link = entry.getLink();
+        if (link == null || articleRepository.existsByLink(link)) {
+            return false;
+        }
+        final Article article = buildArticle(entry, source);
+        articleRepository.save(article);
+        return true;
+    }
+
+    private Article buildArticle(
+            SyndEntry entry, RssFeedProperties.FeedSource source
+    ) {
+        final Article article = new Article();
+        article.setTitle(entry.getTitle());
+        article.setDescription(extractDescription(entry));
+        article.setLink(entry.getLink());
+        article.setSource(source.getName());
+        article.setCategory(source.getCategory());
+        article.setPublishedAt(toLocalDateTime(entry.getPublishedDate()));
+        article.setFetchedAt(LocalDateTime.now());
+        return article;
+    }
+
+    private String extractDescription(SyndEntry entry) {
+        if (entry.getDescription() == null) {
+            return null;
+        }
+        return stripAndTruncate(entry.getDescription().getValue());
+    }
+
+    private String stripAndTruncate(String text) {
+        if (text == null) {
+            return null;
+        }
+        final String clean = text.replaceAll("<[^>]*>", "").trim();
+        if (clean.length() > MAX_DESCRIPTION_LENGTH) {
+            return clean.substring(0, MAX_DESCRIPTION_LENGTH);
+        }
+        return clean;
+    }
+
+    private LocalDateTime toLocalDateTime(Date date) {
+        if (date == null) {
+            return LocalDateTime.now();
+        }
+        return date.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime();
+    }
+
+}

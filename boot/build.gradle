@@ -16,4 +16,5 @@ dependencies {
     implementation project(':image-server')
     implementation project(':vocabulary')
     implementation project(':mental-arithmetic')
+    implementation project(':it-news')
 }
