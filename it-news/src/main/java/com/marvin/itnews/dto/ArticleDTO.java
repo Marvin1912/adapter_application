@@ -27,7 +27,10 @@ public record ArticleDTO(
         LocalDateTime publishedAt,
 
         @Schema(description = "When the article was fetched")
-        LocalDateTime fetchedAt
+        LocalDateTime fetchedAt,
+
+        @Schema(description = "Whether the article has been read")
+        boolean isRead
 ) {
 
 }

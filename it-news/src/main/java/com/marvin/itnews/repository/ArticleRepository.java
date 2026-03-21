@@ -19,4 +19,14 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
             String category, String source, Pageable pageable
     );
 
+    Page<Article> findByIsRead(boolean isRead, Pageable pageable);
+
+    Page<Article> findByCategoryAndIsRead(String category, boolean isRead, Pageable pageable);
+
+    Page<Article> findBySourceAndIsRead(String source, boolean isRead, Pageable pageable);
+
+    Page<Article> findByCategoryAndSourceAndIsRead(
+            String category, String source, boolean isRead, Pageable pageable
+    );
+
 }

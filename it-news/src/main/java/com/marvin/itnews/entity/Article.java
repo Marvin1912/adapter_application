@@ -53,6 +53,9 @@ public class Article {
     @Column(name = "fetched_at", nullable = false)
     private LocalDateTime fetchedAt;
 
+    @Column(name = "is_read", nullable = false)
+    private boolean isRead;
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) {
