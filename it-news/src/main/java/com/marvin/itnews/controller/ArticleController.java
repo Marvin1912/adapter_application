@@ -12,6 +12,8 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -41,10 +43,11 @@ public class ArticleController {
     /**
      * Retrieves a paginated list of articles with optional filters.
      *
-     * @param category optional category filter
-     * @param source   optional source filter
-     * @param page     page number
-     * @param size     page size
+     * @param category    optional category filter
+     * @param source      optional source filter
+     * @param includeRead whether to include read articles
+     * @param page        page number
+     * @param size        page size
      * @return paginated articles
      */
     @GetMapping("/articles")
@@ -56,13 +59,15 @@ public class ArticleController {
             @Parameter(description = "Filter by category") String category,
             @RequestParam(required = false)
             @Parameter(description = "Filter by source") String source,
+            @RequestParam(defaultValue = "false")
+            @Parameter(description = "Include read articles") boolean includeRead,
             @RequestParam(defaultValue = "0")
             @Parameter(description = "Page number") int page,
             @RequestParam(defaultValue = "20")
             @Parameter(description = "Page size") int size
     ) {
         return Mono.fromCallable(
-                () -> articleService.getArticles(category, source, page, size)
+                () -> articleService.getArticles(category, source, includeRead, page, size)
         ).subscribeOn(Schedulers.boundedElastic());
     }
 
@@ -84,6 +89,24 @@ public class ArticleController {
                 .map(f -> new FeedSourceDTO(
                         f.getName(), f.getUrl(), f.getCategory()))
                 .toList();
+    }
+
+    /**
+     * Marks an article as read.
+     *
+     * @param id article ID
+     * @return empty response
+     */
+    @PatchMapping("/articles/{id}/read")
+    @Operation(summary = "Mark article as read",
+            description = "Marks the specified article as read.")
+    public Mono<ResponseEntity<Void>> markAsRead(
+            @PathVariable @Parameter(description = "Article ID") long id
+    ) {
+        return Mono.fromCallable(() -> {
+            articleService.markAsRead(id);
+            return ResponseEntity.ok().<Void>build();
+        }).subscribeOn(Schedulers.boundedElastic());
     }
 
     /**

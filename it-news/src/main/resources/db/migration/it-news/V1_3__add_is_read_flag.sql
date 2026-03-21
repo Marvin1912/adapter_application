@@ -1,0 +1,3 @@
+ALTER TABLE it_news.article ADD COLUMN is_read BOOLEAN NOT NULL DEFAULT FALSE;
+
+ALTER TABLE it_news.article_aud ADD COLUMN is_read BOOLEAN;
