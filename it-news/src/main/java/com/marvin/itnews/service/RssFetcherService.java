@@ -1,8 +1,9 @@
 package com.marvin.itnews.service;
 
-import com.marvin.itnews.configuration.RssFeedProperties;
 import com.marvin.itnews.entity.Article;
+import com.marvin.itnews.entity.FeedConfig;
 import com.marvin.itnews.repository.ArticleRepository;
+import com.marvin.itnews.repository.FeedConfigRepository;
 import com.rometools.rome.feed.synd.SyndEntry;
 import com.rometools.rome.feed.synd.SyndFeed;
 import com.rometools.rome.io.SyndFeedInput;
@@ -15,6 +16,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -29,15 +31,15 @@ public class RssFetcherService {
     private static final int MAX_DESCRIPTION_LENGTH = 4000;
 
     private final ArticleRepository articleRepository;
-    private final RssFeedProperties feedProperties;
+    private final FeedConfigRepository feedConfigRepository;
     private final HttpClient httpClient;
 
     public RssFetcherService(
             ArticleRepository articleRepository,
-            RssFeedProperties feedProperties
+            FeedConfigRepository feedConfigRepository
     ) {
         this.articleRepository = articleRepository;
-        this.feedProperties = feedProperties;
+        this.feedConfigRepository = feedConfigRepository;
         this.httpClient = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(CONNECT_TIMEOUT_SECONDS))
                 .followRedirects(HttpClient.Redirect.NORMAL)
@@ -45,27 +47,27 @@ public class RssFetcherService {
     }
 
     /**
-     * Fetches all configured RSS feeds on a scheduled interval.
+     * Fetches all active RSS feeds on a scheduled interval.
      */
     @Scheduled(fixedDelayString = "${rss.poll-interval-ms:1800000}")
     public void fetchAllFeeds() {
-        log.info("Starting RSS feed fetch for {} sources",
-                feedProperties.getFeeds().size());
-        for (RssFeedProperties.FeedSource source : feedProperties.getFeeds()) {
-            fetchFeed(source);
+        final List<FeedConfig> activeFeeds = feedConfigRepository.findByActiveTrue();
+        log.info("Starting RSS feed fetch for {} sources", activeFeeds.size());
+        for (FeedConfig feedConfig : activeFeeds) {
+            fetchFeed(feedConfig);
         }
         log.info("RSS feed fetch completed");
     }
 
-    private void fetchFeed(RssFeedProperties.FeedSource source) {
+    private void fetchFeed(FeedConfig feedConfig) {
         try {
-            final SyndFeed feed = downloadFeed(source.getUrl());
-            final int newArticles = processFeedEntries(feed, source);
+            final SyndFeed feed = downloadFeed(feedConfig.getUrl());
+            final int newArticles = processFeedEntries(feed, feedConfig);
             log.info("Fetched {} new articles from {}",
-                    newArticles, source.getName());
+                    newArticles, feedConfig.getName());
         } catch (Exception e) {
             log.error("Failed to fetch RSS feed from {}: {}",
-                    source.getName(), e.getMessage());
+                    feedConfig.getName(), e.getMessage());
         }
     }
 
@@ -80,39 +82,33 @@ public class RssFetcherService {
         return new SyndFeedInput().build(new InputSource(response.body()));
     }
 
-    private int processFeedEntries(
-            SyndFeed feed, RssFeedProperties.FeedSource source
-    ) {
+    private int processFeedEntries(SyndFeed feed, FeedConfig feedConfig) {
         int newArticles = 0;
         for (SyndEntry entry : feed.getEntries()) {
-            if (saveEntryIfNew(entry, source)) {
+            if (saveEntryIfNew(entry, feedConfig)) {
                 newArticles++;
             }
         }
         return newArticles;
     }
 
-    private boolean saveEntryIfNew(
-            SyndEntry entry, RssFeedProperties.FeedSource source
-    ) {
+    private boolean saveEntryIfNew(SyndEntry entry, FeedConfig feedConfig) {
         final String link = entry.getLink();
         if (link == null || articleRepository.existsByLink(link)) {
             return false;
         }
-        final Article article = buildArticle(entry, source);
+        final Article article = buildArticle(entry, feedConfig);
         articleRepository.save(article);
         return true;
     }
 
-    private Article buildArticle(
-            SyndEntry entry, RssFeedProperties.FeedSource source
-    ) {
+    private Article buildArticle(SyndEntry entry, FeedConfig feedConfig) {
         final Article article = new Article();
         article.setTitle(entry.getTitle());
         article.setDescription(extractDescription(entry));
         article.setLink(entry.getLink());
-        article.setSource(source.getName());
-        article.setCategory(source.getCategory());
+        article.setSource(feedConfig.getName());
+        article.setCategory(feedConfig.getCategory());
         article.setPublishedAt(toLocalDateTime(entry.getPublishedDate()));
         article.setFetchedAt(LocalDateTime.now());
         return article;
