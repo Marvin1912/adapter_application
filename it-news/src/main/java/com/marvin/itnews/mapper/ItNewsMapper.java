@@ -7,7 +7,7 @@ import com.marvin.itnews.entity.FeedConfig;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
-public interface ArticleMapper {
+public interface ItNewsMapper {
 
     ArticleDTO toArticleDTO(Article article);
 

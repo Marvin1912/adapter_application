@@ -103,7 +103,7 @@ public class FeedConfigController {
     ) {
         return Mono.fromCallable(() -> {
             feedConfigService.deleteFeedConfig(id);
-            return ResponseEntity.ok().<Void>build();
+            return ResponseEntity.noContent().<Void>build();
         }).subscribeOn(Schedulers.boundedElastic());
     }
 

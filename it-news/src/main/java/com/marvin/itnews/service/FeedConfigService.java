@@ -2,7 +2,7 @@ package com.marvin.itnews.service;
 
 import com.marvin.itnews.dto.FeedSourceDTO;
 import com.marvin.itnews.entity.FeedConfig;
-import com.marvin.itnews.mapper.ArticleMapper;
+import com.marvin.itnews.mapper.ItNewsMapper;
 import com.marvin.itnews.repository.FeedConfigRepository;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
@@ -13,11 +13,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class FeedConfigService {
 
     private final FeedConfigRepository feedConfigRepository;
-    private final ArticleMapper articleMapper;
+    private final ItNewsMapper articleMapper;
 
     public FeedConfigService(
             FeedConfigRepository feedConfigRepository,
-            ArticleMapper articleMapper
+            ItNewsMapper articleMapper
     ) {
         this.feedConfigRepository = feedConfigRepository;
         this.articleMapper = articleMapper;
