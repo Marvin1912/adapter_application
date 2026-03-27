@@ -1,9 +1,9 @@
 package com.marvin.itnews.controller;
 
-import com.marvin.itnews.configuration.RssFeedProperties;
 import com.marvin.itnews.dto.ArticleDTO;
 import com.marvin.itnews.dto.FeedSourceDTO;
 import com.marvin.itnews.service.ArticleService;
+import com.marvin.itnews.service.FeedConfigService;
 import com.marvin.itnews.service.RssFetcherService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -27,16 +27,16 @@ import reactor.core.scheduler.Schedulers;
 public class ArticleController {
 
     private final ArticleService articleService;
-    private final RssFeedProperties feedProperties;
+    private final FeedConfigService feedConfigService;
     private final RssFetcherService rssFetcherService;
 
     public ArticleController(
             ArticleService articleService,
-            RssFeedProperties feedProperties,
+            FeedConfigService feedConfigService,
             RssFetcherService rssFetcherService
     ) {
         this.articleService = articleService;
-        this.feedProperties = feedProperties;
+        this.feedConfigService = feedConfigService;
         this.rssFetcherService = rssFetcherService;
     }
 
@@ -72,23 +72,16 @@ public class ArticleController {
     }
 
     /**
-     * Returns the list of configured RSS feed sources.
+     * Returns the list of active RSS feed sources.
      *
-     * @return list of feed sources
+     * @return list of active feed sources
      */
     @GetMapping("/sources")
     @Operation(summary = "Get feed sources",
-            description = "Returns all configured RSS feed sources.")
+            description = "Returns all active RSS feed sources.")
     public Mono<List<FeedSourceDTO>> getSources() {
-        return Mono.fromCallable(this::mapFeedSources)
+        return Mono.fromCallable(feedConfigService::getActiveFeedConfigs)
                 .subscribeOn(Schedulers.boundedElastic());
-    }
-
-    private List<FeedSourceDTO> mapFeedSources() {
-        return feedProperties.getFeeds().stream()
-                .map(f -> new FeedSourceDTO(
-                        f.getName(), f.getUrl(), f.getCategory()))
-                .toList();
     }
 
     /**

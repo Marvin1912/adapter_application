@@ -1,7 +1,7 @@
 package com.marvin.itnews.service;
 
 import com.marvin.itnews.dto.ArticleDTO;
-import com.marvin.itnews.mapper.ArticleMapper;
+import com.marvin.itnews.mapper.ItNewsMapper;
 import com.marvin.itnews.repository.ArticleRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
@@ -15,11 +15,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class ArticleService {
 
     private final ArticleRepository articleRepository;
-    private final ArticleMapper articleMapper;
+    private final ItNewsMapper articleMapper;
 
     public ArticleService(
             ArticleRepository articleRepository,
-            ArticleMapper articleMapper
+            ItNewsMapper articleMapper
     ) {
         this.articleRepository = articleRepository;
         this.articleMapper = articleMapper;
