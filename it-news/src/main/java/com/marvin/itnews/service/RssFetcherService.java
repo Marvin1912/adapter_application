@@ -20,6 +20,7 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.xml.sax.InputSource;
 
 @Service
@@ -50,6 +51,7 @@ public class RssFetcherService {
      * Fetches all active RSS feeds on a scheduled interval.
      */
     @Scheduled(fixedDelayString = "${rss.poll-interval-ms:1800000}")
+    @Transactional(readOnly = true)
     public void fetchAllFeeds() {
         final List<FeedConfig> activeFeeds = feedConfigRepository.findByActiveTrue();
         log.info("Starting RSS feed fetch for {} sources", activeFeeds.size());

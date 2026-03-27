@@ -5,7 +5,9 @@ import com.marvin.itnews.service.FeedConfigService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import java.util.List;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -58,10 +61,11 @@ public class FeedConfigController {
      * @return the created feed config
      */
     @PostMapping("/")
+    @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create feed config",
             description = "Creates a new RSS feed configuration.")
     public Mono<FeedSourceDTO> createFeedConfig(
-            @RequestBody FeedSourceDTO dto
+            @Valid @RequestBody FeedSourceDTO dto
     ) {
         return Mono.fromCallable(() -> feedConfigService.createFeedConfig(dto))
                 .subscribeOn(Schedulers.boundedElastic());
@@ -79,7 +83,7 @@ public class FeedConfigController {
             description = "Updates an existing RSS feed configuration.")
     public Mono<FeedSourceDTO> updateFeedConfig(
             @PathVariable @Parameter(description = "Feed config ID") Integer id,
-            @RequestBody FeedSourceDTO dto
+            @Valid @RequestBody FeedSourceDTO dto
     ) {
         return Mono.fromCallable(() -> feedConfigService.updateFeedConfig(id, dto))
                 .subscribeOn(Schedulers.boundedElastic());

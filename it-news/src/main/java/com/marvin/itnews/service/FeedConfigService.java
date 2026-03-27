@@ -28,6 +28,7 @@ public class FeedConfigService {
      *
      * @return list of all feed configs
      */
+    @Transactional(readOnly = true)
     public List<FeedSourceDTO> getAllFeedConfigs() {
         return feedConfigRepository.findAll().stream()
                 .map(articleMapper::toFeedSourceDTO)
@@ -39,6 +40,7 @@ public class FeedConfigService {
      *
      * @return list of active feed configs
      */
+    @Transactional(readOnly = true)
     public List<FeedSourceDTO> getActiveFeedConfigs() {
         return feedConfigRepository.findByActiveTrue().stream()
                 .map(articleMapper::toFeedSourceDTO)
