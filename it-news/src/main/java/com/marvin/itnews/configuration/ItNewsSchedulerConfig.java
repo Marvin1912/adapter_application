@@ -9,11 +9,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Configuration
-public class SchedulerConfig {
+public class ItNewsSchedulerConfig {
 
     private final ArticleRepository articleRepository;
 
-    public SchedulerConfig(ArticleRepository articleRepository) {
+    public ItNewsSchedulerConfig(ArticleRepository articleRepository) {
         this.articleRepository = articleRepository;
     }
 

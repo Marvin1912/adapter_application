@@ -51,7 +51,7 @@ public class RssFetcherService {
      * Fetches all active RSS feeds on a scheduled interval.
      */
     @Scheduled(fixedDelayString = "${rss.poll-interval-ms:1800000}")
-    @Transactional(readOnly = true)
+    @Transactional
     public void fetchAllFeeds() {
         final List<FeedConfig> activeFeeds = feedConfigRepository.findByActiveTrue();
         log.info("Starting RSS feed fetch for {} sources", activeFeeds.size());

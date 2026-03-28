@@ -7,11 +7,11 @@ import org.springframework.scheduling.annotation.Scheduled;
 
 @Slf4j
 @Configuration
-public class SchedulerConfig {
+public class PlantSchedulerConfig {
 
     private final PlantService plantService;
 
-    public SchedulerConfig(PlantService plantService) {
+    public PlantSchedulerConfig(PlantService plantService) {
         this.plantService = plantService;
     }
 

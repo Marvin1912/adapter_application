@@ -39,3 +39,5 @@ app/google/credentials.json
 
 !gradle/wrapper/gradle-wrapper.jar
 .vscode/settings.json
+
+**/bin/*
