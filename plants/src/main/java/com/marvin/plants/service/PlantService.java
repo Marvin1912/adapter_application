@@ -129,14 +129,14 @@ public class PlantService {
     public void sendWateringNotification() {
         final LocalDate today = LocalDate.now();
         plantRepository.findAll().forEach(plant ->
-                wateringStates.get(plant.getId()).set(plant.getNextWateredDate().isEqual(today) ? 1 : 0)
+                wateringStates.get(plant.getId()).set(!plant.getNextWateredDate().isAfter(today) ? 1 : 0)
         );
     }
 
     public void sendFertilizingNotification() {
         final LocalDate today = LocalDate.now();
         plantRepository.findAll().forEach(plant ->
-                fertilizingStates.get(plant.getId()).set(plant.getNextFertilizedDate() != null && plant.getNextFertilizedDate().isEqual(today) ? 1 : 0)
+                fertilizingStates.get(plant.getId()).set(plant.getNextFertilizedDate() != null && !plant.getNextFertilizedDate().isAfter(today) ? 1 : 0)
         );
     }
 }
