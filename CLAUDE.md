@@ -61,11 +61,7 @@ Self-contained vertical slices: plants, it-news, vocabulary, mental-arithmetic, 
 - **API docs**: Springdoc OpenAPI with WebFlux UI
 - **`-parameters` compiler flag** is enabled (preserves parameter names at runtime)
 
-## Code Style & Testing
+## Testing
 
-- Checkstyle is enforced with zero warnings (`config/checkstyle/checkstyle.xml`)
-- 120 char line length, 4-space indentation, no tabs, no wildcard imports
-- Max 50 lines per method, max 7 parameters
-- K&R brace style
 - JUnit 5 + Mockito + `reactor-test` (StepVerifier for reactive assertions)
 - Tests use `@ExtendWith(MockitoExtension.class)` for unit tests
