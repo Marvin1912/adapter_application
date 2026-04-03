@@ -39,19 +39,41 @@ docker compose -f docker-compose-local.yaml up -d
 
 ## Architecture
 
-This is a **multi-module Gradle monolith** using Spring Boot with an orthogonal architecture. All modules are packaged into a single Spring Boot JAR (`backend.jar`) via the `boot` module.
+This is a **multi-module Gradle monolith** using Spring Boot with an orthogonal architecture. All modules are packaged into a single Spring Boot JAR (`backend.jar`) via the `boot` module. Every module except `common` automatically depends on `common` (configured in root `build.gradle`).
 
-### Module Layers
+### Core Modules
 
-- **boot** - Application entry point (`com.marvin.Application`). Aggregates all modules, enables scheduling. Only module that produces a bootJar.
-- **common** - Shared utilities (JacksonMapper, DTOs, NullSafeUtil). Every other module depends on it automatically (configured in root `build.gradle`).
+- **boot** - Application entry point (`com.marvin.Application`). Aggregates all 16 modules, enables scheduling. Only module that produces a bootJar.
+- **common** - Shared utilities (JacksonMapper, DTOs, NullSafeUtil). No dependencies of its own.
 - **entities** - JPA entity definitions. All entities extend `BasicEntity` which provides `creationDate` and `lastModified` fields.
-- **database** - Repositories and Flyway migrations. Uses two Flyway instances: `flywayMain` (schema: `finance`, migrations: `db/migration/costs`) and `flywayExports` (schema: `exports`, migrations: `db/migration/exports`).
-- **api** - REST API facade and orchestration layer. Depends on importer, exporter, uploader, camt, database, entities.
+- **api** - REST API facade and orchestration layer. Depends on costs, backup, exporter, uploader, camt, entities.
+
+### Domain Modules
+
+- **costs** - Financial cost management (daily/special costs, accounting imports). Owns Flyway migrations, depends on entities, influxdb, consul, camt.
+- **backup** - Data backup operations tracking and run history. Uses Hibernate Envers for audit trail. Depends on entities, uploader.
+- **camt** - CAMT (ISO 20022) XML bank message parsing. Uses xjc plugin for schema-to-Java generation.
+
+### Infrastructure Modules
+
+- **influxdb** - InfluxDB time-series client wrapper for metrics storage.
+- **consul** - HashiCorp Consul KV client for distributed config/secrets.
+- **exporter** - Pass-through module re-exporting costs, influxdb, vocabulary dependencies.
+- **uploader** - Google Drive file upload/download and ZIP compression.
 
 ### Feature Modules
 
-Self-contained vertical slices: plants, it-news, vocabulary, mental-arithmetic, image-server. Each feature module manages its own Flyway migrations in separate schemas and migration paths.
+Self-contained vertical slices, each with own Flyway migrations in separate schemas:
+
+- **plants** - Plant/gardening tracking with images and cost associations. Includes Prometheus metrics.
+- **it-news** - IT news RSS feed aggregator with feed config management.
+- **vocabulary** - Language learning with Anki sync integration. Uses OpenAPI generator.
+- **mental-arithmetic** - Arithmetic exercises with difficulty levels and performance tracking.
+- **image-server** - Image upload/storage and retrieval service.
+
+### Legacy (not in settings.gradle)
+
+The `database/` and `importer/` directories exist but are not included as Gradle modules. They are orphaned and not wired into the boot application.
 
 ### Key Technical Choices
 
