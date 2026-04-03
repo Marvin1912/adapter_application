@@ -40,7 +40,11 @@
       "mcp__github__pull_request_review_write",
       "mcp__github__add_comment_to_pending_review",
       "Bash(gh api:*)",
-      "mcp__github__add_reply_to_pull_request_comment"
+      "mcp__github__add_reply_to_pull_request_comment",
+      "Bash(git remote:*)",
+      "mcp__github__issue_read",
+      "Bash(/home/marvin/workspace/backend/gradlew -p /home/marvin/workspace/backend :plants:compileJava)",
+      "Bash(git stash:*)"
     ],
     "deny": [],
     "ask": []
