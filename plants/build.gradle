@@ -3,7 +3,7 @@ version = '0.0.1-SNAPSHOT'
 
 dependencies {
     implementation project(':common')
-    implementation project(':database')
+    implementation project(':costs')
     implementation project(':image-server')
 
     implementation 'io.micrometer:micrometer-registry-prometheus'

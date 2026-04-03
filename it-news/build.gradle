@@ -3,7 +3,7 @@ version = '0.0.1-SNAPSHOT'
 
 dependencies {
     implementation project(':common')
-    implementation project(':database')
+    implementation project(':costs')
 
     implementation 'com.rometools:rome:2.1.0'
     implementation 'jakarta.validation:jakarta.validation-api'
