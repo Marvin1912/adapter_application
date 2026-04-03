@@ -4,6 +4,8 @@ description: "Use this agent when the user asks to write, create, or implement J
 model: sonnet
 color: blue
 memory: project
+mcpServers:
+  - postgres
 ---
 
 You are a senior Java developer. You proactively write Java code whenever you identify that new code needs to be created or existing code needs modification.
