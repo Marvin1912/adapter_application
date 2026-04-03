@@ -39,7 +39,7 @@ docker compose -f docker-compose-local.yaml up -d
 
 ## Architecture
 
-This is a **multi-module Gradle monolith** using Spring Boot 3.5.6 with an orthogonal architecture. All modules are packaged into a single Spring Boot JAR (`backend.jar`) via the `boot` module.
+This is a **multi-module Gradle monolith** using Spring Boot with an orthogonal architecture. All modules are packaged into a single Spring Boot JAR (`backend.jar`) via the `boot` module.
 
 ### Module Layers
 
@@ -49,41 +49,23 @@ This is a **multi-module Gradle monolith** using Spring Boot 3.5.6 with an ortho
 - **database** - Repositories and Flyway migrations. Uses two Flyway instances: `flywayMain` (schema: `finance`, migrations: `db/migration/costs`) and `flywayExports` (schema: `exports`, migrations: `db/migration/exports`).
 - **api** - REST API facade and orchestration layer. Depends on importer, exporter, uploader, camt, database, entities.
 
-### Feature Modules (self-contained vertical slices)
+### Feature Modules
 
-Each feature module (plants, it-news, vocabulary, mental-arithmetic, image-server) follows the same package structure:
-```
-com.marvin.<module>/
-  configuration/   # FlywayConfig (own migration path), scheduling, etc.
-  controller/      # Reactive REST controllers (WebFlux)
-  dto/             # Data transfer objects
-  entity/          # JPA entities
-  mapper/          # MapStruct mappers
-  repository/      # Spring Data JPA repositories
-  service/         # Business logic
-```
-
-Feature modules manage their own Flyway migrations in separate schemas and migration paths.
+Self-contained vertical slices: plants, it-news, vocabulary, mental-arithmetic, image-server. Each feature module manages its own Flyway migrations in separate schemas and migration paths.
 
 ### Key Technical Choices
 
-- **Reactive stack**: Spring WebFlux (not MVC) - controllers return `Mono<>` / `Flux<>`
+- **Reactive stack**: Spring WebFlux (not MVC) — controllers return `Mono<>` / `Flux<>`
 - **Mapping**: MapStruct for entity-DTO conversion (`@Mapper(componentModel = "spring")`)
-- **Database**: PostgreSQL 15, Flyway migrations, Hibernate Envers for audit trails
 - **Metrics**: Micrometer/Prometheus gauges (e.g., plant watering/fertilizing status)
 - **API docs**: Springdoc OpenAPI with WebFlux UI
-- **Lombok**: Used project-wide via `io.freefair.lombok` plugin
-- **Java**: Source compatibility 17, runtime OpenJDK 21
+- **`-parameters` compiler flag** is enabled (preserves parameter names at runtime)
 
-## Code Style
+## Code Style & Testing
 
 - Checkstyle is enforced with zero warnings (`config/checkstyle/checkstyle.xml`)
 - 120 char line length, 4-space indentation, no tabs, no wildcard imports
 - Max 50 lines per method, max 7 parameters
 - K&R brace style
-- `-parameters` compiler flag is enabled (preserves parameter names at runtime)
-
-## Testing
-
 - JUnit 5 + Mockito + `reactor-test` (StepVerifier for reactive assertions)
 - Tests use `@ExtendWith(MockitoExtension.class)` for unit tests
