@@ -6,7 +6,7 @@ import com.marvin.common.costs.MonthlyCostDTO;
 import com.marvin.costs.infrastructure.Ibans;
 import com.marvin.costs.repository.MonthlyCostRepository;
 import com.marvin.costs.service.ImportService;
-import com.marvin.entities.costs.MonthlyCostEntity;
+import com.marvin.costs.entity.MonthlyCostEntity;
 import com.marvin.influxdb.core.InfluxWriteConfig;
 import com.marvin.influxdb.costs.monthly.service.MonthlyCostImport;
 import java.math.BigDecimal;

@@ -1,7 +1,7 @@
 package com.marvin.backup.service;
 
 import com.marvin.backup.model.event.BackupFileEvent;
-import com.marvin.entities.exports.BackupRunEntity;
+import com.marvin.backup.entity.BackupRunEntity;
 import com.marvin.upload.Uploader;
 import java.io.IOException;
 import java.nio.file.Files;

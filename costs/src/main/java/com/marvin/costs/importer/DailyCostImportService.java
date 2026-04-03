@@ -4,7 +4,7 @@ import com.marvin.camt.model.book_entry.BookingEntryDTO;
 import com.marvin.common.costs.DailyCostDTO;
 import com.marvin.costs.repository.DailyCostRepository;
 import com.marvin.costs.service.ImportService;
-import com.marvin.entities.costs.DailyCostEntity;
+import com.marvin.costs.entity.DailyCostEntity;
 import com.marvin.influxdb.core.InfluxWriteConfig;
 import com.marvin.influxdb.costs.daily.service.DailyCostImport;
 import java.math.BigDecimal;

@@ -1,7 +1,7 @@
 package com.marvin.backup.service;
 
 import com.marvin.backup.repository.BackupRunRepository;
-import com.marvin.entities.exports.BackupRunEntity;
+import com.marvin.backup.entity.BackupRunEntity;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;

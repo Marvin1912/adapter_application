@@ -6,7 +6,7 @@ import com.marvin.common.costs.SalaryDTO;
 import com.marvin.costs.infrastructure.Ibans;
 import com.marvin.costs.repository.SalaryRepository;
 import com.marvin.costs.service.ImportService;
-import com.marvin.entities.costs.SalaryEntity;
+import com.marvin.costs.entity.SalaryEntity;
 import com.marvin.influxdb.core.InfluxWriteConfig;
 import com.marvin.influxdb.costs.salary.service.SalaryImport;
 import java.util.Optional;
