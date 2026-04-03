@@ -19,11 +19,11 @@ public class ItNewsSchedulerConfig {
 
     @Scheduled(cron = "0 0 3 * * *")
     @Transactional
-    public void cleanUpOldReadArticles() {
+    public void cleanUpOldArticles() {
         final LocalDateTime cutoff = LocalDateTime.now().minusMonths(1);
-        log.info("Cleaning up read articles older than {}", cutoff);
-        final int deleted = articleRepository.deleteReadArticlesOlderThan(cutoff);
-        log.info("Deleted {} old read articles", deleted);
+        log.info("Cleaning up articles older than {}", cutoff);
+        final int deleted = articleRepository.deleteArticlesOlderThan(cutoff);
+        log.info("Deleted {} old articles", deleted);
     }
 
 }
