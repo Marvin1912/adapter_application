@@ -1,6 +1,6 @@
 package com.marvin.api.controller;
 
-import com.marvin.app.importer.costs.DailyCostImportService;
+import com.marvin.costs.importer.DailyCostImportService;
 import com.marvin.camt.model.book_entry.BookingEntryDTO;
 import com.marvin.camt.model.book_entry.BookingsDTO;
 import com.marvin.camt.model.book_entry.CreditDebitCodeDTO;
@@ -84,7 +84,7 @@ public class CamtController {
             return DataBufferUtils.join(file.content())
                     .flatMapMany(dataBuffer -> {
 
-                        Flux<ByteArrayOutputStream> using = Flux.using(
+                        final Flux<ByteArrayOutputStream> using = Flux.using(
                                 dataBuffer::asInputStream,
                                 camtFileParser::unzipFile,
                                 inputStream -> {

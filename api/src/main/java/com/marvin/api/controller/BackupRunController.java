@@ -1,7 +1,7 @@
 package com.marvin.api.controller;
 
 import com.marvin.api.dto.BackupRunDTO;
-import com.marvin.database.repository.BackupRunRepository;
+import com.marvin.backup.repository.BackupRunRepository;
 import com.marvin.entities.exports.BackupRunEntity;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+/** REST controller for retrieving backup upload run history. */
 @RestController
 @RequestMapping("/backups")
 @RequiredArgsConstructor
@@ -33,6 +34,16 @@ public class BackupRunController {
 
     private final BackupRunRepository backupRunRepository;
 
+    /**
+     * Returns a paginated list of backup runs filtered by optional date range and status.
+     *
+     * @param from   the inclusive start date filter (optional)
+     * @param to     the inclusive end date filter (optional)
+     * @param status the status filter (optional)
+     * @param limit  the page size (default 20)
+     * @param offset the page offset (default 0)
+     * @return a page of matching backup run DTOs
+     */
     @Operation(
         summary = "Get backup runs",
         description = "Retrieves a paginated list of backup upload runs with optional filtering by date range and status"
@@ -41,27 +52,42 @@ public class BackupRunController {
         @ApiResponse(
             responseCode = "200",
             description = "Successfully retrieved backup runs",
-            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Page.class))
+            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = Page.class))
         )
     })
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Page<BackupRunDTO>> getBackupRuns(
-            @Parameter(description = "Start date filter") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
-            @Parameter(description = "End date filter") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to,
-            @Parameter(description = "Status filter (SUCCESS, FAILED, IN_PROGRESS)") @RequestParam(required = false) String status,
-            @Parameter(description = "Page size (default 20)") @RequestParam(defaultValue = "20") int limit,
-            @Parameter(description = "Page offset (default 0)") @RequestParam(defaultValue = "0") int offset) {
+            @Parameter(description = "Start date filter")
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
+            @Parameter(description = "End date filter")
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to,
+            @Parameter(description = "Status filter (SUCCESS, FAILED, IN_PROGRESS)")
+            @RequestParam(required = false) String status,
+            @Parameter(description = "Page size (default 20)")
+            @RequestParam(defaultValue = "20") int limit,
+            @Parameter(description = "Page offset (default 0)")
+            @RequestParam(defaultValue = "0") int offset) {
 
         final Pageable pageable = PageRequest.of(offset / limit, limit);
-        final Page<BackupRunDTO> page = backupRunRepository.findByFilters(from, to, status, pageable)
-                .map(this::toDTO);
+        final Page<BackupRunDTO> page = backupRunRepository.findByFilters(from, to, status,
+                pageable).map(this::toDTO);
         return ResponseEntity.ok(page);
     }
 
+    /**
+     * Returns the backup run with the given ID.
+     *
+     * @param id the backup run ID
+     * @return the matching backup run DTO, or 404 if not found
+     */
     @Operation(summary = "Get backup run by ID")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Successfully retrieved backup run",
-            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = BackupRunDTO.class))),
+            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = BackupRunDTO.class))),
         @ApiResponse(responseCode = "404", description = "Backup run not found")
     })
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)

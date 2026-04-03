@@ -1,10 +1,10 @@
 package com.marvin.api.controller;
 
-import com.marvin.api.dto.FileListResponse;
 import com.marvin.api.dto.FileDeleteResponse;
-import com.marvin.upload.FileLister;
-import com.marvin.upload.FileDeleter;
+import com.marvin.api.dto.FileListResponse;
 import com.marvin.upload.DriveFileInfo;
+import com.marvin.upload.FileDeleter;
+import com.marvin.upload.FileLister;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+/** REST controller for listing and deleting files in Google Drive. */
 @RestController
 @Tag(name = "File List", description = "API for listing files in Google Drive")
 public class FileListController {
@@ -27,14 +28,27 @@ public class FileListController {
     private final FileLister fileLister;
     private final FileDeleter fileDeleter;
 
+    /**
+     * Constructs a new {@code FileListController}.
+     *
+     * @param fileLister  the service for listing files in Google Drive
+     * @param fileDeleter the service for deleting files from Google Drive
+     */
     public FileListController(FileLister fileLister, FileDeleter fileDeleter) {
         this.fileLister = fileLister;
         this.fileDeleter = fileDeleter;
     }
 
+    /**
+     * Lists all files in the configured Google Drive parent folder.
+     *
+     * @return the list of files with metadata
+     */
     @Operation(
         summary = "List files in Google Drive",
-        description = "Retrieves a list of all files and folders in the configured Google Drive parent folder. The listing includes file metadata such as ID, name, size, modification time, and web view link. File IDs can be used for deletion operations."
+        description = "Retrieves a list of all files and folders in the configured Google Drive "
+                + "parent folder. The listing includes file metadata such as ID, name, size, "
+                + "modification time, and web view link."
     )
     @ApiResponses(value = {
         @ApiResponse(
@@ -58,15 +72,25 @@ public class FileListController {
     public ResponseEntity<FileListResponse> listFiles() {
         try {
             final List<DriveFileInfo> files = fileLister.listFiles();
-            return ResponseEntity.ok(FileListResponse.success("Successfully listed files from Google Drive", files));
+            return ResponseEntity.ok(
+                    FileListResponse.success("Successfully listed files from Google Drive", files));
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(FileListResponse.error("Failed to list files from Google Drive: " + e.getMessage()));
+            return ResponseEntity.internalServerError()
+                    .body(FileListResponse.error(
+                            "Failed to list files from Google Drive: " + e.getMessage()));
         }
     }
 
+    /**
+     * Deletes the file with the given ID from Google Drive.
+     *
+     * @param fileId the Google Drive file ID to delete
+     * @return a response indicating success or failure
+     */
     @Operation(
         summary = "Delete a file from Google Drive",
-        description = "Deletes a specific file from Google Drive using its file ID. This operation is permanent and cannot be undone."
+        description = "Deletes a specific file from Google Drive using its file ID. "
+                + "This operation is permanent and cannot be undone."
     )
     @ApiResponses(value = {
         @ApiResponse(
@@ -104,17 +128,22 @@ public class FileListController {
     })
     @DeleteMapping(path = "/files/{fileId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<FileDeleteResponse> deleteFile(
-            @Parameter(description = "The ID of the file to delete from Google Drive", required = true)
+            @Parameter(description = "The ID of the file to delete from Google Drive",
+                    required = true)
             @PathVariable String fileId) {
         try {
             if (fileId == null || fileId.trim().isEmpty()) {
-                return ResponseEntity.badRequest().body(FileDeleteResponse.error("File ID cannot be null or empty"));
+                return ResponseEntity.badRequest()
+                        .body(FileDeleteResponse.error("File ID cannot be null or empty"));
             }
 
             fileDeleter.deleteFile(fileId);
-            return ResponseEntity.ok(FileDeleteResponse.success("File successfully deleted from Google Drive", fileId));
+            return ResponseEntity.ok(FileDeleteResponse.success(
+                    "File successfully deleted from Google Drive", fileId));
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(FileDeleteResponse.error("Failed to delete file from Google Drive: " + e.getMessage()));
+            return ResponseEntity.internalServerError()
+                    .body(FileDeleteResponse.error(
+                            "Failed to delete file from Google Drive: " + e.getMessage()));
         }
     }
 }

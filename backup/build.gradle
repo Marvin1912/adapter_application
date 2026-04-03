@@ -1,0 +1,21 @@
+group = 'com.marvin'
+version = '0.0.1-SNAPSHOT'
+
+dependencies {
+    api project(':entities')
+    api project(':uploader')
+    api 'org.flywaydb:flyway-database-postgresql'
+    api 'org.hibernate.orm:hibernate-envers'
+    implementation 'org.postgresql:postgresql:42.7.2'
+
+    // Test dependencies
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.junit.platform:junit-platform-launcher'
+    testImplementation 'org.mockito:mockito-core'
+    testImplementation 'org.mockito:mockito-junit-jupiter'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}

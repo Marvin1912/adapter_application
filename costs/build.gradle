@@ -1,0 +1,13 @@
+group = 'com.marvin'
+version = '0.0.1-SNAPSHOT'
+
+dependencies {
+    api project(':entities')
+    api project(':influxdb')
+    api project(':consul')
+    api project(':camt')
+    api 'org.flywaydb:flyway-database-postgresql'
+    api 'org.hibernate.orm:hibernate-envers'
+    implementation 'org.postgresql:postgresql:42.7.2'
+    implementation 'io.projectreactor:reactor-core'
+}

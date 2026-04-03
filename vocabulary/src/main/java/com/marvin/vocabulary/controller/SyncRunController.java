@@ -1,6 +1,6 @@
 package com.marvin.vocabulary.controller;
 
-import com.marvin.database.repository.BackupRunRepository;
+import com.marvin.backup.repository.BackupRunRepository;
 import com.marvin.entities.exports.BackupRunEntity;
 import com.marvin.vocabulary.dto.AnkiSyncRunRequest;
 import java.time.Duration;
