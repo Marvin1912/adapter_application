@@ -1,4 +1,4 @@
-package com.marvin.entities.exports;
+package com.marvin.backup.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
 
+/** JPA entity representing a single backup upload run in the exports schema. */
 @Getter
 @Setter
 @Entity

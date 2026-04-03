@@ -2,7 +2,7 @@ group = 'com.marvin'
 version = '0.0.1-SNAPSHOT'
 
 dependencies {
-    api project(':entities')
+    api 'org.springframework.boot:spring-boot-starter-data-jpa'
     api project(':uploader')
     api 'org.flywaydb:flyway-database-postgresql'
     api 'org.hibernate.orm:hibernate-envers'

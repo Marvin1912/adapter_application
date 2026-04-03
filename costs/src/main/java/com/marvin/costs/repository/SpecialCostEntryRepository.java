@@ -1,6 +1,6 @@
 package com.marvin.costs.repository;
 
-import com.marvin.entities.costs.SpecialCostEntryEntity;
+import com.marvin.costs.entity.SpecialCostEntryEntity;
 import java.time.LocalDate;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,6 +1,6 @@
 package com.marvin.backup.repository;
 
-import com.marvin.entities.exports.BackupRunEntity;
+import com.marvin.backup.entity.BackupRunEntity;
 import java.time.LocalDateTime;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

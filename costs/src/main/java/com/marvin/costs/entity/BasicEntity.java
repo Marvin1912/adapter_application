@@ -1,4 +1,4 @@
-package com.marvin.entities.costs;
+package com.marvin.costs.entity;
 
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
@@ -8,6 +8,7 @@ import java.util.Objects;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+/** Base entity providing audit timestamps for all cost-related entities. */
 @MappedSuperclass
 public class BasicEntity {
 
@@ -21,18 +22,38 @@ public class BasicEntity {
     @UpdateTimestamp
     private LocalDateTime lastModified;
 
+    /**
+     * Returns the creation date.
+     *
+     * @return the creation date
+     */
     public LocalDateTime getCreationDate() {
         return creationDate;
     }
 
+    /**
+     * Sets the creation date.
+     *
+     * @param creationDate the creation date to set
+     */
     public void setCreationDate(LocalDateTime creationDate) {
         this.creationDate = creationDate;
     }
 
+    /**
+     * Returns the last modified date.
+     *
+     * @return the last modified date
+     */
     public LocalDateTime getLastModified() {
         return lastModified;
     }
 
+    /**
+     * Sets the last modified date.
+     *
+     * @param lastModified the last modified date to set
+     */
     public void setLastModified(LocalDateTime lastModified) {
         this.lastModified = lastModified;
     }
@@ -45,7 +66,7 @@ public class BasicEntity {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        BasicEntity that = (BasicEntity) o;
+        final BasicEntity that = (BasicEntity) o;
         return Objects.equals(creationDate, that.creationDate) && Objects.equals(lastModified,
                 that.lastModified);
     }

@@ -2,7 +2,7 @@ package com.marvin.api.controller;
 
 import com.marvin.api.dto.BackupRunDTO;
 import com.marvin.backup.repository.BackupRunRepository;
-import com.marvin.entities.exports.BackupRunEntity;
+import com.marvin.backup.entity.BackupRunEntity;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;

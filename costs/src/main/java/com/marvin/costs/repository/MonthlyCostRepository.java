@@ -1,6 +1,6 @@
 package com.marvin.costs.repository;
 
-import com.marvin.entities.costs.MonthlyCostEntity;
+import com.marvin.costs.entity.MonthlyCostEntity;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;

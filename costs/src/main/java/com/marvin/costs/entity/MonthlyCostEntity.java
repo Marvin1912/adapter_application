@@ -1,4 +1,4 @@
-package com.marvin.entities.costs;
+package com.marvin.costs.entity;
 
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
@@ -11,9 +11,10 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
 
+/** JPA entity representing a monthly cost entry in the finance schema. */
 @Entity
-@Table(name = "daily_cost", schema = "finance")
-public class DailyCostEntity extends BasicEntity {
+@Table(name = "monthly_cost", schema = "finance")
+public class MonthlyCostEntity extends BasicEntity {
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
@@ -28,42 +29,56 @@ public class DailyCostEntity extends BasicEntity {
     @Column(name = "value")
     private BigDecimal value;
 
-    @Basic
-    @Column(name = "description")
-    private String description;
-
-    public DailyCostEntity() {
+    /** Default constructor required by JPA. */
+    public MonthlyCostEntity() {
         // NOOP
     }
 
-    public DailyCostEntity(LocalDate costDate, BigDecimal value, String description) {
+    /**
+     * Constructs a new {@code MonthlyCostEntity} with the given fields.
+     *
+     * @param costDate the date of the monthly cost
+     * @param value    the monetary value
+     */
+    public MonthlyCostEntity(LocalDate costDate, BigDecimal value) {
         this.costDate = costDate;
         this.value = value;
-        this.description = description;
     }
 
+    /**
+     * Returns the cost date.
+     *
+     * @return the cost date
+     */
     public LocalDate getCostDate() {
         return costDate;
     }
 
+    /**
+     * Sets the cost date.
+     *
+     * @param costDate the cost date to set
+     */
     public void setCostDate(LocalDate costDate) {
         this.costDate = costDate;
     }
 
+    /**
+     * Returns the monetary value.
+     *
+     * @return the value
+     */
     public BigDecimal getValue() {
         return value;
     }
 
+    /**
+     * Sets the monetary value.
+     *
+     * @param value the value to set
+     */
     public void setValue(BigDecimal value) {
         this.value = value;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     @Override
@@ -77,24 +92,22 @@ public class DailyCostEntity extends BasicEntity {
         if (!super.equals(o)) {
             return false;
         }
-        DailyCostEntity that = (DailyCostEntity) o;
-        return id == that.id && Objects.equals(costDate, that.costDate)
-                && Objects.equals(value, that.value)
-                && Objects.equals(description, that.description);
+        final MonthlyCostEntity that = (MonthlyCostEntity) o;
+        return id == that.id && Objects.equals(costDate, that.costDate) && Objects.equals(value,
+                that.value);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), id, costDate, value, description);
+        return Objects.hash(super.hashCode(), id, costDate, value);
     }
 
     @Override
     public String toString() {
-        return "DailyCostEntity{"
+        return "MonthlyCostEntity{"
                 + "id=" + id
                 + ", costDate=" + costDate
                 + ", value=" + value
-                + ", description='" + description + '\''
                 + '}';
     }
 }
