@@ -65,3 +65,8 @@ Self-contained vertical slices: plants, it-news, vocabulary, mental-arithmetic, 
 
 - JUnit 5 + Mockito + `reactor-test` (StepVerifier for reactive assertions)
 - Tests use `@ExtendWith(MockitoExtension.class)` for unit tests
+
+## Agent Workflow
+
+- **All development tasks** must use the `java-developer` agent.
+- **After development is complete** and a PR has been created, use the `java-code-reviewer` agent to review the changes before merging.
