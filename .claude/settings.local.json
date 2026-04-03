@@ -44,7 +44,9 @@
       "Bash(git remote:*)",
       "mcp__github__issue_read",
       "Bash(/home/marvin/workspace/backend/gradlew -p /home/marvin/workspace/backend :plants:compileJava)",
-      "Bash(git stash:*)"
+      "Bash(git stash:*)",
+      "Bash(python3:*)",
+      "mcp__github__get_commit"
     ],
     "deny": [],
     "ask": []

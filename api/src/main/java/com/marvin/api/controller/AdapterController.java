@@ -1,6 +1,6 @@
 package com.marvin.api.controller;
 
-import com.marvin.app.importer.costs.CostImporter;
+import com.marvin.costs.importer.CostImporter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;

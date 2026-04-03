@@ -2,7 +2,7 @@ group = 'com.marvin'
 version = '0.0.1-SNAPSHOT'
 
 dependencies {
-    implementation project(':database')
+    implementation project(':costs')
     implementation project(':influxdb')
     implementation project(':vocabulary')
 }
