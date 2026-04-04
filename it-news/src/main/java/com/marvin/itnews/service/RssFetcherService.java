@@ -39,12 +39,24 @@ public class RssFetcherService {
             ArticleRepository articleRepository,
             FeedConfigRepository feedConfigRepository
     ) {
+        this(
+                articleRepository,
+                feedConfigRepository,
+                HttpClient.newBuilder()
+                        .connectTimeout(Duration.ofSeconds(CONNECT_TIMEOUT_SECONDS))
+                        .followRedirects(HttpClient.Redirect.NORMAL)
+                        .build()
+        );
+    }
+
+    RssFetcherService(
+            ArticleRepository articleRepository,
+            FeedConfigRepository feedConfigRepository,
+            HttpClient httpClient
+    ) {
         this.articleRepository = articleRepository;
         this.feedConfigRepository = feedConfigRepository;
-        this.httpClient = HttpClient.newBuilder()
-                .connectTimeout(Duration.ofSeconds(CONNECT_TIMEOUT_SECONDS))
-                .followRedirects(HttpClient.Redirect.NORMAL)
-                .build();
+        this.httpClient = httpClient;
     }
 
     /**
@@ -97,6 +109,10 @@ public class RssFetcherService {
     private boolean saveEntryIfNew(SyndEntry entry, FeedConfig feedConfig) {
         final String link = entry.getLink();
         if (link == null || articleRepository.existsByLink(link)) {
+            return false;
+        }
+        final LocalDateTime publishedAt = toLocalDateTime(entry.getPublishedDate());
+        if (publishedAt.isBefore(LocalDateTime.now().minusMonths(1))) {
             return false;
         }
         final Article article = buildArticle(entry, feedConfig);
