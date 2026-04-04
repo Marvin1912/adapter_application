@@ -20,6 +20,7 @@ public class ItNewsSchedulerConfig {
     }
 
     @EventListener(ApplicationReadyEvent.class)
+    @Transactional
     public void onStartup() {
         startCleanUpOldArticles();
     }
