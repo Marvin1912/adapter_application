@@ -33,7 +33,7 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
     );
 
     @Modifying
-    @Query("DELETE FROM Article a WHERE a.fetchedAt < :cutoff")
+    @Query("DELETE FROM Article a WHERE a.publishedAt < :cutoff")
     int deleteArticlesOlderThan(LocalDateTime cutoff);
 
 }
