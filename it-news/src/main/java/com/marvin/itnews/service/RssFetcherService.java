@@ -27,7 +27,6 @@ import org.xml.sax.InputSource;
 @Slf4j
 public class RssFetcherService {
 
-    private static final int CONNECT_TIMEOUT_SECONDS = 15;
     private static final int REQUEST_TIMEOUT_SECONDS = 30;
     private static final int MAX_DESCRIPTION_LENGTH = 4000;
 
@@ -36,27 +35,13 @@ public class RssFetcherService {
     private final HttpClient httpClient;
 
     public RssFetcherService(
-            ArticleRepository articleRepository,
-            FeedConfigRepository feedConfigRepository
-    ) {
-        this(
-                articleRepository,
-                feedConfigRepository,
-                HttpClient.newBuilder()
-                        .connectTimeout(Duration.ofSeconds(CONNECT_TIMEOUT_SECONDS))
-                        .followRedirects(HttpClient.Redirect.NORMAL)
-                        .build()
-        );
-    }
-
-    RssFetcherService(
-            ArticleRepository articleRepository,
-            FeedConfigRepository feedConfigRepository,
-            HttpClient httpClient
+        ArticleRepository articleRepository,
+        FeedConfigRepository feedConfigRepository,
+        HttpClient itNewsHttpClient
     ) {
         this.articleRepository = articleRepository;
         this.feedConfigRepository = feedConfigRepository;
-        this.httpClient = httpClient;
+        this.httpClient = itNewsHttpClient;
     }
 
     /**
@@ -78,20 +63,20 @@ public class RssFetcherService {
             final SyndFeed feed = downloadFeed(feedConfig.getUrl());
             final int newArticles = processFeedEntries(feed, feedConfig);
             log.info("Fetched {} new articles from {}",
-                    newArticles, feedConfig.getName());
+                newArticles, feedConfig.getName());
         } catch (Exception e) {
             log.error("Failed to fetch RSS feed from {}: {}",
-                    feedConfig.getName(), e.getMessage());
+                feedConfig.getName(), e.getMessage());
         }
     }
 
     private SyndFeed downloadFeed(String url) throws Exception {
         final HttpRequest request = HttpRequest.newBuilder(URI.create(url))
-                .timeout(Duration.ofSeconds(REQUEST_TIMEOUT_SECONDS))
-                .header("User-Agent", "IT-News-Aggregator/1.0")
-                .build();
+            .timeout(Duration.ofSeconds(REQUEST_TIMEOUT_SECONDS))
+            .header("User-Agent", "IT-News-Aggregator/1.0")
+            .build();
         final HttpResponse<InputStream> response = httpClient.send(
-                request, HttpResponse.BodyHandlers.ofInputStream()
+            request, HttpResponse.BodyHandlers.ofInputStream()
         );
         return new SyndFeedInput().build(new InputSource(response.body()));
     }
@@ -155,8 +140,8 @@ public class RssFetcherService {
             return LocalDateTime.now();
         }
         return date.toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDateTime();
+            .atZone(ZoneId.systemDefault())
+            .toLocalDateTime();
     }
 
 }
