@@ -45,7 +45,7 @@ public class ItNewsSchedulerConfig {
     }
 
     private void startCleanUpOldArticles() {
-        final LocalDateTime cutoff = LocalDateTime.now().minusMonths(1);
+        final LocalDateTime cutoff = LocalDateTime.now().minusWeeks(1);
         log.info("Cleaning up articles older than {}", cutoff);
         final int deleted = articleRepository.deleteArticlesOlderThan(cutoff);
         log.info("Deleted {} old articles", deleted);

@@ -97,7 +97,7 @@ public class RssFetcherService {
             return false;
         }
         final LocalDateTime publishedAt = toLocalDateTime(entry.getPublishedDate());
-        if (publishedAt.isBefore(LocalDateTime.now().minusMonths(1))) {
+        if (publishedAt.isBefore(LocalDateTime.now().minusWeeks(1))) {
             return false;
         }
         final Article article = buildArticle(entry, feedConfig);
