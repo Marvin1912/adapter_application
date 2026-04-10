@@ -51,12 +51,14 @@ public class DirectoryWatcher {
     /** Starts the watch service when the application is ready. */
     @EventListener(ApplicationReadyEvent.class)
     public void startUpWatchService() {
-        IS_RUNNING.set(true);
-        try {
-            watchDirectory();
-        } catch (Exception e) {
-            LOGGER.error("Error starting WatchService!", e);
-        }
+        new Thread(() -> {
+            IS_RUNNING.set(true);
+            try {
+                watchDirectory();
+            } catch (Exception e) {
+                LOGGER.error("Error starting WatchService!", e);
+            }
+        }).start();
     }
 
     /** Stops the watch service on application shutdown. */
