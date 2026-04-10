@@ -49,13 +49,15 @@ public class BackupDirectoryWatcher {
     /** Starts the watch service when the application is ready. */
     @EventListener(ApplicationReadyEvent.class)
     public void startWatchService() {
-        IS_RUNNING.set(true);
-        try {
-            ensureDirectoryExists();
-            watchDirectory();
-        } catch (Exception e) {
-            LOGGER.error("Error starting backup WatchService!", e);
-        }
+        new Thread(() -> {
+            IS_RUNNING.set(true);
+            try {
+                ensureDirectoryExists();
+                watchDirectory();
+            } catch (Exception e) {
+                LOGGER.error("Error starting backup WatchService!", e);
+            }
+        }).start();
     }
 
     /** Stops the watch service on application shutdown. */
